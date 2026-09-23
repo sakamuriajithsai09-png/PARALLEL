@@ -28,6 +28,11 @@
       "password": "mess123"
     },
     {
+      "adminId": "admin003",
+      "name": "Transport Administrator",
+      "password": "transport123"
+    },
+    {
       "adminId": "superadmin",
       "name": "System Administrator",
       "password": "parallel2026"
