@@ -355,7 +355,7 @@
         </main>
     </section>
 
-    <div id="assign-modal" class="modal-backdrop fixed inset-0 z-[110] hidden items-center justify-center p-4"><div class="card-glass w-full max-w-md border-brandAccent/30 p-6"><div class="flex items-center justify-between"><h2 class="display-font text-2xl text-white">UPGRADE STATUS</h2><button id="close-assign-modal" class="text-slate-400 hover:text-white">✕</button></div><p class="mt-2 text-xs text-slate-500">A valid proof note is required before the complaint can move forward.</p><form id="assign-form" class="mt-5 space-y-4"><select id="assign-status" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option value="IN_PROGRESS">Mark In Progress</option><option value="RESOLVED">Mark Resolved</option></select><select id="assign-staff" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Ramesh Kumar</option><option>Suresh V.</option><option>Anita Joseph</option><option>Rahul Menon</option></select><select id="assign-department" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Mess Department</option><option>Hostel Administration</option><option>IT Infrastructure</option></select><input id="assign-due-date" type="date" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><select id="assign-priority" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>HIGH</option><option selected>MEDIUM</option><option>LOW</option></select><textarea id="assign-proof" required minlength="10" rows="3" placeholder="Proof of work or resolution (minimum 10 characters)" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600"></textarea><button class="login-button w-full rounded-xl py-3 font-bold text-slate-950">Verify Proof &amp; Upgrade Status</button></form></div></div>
+    <div id="assign-modal" class="modal-backdrop fixed inset-0 z-[110] hidden items-center justify-center p-4"><div class="card-glass w-full max-w-md border-brandAccent/30 p-6"><div class="flex items-center justify-between"><h2 class="display-font text-2xl text-white">UPGRADE STATUS</h2><button id="close-assign-modal" class="text-slate-400 hover:text-white">✕</button></div><p class="mt-2 text-xs text-slate-500">A valid proof note is required before the complaint can move forward.</p><form id="assign-form" class="mt-5 space-y-4"><select id="assign-status" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option value="IN_PROGRESS">Mark In Progress</option><option value="RESOLVED">Mark Resolved</option></select><select id="assign-staff" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Ramesh Kumar</option><option>Suresh V.</option><option>Anita Joseph</option><option>Rahul Menon</option></select><select id="assign-department" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Mess Department</option><option>Hostel Administration</option><option>IT Infrastructure</option></select><input id="assign-due-date" type="date" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><select id="assign-priority" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>HIGH</option><option selected>MEDIUM</option><option>LOW</option></select><textarea id="assign-proof" required minlength="10" rows="3" placeholder="Proof of work or resolution (minimum 10 characters)" class="login-input w-full rounded-xl py-3 px-4 text-sm text-white placeholder-slate-600"></textarea><div id="assign-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-4 py-3 text-xs font-semibold text-red-300" role="alert"></div><button class="login-button w-full rounded-xl py-3 font-bold text-slate-950">Verify Proof &amp; Upgrade Status</button></form></div></div>
 
     <!-- NAVIGATION BAR -->
     <header class="sticky top-0 z-40 border-b border-white/10 bg-brandBg/90 backdrop-blur-md">
@@ -1269,6 +1269,8 @@
         document.getElementById('assign-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!adminSelectedComplaint) return;
+            const assignMessage = document.getElementById('assign-message');
+            assignMessage.classList.add('hidden');
             try {
                 const status = document.getElementById('assign-status').value;
                 const proof = document.getElementById('assign-proof').value.trim();
@@ -1276,7 +1278,7 @@
                 const response = await fetch(`/api/complaints/${adminSelectedComplaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, proof, staff: document.getElementById('assign-staff').value, department: document.getElementById('assign-department').value, priority: document.getElementById('assign-priority').value, dueDate: document.getElementById('assign-due-date').value }) });
                 if (!response.ok) {
                     const result = await response.json().catch(() => ({}));
-                    throw new Error(result.error || 'Unable to upgrade complaint');
+                    throw new Error(result.error || `Unable to upgrade complaint (HTTP ${response.status})`);
                 }
                 adminSelectedComplaint.status = status;
                 adminSelectedComplaint.proof = proof;
@@ -1285,7 +1287,10 @@
                 adminSelectedComplaint.priority = document.getElementById('assign-priority').value;
                 document.getElementById('assign-modal').classList.add('hidden');
                 renderAdminDashboard();
-            } catch (error) { alert(error.message); }
+            } catch (error) {
+                assignMessage.innerText = error.message;
+                assignMessage.classList.remove('hidden');
+            }
         });
 
         function openAssignModal(complaintId) {
