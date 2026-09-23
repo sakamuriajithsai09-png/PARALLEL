@@ -996,8 +996,11 @@
 
         function saveSession(role, account, remember) {
             const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            const otherKey = role === 'student' ? 'parallelAdminSession' : 'parallelStudentSession';
             localStorage.removeItem(key);
             sessionStorage.removeItem(key);
+            localStorage.removeItem(otherKey);
+            sessionStorage.removeItem(otherKey);
             (remember ? localStorage : sessionStorage).setItem(key, JSON.stringify(account));
         }
 
@@ -1041,6 +1044,7 @@
             try {
                 const account = await authenticate('student', studentId, password);
                 saveSession('student', account, studentRememberMe.checked);
+                document.getElementById('admin-dashboard').classList.add('hidden');
                 document.getElementById('logged-in-student-name').innerText = `Welcome, ${account.name}`;
                 document.getElementById('logged-in-student-id').innerText = account.identifier;
                 showLoginMessage(studentLoginMessage, 'Login Successful! Redirecting to Student Dashboard...', 'success');
@@ -1076,6 +1080,7 @@
             try {
                 const account = await authenticate('admin', enteredId, password);
                 saveSession('admin', account, document.getElementById('admin-remember-me').checked);
+                document.body.classList.add('overflow-hidden');
                 document.getElementById('logged-in-admin-name').innerText = `Welcome, ${account.name}`;
                 localStorage.setItem('parallelAdminLastLogin', new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
                 renderAdminSecurityStatus();
@@ -1112,16 +1117,18 @@
         });
 
         const studentSession = getStoredSession('student');
-        if (studentSession) {
+        const adminSession = getStoredSession('admin');
+        const activeSession = selectedRole === 'admin' ? adminSession : selectedRole === 'student' ? studentSession : adminSession || studentSession;
+        if (activeSession && activeSession.role === 'student') {
             document.getElementById('logged-in-student-name').innerText = `Welcome, ${studentSession.name}`;
             document.getElementById('logged-in-student-id').innerText = studentSession.identifier;
             loginPage.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-        const adminSession = getStoredSession('admin');
-        if (adminSession) {
+        if (activeSession && activeSession.role === 'admin') {
             document.getElementById('logged-in-admin-name').innerText = `Welcome, ${adminSession.name}`;
             loginPage.classList.add('hidden');
+            document.body.classList.add('overflow-hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
             renderAdminDashboard();
         }
