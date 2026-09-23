@@ -112,7 +112,26 @@ app.put("/api/complaints/:id", (req, res) => {
     return res.status(404).json({ error: "Complaint not found" });
   }
 
-  if (req.body.status) complaint.status = req.body.status;
+  if (req.body.status) {
+    const statuses = { PENDING: 0, IN_PROGRESS: 1, RESOLVED: 2 };
+    const nextStatus = String(req.body.status).toUpperCase().replace(" ", "_");
+    const currentStatus = String(complaint.status || "PENDING").toUpperCase().replace(" ", "_");
+    const proof = typeof req.body.proof === "string" ? req.body.proof.trim() : "";
+
+    if (!Object.prototype.hasOwnProperty.call(statuses, nextStatus)) {
+      return res.status(400).json({ error: "Invalid complaint status" });
+    }
+    if (statuses[nextStatus] <= (statuses[currentStatus] ?? 0)) {
+      return res.status(400).json({ error: "Status can only be upgraded" });
+    }
+    if (proof.length < 10) {
+      return res.status(400).json({ error: "Valid proof is required to upgrade the complaint status." });
+    }
+
+    complaint.status = nextStatus;
+    complaint.proof = proof;
+    complaint.proofAt = new Date().toISOString();
+  }
   if (req.body.rating !== undefined) complaint.rating = req.body.rating;
   if (req.body.staff) complaint.staff = req.body.staff;
   if (req.body.department) complaint.department = req.body.department;

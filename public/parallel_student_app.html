@@ -355,7 +355,7 @@
         </main>
     </section>
 
-    <div id="assign-modal" class="modal-backdrop fixed inset-0 z-[110] hidden items-center justify-center p-4"><div class="card-glass w-full max-w-md border-brandAccent/30 p-6"><div class="flex items-center justify-between"><h2 class="display-font text-2xl text-white">ASSIGN STAFF</h2><button id="close-assign-modal" class="text-slate-400 hover:text-white">✕</button></div><form id="assign-form" class="mt-5 space-y-4"><select id="assign-staff" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Ramesh Kumar</option><option>Suresh V.</option><option>Anita Joseph</option><option>Rahul Menon</option></select><select id="assign-department" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Mess Department</option><option>Hostel Administration</option><option>IT Infrastructure</option><option>Electrical Maintenance</option></select><input id="assign-due-date" type="date" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><select id="assign-priority" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>HIGH</option><option selected>MEDIUM</option><option>LOW</option></select><button class="login-button w-full rounded-xl py-3 font-bold text-slate-950">Assign Complaint</button></form></div></div>
+    <div id="assign-modal" class="modal-backdrop fixed inset-0 z-[110] hidden items-center justify-center p-4"><div class="card-glass w-full max-w-md border-brandAccent/30 p-6"><div class="flex items-center justify-between"><h2 class="display-font text-2xl text-white">UPGRADE STATUS</h2><button id="close-assign-modal" class="text-slate-400 hover:text-white">✕</button></div><p class="mt-2 text-xs text-slate-500">A valid proof note is required before the complaint can move forward.</p><form id="assign-form" class="mt-5 space-y-4"><select id="assign-status" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option value="IN_PROGRESS">Mark In Progress</option><option value="RESOLVED">Mark Resolved</option></select><select id="assign-staff" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Ramesh Kumar</option><option>Suresh V.</option><option>Anita Joseph</option><option>Rahul Menon</option></select><select id="assign-department" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>Mess Department</option><option>Hostel Administration</option><option>IT Infrastructure</option></select><input id="assign-due-date" type="date" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><select id="assign-priority" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white"><option>HIGH</option><option selected>MEDIUM</option><option>LOW</option></select><textarea id="assign-proof" required minlength="10" rows="3" placeholder="Proof of work or resolution (minimum 10 characters)" class="login-input w-full rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600"></textarea><button class="login-button w-full rounded-xl py-3 font-bold text-slate-950">Verify Proof &amp; Upgrade Status</button></form></div></div>
 
     <!-- NAVIGATION BAR -->
     <header class="sticky top-0 z-40 border-b border-white/10 bg-brandBg/90 backdrop-blur-md">
@@ -1225,7 +1225,7 @@
             document.getElementById('admin-page-info').innerText = `Page ${adminPage} of ${pageCount} · ${filtered.length} records`;
             document.getElementById('admin-prev').disabled = adminPage === 1;
             document.getElementById('admin-next').disabled = adminPage === pageCount;
-            document.getElementById('admin-complaints').innerHTML = visible.length ? visible.map((complaint) => `<tr class="transition hover:bg-white/[.03]"><td class="px-5 py-4"><button data-complaint-id="${complaint.id}" class="font-mono font-bold text-brandAccent hover:text-white">${complaint.id}</button></td><td class="px-3 py-4 text-slate-300">${complaint.studentId || '—'}</td><td class="px-3 py-4 text-white">${complaint.name || '—'}</td><td class="px-3 py-4">${complaint.category}</td><td class="px-3 py-4">${adminBadge(complaint.priority, 'priority')}</td><td class="px-3 py-4 text-slate-400">${complaint.location}</td><td class="px-3 py-4">${adminBadge(complaint.status, 'status')}</td><td class="px-3 py-4 text-slate-400">${complaint.staff}</td><td class="px-3 py-4 text-[10px] text-slate-500">${complaint.time}</td><td class="px-3 py-4"><button data-assign-id="${complaint.id}" class="rounded-lg border border-brandAccent/30 px-2 py-1 text-[10px] font-bold text-brandAccent hover:bg-brandAccent/10">Assign</button></td></tr>`).join('') : '<tr><td colspan="10" class="p-10 text-center text-sm text-slate-500">No complaints match these filters.</td></tr>';
+            document.getElementById('admin-complaints').innerHTML = visible.length ? visible.map((complaint) => `<tr class="transition hover:bg-white/[.03]"><td class="px-5 py-4"><button data-complaint-id="${complaint.id}" class="font-mono font-bold text-brandAccent hover:text-white">${complaint.id}</button></td><td class="px-3 py-4 text-slate-300">${complaint.studentId || '—'}</td><td class="px-3 py-4 text-white">${complaint.name || '—'}</td><td class="px-3 py-4">${complaint.category}</td><td class="px-3 py-4">${adminBadge(complaint.priority, 'priority')}</td><td class="px-3 py-4 text-slate-400">${complaint.location}</td><td class="px-3 py-4">${adminBadge(complaint.status, 'status')}</td><td class="px-3 py-4 text-slate-400">${complaint.staff}</td><td class="px-3 py-4 text-[10px] text-slate-500">${complaint.time}</td><td class="px-3 py-4"><button data-assign-id="${complaint.id}" ${complaint.status === 'RESOLVED' ? 'disabled' : ''} class="rounded-lg border border-brandAccent/30 px-2 py-1 text-[10px] font-bold text-brandAccent hover:bg-brandAccent/10 disabled:cursor-not-allowed disabled:opacity-40">${complaint.proof ? 'Upgrade' : 'Add Proof'}</button></td></tr>`).join('') : '<tr><td colspan="10" class="p-10 text-center text-sm text-slate-500">No complaints match these filters.</td></tr>';
             document.querySelectorAll('[data-complaint-id]').forEach((button) => button.addEventListener('click', () => selectAdminComplaint(button.dataset.complaintId)));
             document.querySelectorAll('[data-assign-id]').forEach((button) => button.addEventListener('click', () => openAssignModal(button.dataset.assignId)));
         }
@@ -1239,9 +1239,12 @@
         }
 
         async function updateComplaintStatus(complaint, status) {
-            const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+            const proof = window.prompt('Enter proof before upgrading this complaint (minimum 10 characters):', '');
+            if (!proof || proof.trim().length < 10) throw new Error('Valid proof is required to upgrade the complaint status.');
+            const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, proof: proof.trim() }) });
             if (!response.ok) throw new Error('Unable to update complaint');
             complaint.status = status;
+            complaint.proof = proof.trim();
             renderAdminDashboard();
         }
 
@@ -1267,9 +1270,16 @@
             event.preventDefault();
             if (!adminSelectedComplaint) return;
             try {
-                const response = await fetch(`/api/complaints/${adminSelectedComplaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'IN_PROGRESS', staff: document.getElementById('assign-staff').value, department: document.getElementById('assign-department').value, priority: document.getElementById('assign-priority').value, dueDate: document.getElementById('assign-due-date').value }) });
-                if (!response.ok) throw new Error('Unable to assign complaint');
-                adminSelectedComplaint.status = 'IN_PROGRESS';
+                const status = document.getElementById('assign-status').value;
+                const proof = document.getElementById('assign-proof').value.trim();
+                if (proof.length < 10) throw new Error('Valid proof is required to upgrade the complaint status.');
+                const response = await fetch(`/api/complaints/${adminSelectedComplaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, proof, staff: document.getElementById('assign-staff').value, department: document.getElementById('assign-department').value, priority: document.getElementById('assign-priority').value, dueDate: document.getElementById('assign-due-date').value }) });
+                if (!response.ok) {
+                    const result = await response.json().catch(() => ({}));
+                    throw new Error(result.error || 'Unable to upgrade complaint');
+                }
+                adminSelectedComplaint.status = status;
+                adminSelectedComplaint.proof = proof;
                 adminSelectedComplaint.staff = document.getElementById('assign-staff').value;
                 adminSelectedComplaint.department = document.getElementById('assign-department').value;
                 adminSelectedComplaint.priority = document.getElementById('assign-priority').value;
@@ -1306,6 +1316,7 @@
                 priority: complaint.priority || 'MEDIUM',
                 department: complaint.department || 'General Maintenance',
                 staff: complaint.staff || 'Pending Assignment',
+                proof: complaint.proof || '',
                 rawCreatedAt: complaint.createdAt,
                 time: complaint.createdAt ? new Date(complaint.createdAt).toLocaleString() : 'Just now',
                 backendId: complaint.id
