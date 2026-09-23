@@ -140,6 +140,7 @@ app.put("/api/complaints/:id", (req, res) => {
 
     complaint.status = nextStatus;
     complaint.proof = proof;
+    complaint.proofFile = typeof req.body.proofFile === "string" ? req.body.proofFile.trim() : "";
     complaint.proofAt = new Date().toISOString();
   }
   if (req.body.rating !== undefined) complaint.rating = req.body.rating;

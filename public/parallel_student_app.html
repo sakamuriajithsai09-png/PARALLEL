@@ -348,10 +348,14 @@
             <section id="admin-complaint-detail-draft" class="hidden">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4"><div><p class="text-xs font-bold uppercase tracking-[.2em] text-brandAccent2">Complaint command view</p><h2 class="display-font mt-1 text-2xl text-white">Complaint <span id="draft-complaint-id" class="text-brandAccent">#---</span></h2></div><button id="draft-back-button" class="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-300 hover:border-brandAccent hover:text-white">Back to queue</button></div>
                 <div class="mt-5 grid gap-5 xl:grid-cols-[1.1fr_1fr_1fr]">
-                    <div class="rounded-xl border border-brandAccent/20 bg-black/20 p-5"><div class="flex items-start gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-xl border border-brandAccent/40 bg-brandAccent/10 text-xl">🍴</div><div><h3 id="detail-category" class="font-bold text-white">Complaint</h3><p id="detail-description" class="mt-1 text-xs leading-relaxed text-slate-400">Select a complaint from the queue to inspect it.</p></div></div><dl class="mt-5 space-y-3 border-t border-white/10 pt-4 text-xs"><div class="flex justify-between gap-3"><dt class="text-slate-500">Student ID</dt><dd id="detail-student-id" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Student Name</dt><dd id="detail-student-name" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Location</dt><dd id="detail-location" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Submitted</dt><dd id="detail-created" class="font-bold text-white">—</dd></div></dl></div>
-                    <div class="rounded-xl border border-brandAccent2/20 bg-black/20 p-5"><h3 class="font-bold text-white">Status &amp; Progress</h3><div id="detail-timeline" class="mt-5 space-y-4 border-l border-brandAccent/50 pl-4 text-xs"></div></div>
-                    <div class="rounded-xl border border-brandAccent2/20 bg-black/20 p-5"><h3 class="font-bold text-white">Current Action</h3><label class="mt-4 block text-[10px] font-bold uppercase tracking-wider text-brandAccent2">Update status</label><select id="detail-status" class="login-input mt-2 w-full rounded-lg px-3 py-3 text-sm text-white"><option value="IN_PROGRESS">In Progress</option><option value="RESOLVED">Resolved</option></select><label class="mt-4 block text-[10px] font-bold uppercase tracking-wider text-brandAccent2">Proof of work</label><input id="detail-proof-file" type="file" accept="image/*,.pdf" class="mt-2 w-full rounded-lg border border-dashed border-brandAccent2/50 bg-black/20 p-3 text-xs text-slate-400"><textarea id="detail-proof" rows="3" minlength="10" placeholder="Describe the work completed (minimum 10 characters)" class="login-input mt-3 w-full rounded-lg px-3 py-3 text-xs text-white placeholder-slate-600"></textarea><div id="detail-message" class="mt-3 hidden rounded-lg border border-red-400/30 bg-red-950/20 px-3 py-2 text-xs text-red-300"></div><button id="detail-update-button" class="login-button mt-3 w-full rounded-lg py-3 text-sm font-bold text-slate-950">Verify Proof &amp; Update</button></div>
+                    <div class="rounded-xl border border-brandAccent/20 bg-black/20 p-5"><div class="flex items-start gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-xl border border-brandAccent/40 bg-brandAccent/10 text-xl">🍴</div><div><h3 id="draft-category" class="font-bold text-white">Complaint</h3><p id="draft-description" class="mt-1 text-xs leading-relaxed text-slate-400">Select a complaint from the queue to inspect it.</p></div></div><dl class="mt-5 space-y-3 border-t border-white/10 pt-4 text-xs"><div class="flex justify-between gap-3"><dt class="text-slate-500">Student ID</dt><dd id="draft-student-id" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Student Name</dt><dd id="draft-student-name" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Location</dt><dd id="draft-location" class="font-bold text-white">—</dd></div><div class="flex justify-between gap-3"><dt class="text-slate-500">Submitted</dt><dd id="draft-created" class="font-bold text-white">—</dd></div></dl></div>
+                    <div class="rounded-xl border border-brandAccent2/20 bg-black/20 p-5"><h3 class="font-bold text-white">Status &amp; Progress</h3><div id="draft-timeline" class="mt-5 space-y-4 border-l border-brandAccent/50 pl-4 text-xs"></div></div>
+                    <div class="rounded-xl border border-brandAccent2/20 bg-black/20 p-5"><h3 class="font-bold text-white">Current Action</h3><label class="mt-4 block text-[10px] font-bold uppercase tracking-wider text-brandAccent2">Update status</label><select id="draft-status" class="login-input mt-2 w-full rounded-lg px-3 py-3 text-sm text-white"><option value="IN_PROGRESS">In Progress</option><option value="RESOLVED">Resolved</option></select><label class="mt-4 block text-[10px] font-bold uppercase tracking-wider text-brandAccent2">Proof of work</label><input id="draft-proof-file" type="file" accept="image/*,.pdf" class="login-input mt-2 w-full rounded-lg border border-dashed border-brandAccent2/50 bg-black/20 p-3 text-xs text-slate-400"><textarea id="draft-proof" rows="3" minlength="10" placeholder="Describe the work completed (minimum 10 characters)" class="login-input mt-3 w-full rounded-lg py-3 px-4 text-xs text-white placeholder-slate-600"></textarea><div id="draft-message" class="mt-3 hidden rounded-lg border border-red-400/30 bg-red-950/20 px-3 py-2 text-xs text-red-300"></div><button id="draft-update-button" class="login-button mt-3 w-full rounded-lg py-3 text-sm font-bold text-slate-950">Verify Proof &amp; Update</button></div>
                 </div>
+            </section>
+            <section id="detail-workflow-support" class="hidden grid gap-5 lg:grid-cols-2">
+                <div class="dashboard-glass rounded-2xl border border-brandAccent2/25 p-5"><div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.18em] text-brandAccent2">Staff Work Progress</p><h3 id="detail-staff-name" class="mt-2 text-lg font-bold text-white">Pending Assignment</h3></div><span id="detail-work-status" class="rounded-full border border-brandGold/30 bg-brandGold/10 px-3 py-1 text-[10px] font-bold text-brandGold">PENDING</span></div><div class="mt-4 flex items-center justify-between text-xs text-slate-400"><span id="detail-department">General Maintenance</span><span id="detail-work-progress">0% started</span></div><div class="mt-2 h-2 overflow-hidden rounded-full bg-white/10"><div id="detail-work-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-brandAccent2 to-brandAccent transition-all"></div></div><button id="detail-start-work" class="login-button mt-5 w-full rounded-lg py-3 text-sm font-bold text-slate-950">Start Work</button></div>
+                <div id="detail-notification-card" class="dashboard-glass hidden rounded-2xl border border-brandAccent/30 p-5"><div class="flex items-start gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brandAccent/10 text-xl">🔔</span><div><p class="text-xs font-bold uppercase tracking-[.18em] text-brandAccent">Student Notification Sent</p><h3 class="mt-2 font-bold text-white">Resolution update delivered</h3><p class="mt-2 text-xs leading-relaxed text-slate-400">Your complaint has been resolved. Please review the uploaded proof and provide feedback.</p><p class="mt-3 text-[10px] text-slate-500">Complaint <b id="detail-notification-id" class="text-brandAccent">#--</b> · <span id="detail-resolution-time">--</span></p><p id="detail-proof-name" class="mt-1 text-[10px] text-brandAccent2">Proof attached</p></div></div></div>
             </section>
             <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_330px]">
                 <section class="card-glass overflow-hidden"><div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 p-5"><div><h2 class="font-bold text-white">Smart Complaint Management</h2><p class="mt-1 text-xs text-slate-500">Review, assign, and update the campus queue.</p></div><button id="admin-refresh" class="rounded-lg border border-brandAccent/30 px-3 py-2 text-xs font-bold text-brandAccent hover:bg-brandAccent/10">↻ Refresh</button></div>
@@ -1267,6 +1271,31 @@
             panel.classList.remove('hidden');
             panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
             panel.dataset.complaintId = complaint.id;
+            const proofNotes = panel.querySelector('#detail-proof');
+            if (!panel.querySelector('#detail-proof-file')) {
+                proofNotes.insertAdjacentHTML('beforebegin', '<label class="mt-4 block text-xs font-bold text-brandAccent2">Upload Resolution Proof <span class="text-slate-500">(JPG, PNG, PDF)</span></label><input id="detail-proof-file" type="file" accept="image/jpeg,image/png,application/pdf" class="login-input mt-2 w-full rounded-lg border border-dashed border-brandAccent2/50 bg-black/20 p-3 text-xs text-slate-400"><p id="detail-file-preview" class="mt-2 hidden text-[10px] text-brandAccent2"></p><span id="detail-proof-verified" class="mt-2 hidden rounded-full border border-brandAccent/30 bg-brandAccent/10 px-2 py-1 text-[10px] font-bold text-brandAccent">✓ Proof Verified</span>');
+                panel.querySelector('#detail-proof-file').addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    const preview = panel.querySelector('#detail-file-preview');
+                    const verified = panel.querySelector('#detail-proof-verified');
+                    panel.dataset.proofFile = file ? file.name : '';
+                    preview.innerText = file ? `Selected: ${file.name}` : '';
+                    preview.classList.toggle('hidden', !file);
+                    verified.classList.add('hidden');
+                });
+            }
+            const workflowSupport = document.getElementById('detail-workflow-support');
+            workflowSupport.classList.remove('hidden');
+            workflowSupport.querySelector('#detail-staff-name').innerText = complaint.staff || 'Pending Assignment';
+            workflowSupport.querySelector('#detail-department').innerText = complaint.department || 'General Maintenance';
+            workflowSupport.querySelector('#detail-work-status').innerText = complaint.status === 'PENDING' ? 'PENDING' : 'IN PROGRESS';
+            workflowSupport.querySelector('#detail-work-progress').innerText = complaint.status === 'PENDING' ? '0% started' : complaint.status === 'RESOLVED' ? '100% complete' : '55% started';
+            workflowSupport.querySelector('#detail-work-bar').style.width = complaint.status === 'PENDING' ? '0%' : complaint.status === 'RESOLVED' ? '100%' : '55%';
+            workflowSupport.querySelector('#detail-start-work').disabled = complaint.status !== 'PENDING';
+            workflowSupport.querySelector('#detail-notification-card').classList.toggle('hidden', complaint.status !== 'RESOLVED');
+            workflowSupport.querySelector('#detail-notification-id').innerText = complaint.id;
+            workflowSupport.querySelector('#detail-resolution-time').innerText = complaint.proofAt ? new Date(complaint.proofAt).toLocaleString() : 'Just now';
+            workflowSupport.querySelector('#detail-proof-name').innerText = complaint.proofFile ? `Proof attached: ${complaint.proofFile}` : 'Proof notes verified';
         }
 
         const complaintDetailPanel = document.getElementById('complaint-detail-panel');
@@ -1274,18 +1303,34 @@
         complaintDetailPanel.querySelector('#detail-update-button').addEventListener('click', async () => {
             const panel = complaintDetailPanel;
             const complaint = sampleComplaints.find((item) => item.id === panel.dataset.complaintId);
-            const proof = panel.querySelector('#detail-proof').value.trim();
+            const proofNotes = panel.querySelector('#detail-proof').value.trim();
+            const proofFile = panel.dataset.proofFile || '';
+            const status = panel.querySelector('#detail-status').value;
             const message = panel.querySelector('#detail-message');
-            if (!complaint || proof.length < 10) { message.innerText = 'Valid proof is required (minimum 10 characters).'; message.classList.remove('hidden'); return; }
+            if (!complaint || proofNotes.length < 10 || (status === 'RESOLVED' && !proofFile)) { message.innerText = status === 'RESOLVED' && !proofFile ? 'Please upload valid proof before resolving this complaint.' : 'Valid proof is required (minimum 10 characters).'; message.classList.remove('hidden'); return; }
             try {
-                const status = panel.querySelector('#detail-status').value;
-                const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, proof }) });
+                const proof = proofFile ? `${proofNotes} [Proof file: ${proofFile}]` : proofNotes;
+                const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, proof, proofFile }) });
                 if (!response.ok) { const result = await response.json().catch(() => ({})); throw new Error(result.error || `Update failed (HTTP ${response.status})`); }
                 complaint.status = status;
                 complaint.proof = proof;
+                complaint.proofFile = proofFile;
+                complaint.proofAt = new Date().toISOString();
+                panel.querySelector('#detail-proof-verified')?.classList.remove('hidden');
                 selectAdminComplaint(complaint.id);
                 renderAdminDashboard();
             } catch (error) { message.innerText = error.message; message.classList.remove('hidden'); }
+        });
+
+        document.getElementById('detail-workflow-support').querySelector('#detail-start-work').addEventListener('click', () => {
+            const panel = document.getElementById('complaint-detail-panel');
+            const complaint = sampleComplaints.find((item) => item.id === panel.dataset.complaintId);
+            if (!complaint) return;
+            panel.querySelector('#detail-status').value = 'IN_PROGRESS';
+            panel.querySelector('#detail-proof').focus();
+            document.getElementById('detail-work-status').innerText = 'IN PROGRESS';
+            document.getElementById('detail-work-progress').innerText = '55% started';
+            document.getElementById('detail-work-bar').style.width = '55%';
         });
 
         async function updateComplaintStatus(complaint, status) {
@@ -1372,6 +1417,7 @@
                 department: complaint.department || 'General Maintenance',
                 staff: complaint.staff || 'Pending Assignment',
                 proof: complaint.proof || '',
+                proofFile: complaint.proofFile || '',
                 rawCreatedAt: complaint.createdAt,
                 time: complaint.createdAt ? new Date(complaint.createdAt).toLocaleString() : 'Just now',
                 backendId: complaint.id
