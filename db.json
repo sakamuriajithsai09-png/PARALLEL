@@ -1,0 +1,19 @@
+{
+  "complaints": [
+    {
+      "id": 1000,
+      "studentId": "2600040101",
+      "name": "Abhiram R.",
+      "category": "Hostel",
+      "location": "Hostel Mess 2",
+      "description": "d",
+      "subissue": "Room Maintenance",
+      "priority": "MEDIUM",
+      "department": "Hostel Administration",
+      "status": "IN_PROGRESS",
+      "createdAt": "2026-09-23T02:09:36.679Z",
+      "staff": "Suresh V."
+    }
+  ],
+  "nextId": 1001
+}
