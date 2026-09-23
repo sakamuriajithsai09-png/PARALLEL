@@ -9,7 +9,7 @@ const path = require("path");
 const app = express();
 const PORT = 5000;
 const DB_FILE = path.join(__dirname, "db.json");
-const PUBLIC_DIR = process.env.PUBLIC_DIR || path.resolve(__dirname, "../../Downloads/public");
+const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(__dirname, "public");
 
 app.use(cors());
 app.use(express.json());
@@ -99,6 +99,10 @@ app.put("/api/complaints/:id", (req, res) => {
   res.json(complaint);
 });
 
-app.listen(PORT, () =>
-  console.log(`PARALLEL server running on http://localhost:${PORT}`)
-);
+if (require.main === module) {
+  app.listen(PORT, () =>
+    console.log(`PARALLEL server running on http://localhost:${PORT}`)
+  );
+}
+
+module.exports = app;

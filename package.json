@@ -4,10 +4,7 @@
   "description": "PARALLEL — Smart Campus Complaint & Issue Management System",
   "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "node server.js",
     "server": "node server.js"
   },
   "dependencies": {

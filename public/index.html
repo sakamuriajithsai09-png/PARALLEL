@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PARALLEL — Smart Campus Complaint & Issue Management System</title>
+<meta name="description" content="One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#11161f; --accent:#00e676; --accent2:#00b0ff; --gold:#ffc400;
+  }
+  *{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:#e8edf3; font-family:'Inter',system-ui,sans-serif; }
+  .display{ font-family:'Anton','Inter',sans-serif; letter-spacing:.02em; }
+  .glow{ text-shadow:0 0 30px rgba(0,230,118,.45); }
+  .grad-text{ background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .card{ background:var(--panel); border:1px solid rgba(255,255,255,.07); border-radius:1.25rem; transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+  .card:hover{ transform:translateY(-6px); border-color:rgba(0,230,118,.4); box-shadow:0 20px 50px rgba(0,230,118,.12); }
+  .step-num{ font-family:'Anton'; font-size:3rem; color:transparent; -webkit-text-stroke:1.5px var(--accent); }
+  .chip{ border:1px solid rgba(0,230,118,.35); color:var(--accent); }
+  .marquee{ display:flex; gap:3rem; white-space:nowrap; animation:scroll 22s linear infinite; }
+  @keyframes scroll{ to{ transform:translateX(-50%);} }
+  .status-pending{ background:#4a3b00; color:var(--gold); }
+  .status-progress{ background:#0d3a5c; color:var(--accent2); }
+  .status-resolved{ background:#0d4d2b; color:var(--accent); }
+  .bar{ background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+  ::-webkit-scrollbar{ width:10px; } ::-webkit-scrollbar-thumb{ background:#1e2632; border-radius:8px; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:.5rem; }
+  @media (prefers-reduced-motion: reduce){
+    .marquee{ animation:none; }
+    .card{ transition:none; }
+    .card:hover{ transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#0a0e14cc] border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2">
+      <span class="display text-2xl tracking-wide">PARALLEL<span class="text-[--accent]">.</span></span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm text-white/70">
+      <a href="#problem" class="hover:text-white">Problem</a>
+      <a href="#workflow" class="hover:text-white">Workflow</a>
+      <a href="#flow" class="hover:text-white">End-to-End</a>
+      <a href="#team" class="hover:text-white">Team</a>
+      <a class="text-[--accent] hover:text-white" href="parallel_student_app.html?role=student">Student Login</a>
+      <a class="text-[--accent2] hover:text-white" href="parallel_student_app.html?role=admin">Admin Login</a>
+    </div>
+    <a class="bg-[--accent] text-black font-bold text-sm px-5 py-2.5 rounded-full hover:opacity-90" href="parallel_student_app.html?role=student">Launch Student Login</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header id="top" class="relative pt-40 pb-24 overflow-hidden">
+  <div class="absolute inset-0 opacity-[0.07]" style="background:radial-gradient(circle at 70% 30%, #00e676, transparent 40%), radial-gradient(circle at 20% 80%, #00b0ff, transparent 40%);"></div>
+  <div class="max-w-7xl mx-auto px-6 relative">
+    <p class="text-[--accent] font-bold tracking-[.3em] text-sm mb-4">PARALLEL TEAM · PROJECT PRESENTATION</p>
+    <h1 class="display text-5xl md:text-8xl leading-[0.95] uppercase">
+      Smart Campus<br><span class="grad-text glow">Complaint &amp;</span><br>Issue Management
+    </h1>
+    <p class="mt-6 max-w-2xl text-white/60 text-lg">One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.</p>
+    <div class="mt-10 flex flex-wrap gap-4">
+      <a class="bg-[--accent] text-black font-bold px-8 py-4 rounded-full" href="parallel_student_app.html?role=student">Student Login</a>
+      <a class="border border-brandAccent2/50 text-brandAccent2 px-8 py-4 rounded-full hover:bg-brandAccent2/10" href="parallel_student_app.html?role=admin">Admin Login</a>
+      <a href="#problem" class="border border-white/20 px-8 py-4 rounded-full hover:bg-white/5">Why This Project?</a>
+    </div>
+    <div class="mt-14 grid grid-cols-3 gap-6 max-w-lg">
+      <div><div class="display text-4xl text-[--accent]">13</div><div class="text-xs text-white/50 mt-1">WORKFLOW STEPS</div></div>
+      <div><div class="display text-4xl text-[--accent2]">100%</div><div class="text-xs text-white/50 mt-1">TRACKABLE</div></div>
+      <div><div class="display text-4xl text-[--gold]">AI</div><div class="text-xs text-white/50 mt-1">CLASSIFIED &amp; ROUTED</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="border-y border-white/10 py-4 overflow-hidden bg-[#0d1219]" aria-hidden="true">
+  <div class="marquee display text-xl uppercase text-white/40">
+    <span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span><span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span>
+    <span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span><span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span>
+  </div>
+</div>
+
+<!-- PROBLEM / ANSWER -->
+<section id="problem" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Problem <span class="grad-text">→</span> Answer</h2>
+    <p class="text-white/50 mb-12">Why this project?</p>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="card p-8">
+        <h3 class="display text-2xl text-red-400 uppercase mb-6">✕ The Problem</h3>
+        <ul class="space-y-4 text-white/75">
+          <li class="flex gap-3"><span class="text-red-400">•</span> Students may not know where to report campus issues.</li>
+          <li class="flex gap-3"><span class="text-red-400">•</span> Complaints can be delayed, misplaced, or hard to track.</li>
+          <li class="flex gap-3"><span class="text-red-400">•</span> Manual routing to the correct department takes time.</li>
+          <li class="flex gap-3"><span class="text-red-400">•</span> Students receive little visibility after submitting.</li>
+        </ul>
+      </div>
+      <div class="card p-8 border-[rgba(0,230,118,.3)]">
+        <h3 class="display text-2xl text-[--accent] uppercase mb-6">✓ Our Answer</h3>
+        <ul class="space-y-4 text-white/75">
+          <li class="flex gap-3"><span class="text-[--accent]">•</span> One digital platform for complaints across campus.</li>
+          <li class="flex gap-3"><span class="text-[--accent]">•</span> AI classifies the issue, priority, and department.</li>
+          <li class="flex gap-3"><span class="text-[--accent]">•</span> Admin assigns staff and tracks resolution status.</li>
+          <li class="flex gap-3"><span class="text-[--accent]">•</span> Notifications, feedback, and analytics close the loop.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="mt-8 text-center display text-xl uppercase text-white/50">A transparent complaint-to-resolution cycle</p>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow" class="py-24 bg-[#0d1219]">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Smart Campus <span class="grad-text">Workflow</span></h2>
+    <p class="text-white/50 mb-14">13 steps — from opening the app to AI analytics.</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <div class="card p-7 relative"><div class="step-num">01</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Open the App</h3>
+        <p class="text-white/60 text-sm">Login with student credentials or register as a new user. A simple entry point for all campus issues.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Goal: easy to start</span></div>
+
+      <div class="card p-7"><div class="step-num">02</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Dashboard</h3>
+        <p class="text-white/60 text-sm">Welcome message, profile access, existing complaints and notifications — with a "New Complaint" button front and center.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Goal: everything in one place</span></div>
+
+      <div class="card p-7"><div class="step-num">03</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Select Complaint Type</h3>
+        <p class="text-white/60 text-sm">Choose the campus area: College, Hostel, Mess, Transport, Wi-Fi, Electricity, Water — or Cleaning, Maintenance, Security, Other. E.g. <b class="text-white">"Mess"</b>.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Narrows to the right service area</span></div>
+
+      <div class="card p-7"><div class="step-num">04</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Select the Problem</h3>
+        <p class="text-white/60 text-sm">Issue types relevant to the category appear: Food Quality, Quantity, Hygiene, Taste, Menu, Timing, Other. E.g. <b class="text-white">"Food Quality"</b> selected.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Less typing • clearer classification</span></div>
+
+      <div class="card p-7"><div class="step-num">05</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Describe the Problem</h3>
+        <p class="text-white/60 text-sm">"The food served today was not properly cooked." Upload a photo 📷, pick a location 📍 (e.g. Hostel Mess 1), and submit. Good details help staff solve it.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Evidence + context</span></div>
+
+      <div class="card p-7"><div class="step-num">06</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">AI Checks the Complaint</h3>
+        <div class="mt-3 text-sm space-y-1.5">
+          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Category</span><b>Mess</b></div>
+          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Problem</span><b>Food Quality</b></div>
+          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Priority</span><b class="text-[--gold]">Medium</b></div>
+          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Department</span><b class="text-[--accent]">Mess Management</b></div>
+        </div>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">No manual department selection</span></div>
+
+      <div class="card p-7"><div class="step-num">07</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Complaint ID</h3>
+        <div class="mt-3 bg-black/40 rounded-xl p-5 text-center">
+          <div class="display text-3xl grad-text">CMP1025</div>
+          <span class="status-pending text-xs font-bold px-3 py-1 rounded-full inline-block mt-2">🟡 PENDING</span>
+        </div>
+        <p class="text-white/60 text-sm mt-3">Every complaint becomes traceable from start to finish.</p></div>
+
+      <div class="card p-7"><div class="step-num">08</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Admin Dashboard</h3>
+        <p class="text-white/60 text-sm">The manager receives CMP1025 — Food Quality • Hostel Mess 1 • Priority: Medium — and can <b class="text-white">Accept → Assign Staff → Start Work</b>.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Right team, clear task, full context</span></div>
+
+      <div class="card p-7"><div class="step-num">09</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Staff Resolves It</h3>
+        <p class="text-white/60 text-sm">Assigned staff investigates the actual problem, work begins, and progress is recorded. Clear ownership reduces delays and missed complaints.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Ownership = speed</span></div>
+
+      <div class="card p-7"><div class="step-num">10</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Track Resolution Status</h3>
+        <div class="mt-4 flex items-center gap-2 text-xs font-bold">
+          <span class="status-pending px-3 py-1.5 rounded-full">1 · PENDING</span>→
+          <span class="status-progress px-3 py-1.5 rounded-full">2 · IN PROGRESS</span>→
+          <span class="status-resolved px-3 py-1.5 rounded-full">3 · RESOLVED</span>
+        </div>
+        <p class="text-white/60 text-sm mt-4">A visible lifecycle — students and admins always know where a complaint stands.</p></div>
+
+      <div class="card p-7"><div class="step-num">11</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Notification 🔔</h3>
+        <div class="mt-3 bg-black/40 rounded-xl p-4 text-sm text-white/80 border-l-4 border-[--accent]">"Complaint CMP1025 has been resolved."</div>
+        <p class="text-white/60 text-sm mt-3">No repeated trips to the office — the loop closes with timely communication.</p></div>
+
+      <div class="card p-7"><div class="step-num">12</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Feedback</h3>
+        <p class="text-white/60 text-sm">Was your problem solved? <b class="text-white">Yes ✓ / No ✕</b> plus a star rating ⭐⭐⭐⭐⭐. Feedback evaluates service quality and feeds future improvement.</p>
+        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Quality input</span></div>
+
+      <div class="card p-7 lg:col-span-3 md:col-span-2"><div class="step-num">13</div>
+        <h3 class="display text-xl mt-3 mb-2 uppercase">AI Analytics</h3>
+        <p class="text-white/60 text-sm mb-4">Complaint history becomes actionable insight. Mess 1 example:</p>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div><div class="flex justify-between text-sm mb-1"><span>Food</span><b>45</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:90%"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-1"><span>Hygiene</span><b>20</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:45%"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-1"><span>Timing</span><b>12</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:27%"></div></div></div>
+        </div>
+        <p class="mt-4 text-sm"><span class="status-pending text-xs font-bold px-3 py-1.5 rounded-full">⚠ Food complaints ↑ rising</span></p>
+        <p class="text-white/60 text-sm mt-3">Management can act before a small issue becomes a bigger one. From complaints → data → preventive action.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- END TO END FLOW -->
+<section id="flow" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Final Project <span class="grad-text">Flow</span></h2>
+    <p class="text-white/50 mb-14">End-to-end cycle — from student complaint to smart campus improvement.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-4 text-center">
+      <div class="card p-4"><div class="text-3xl">📱</div><div class="text-xs font-bold mt-2 uppercase">Student App</div></div>
+      <div class="card p-4"><div class="text-3xl">📝</div><div class="text-xs font-bold mt-2 uppercase">Submit Complaint</div></div>
+      <div class="card p-4"><div class="text-3xl">🤖</div><div class="text-xs font-bold mt-2 uppercase">AI Classification</div></div>
+      <div class="card p-4"><div class="text-3xl">💻</div><div class="text-xs font-bold mt-2 uppercase">Admin Dashboard</div></div>
+      <div class="card p-4"><div class="text-3xl">👨‍🔧</div><div class="text-xs font-bold mt-2 uppercase">Assign Staff</div></div>
+      <div class="card p-4"><div class="text-3xl">✅</div><div class="text-xs font-bold mt-2 uppercase">Problem Solved</div></div>
+      <div class="card p-4"><div class="text-3xl">🔔</div><div class="text-xs font-bold mt-2 uppercase">Notification</div></div>
+      <div class="card p-4"><div class="text-3xl">⭐</div><div class="text-xs font-bold mt-2 uppercase">Feedback</div></div>
+      <div class="card p-4"><div class="text-3xl">📊</div><div class="text-xs font-bold mt-2 uppercase">AI Analytics</div></div>
+    </div>
+    <p class="mt-10 text-center display text-lg uppercase text-white/40">One Platform • Smart Routing • Trackable Resolution • Continuous Improvement</p>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="py-24 bg-[#0d1219]">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Team <span class="grad-text">Parallel</span></h2>
+    <p class="text-white/50 mb-14">Smart Ideas • One Team • Parallel Progress</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="card p-6 text-center"><div class="display text-2xl text-[--accent] mb-1">ABHIRAM</div><div class="text-xs text-white/50">2600040101</div><span class="chip inline-block mt-3 text-xs px-3 py-1 rounded-full font-bold">TEAM LEADER</span></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">AJITH</div><div class="text-xs text-white/50">2600040107</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SUDHEER</div><div class="text-xs text-white/50">2600040615</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SNEHITHA REDDY</div><div class="text-xs text-white/50">2600080016</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">MANIKANTA</div><div class="text-xs text-white/50">2600040270</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">LAVANYA</div><div class="text-xs text-white/50">2600040396</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">ARAVIND</div><div class="text-xs text-white/50">2600040312</div></div>
+      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SRAVANI</div><div class="text-xs text-white/50">2600040165</div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 border-t border-white/10 text-center text-white/40 text-sm">
+  <span class="display text-lg text-white">PARALLEL<span class="text-[--accent]">.</span></span>
+  <p class="mt-2">Smart Campus Complaint &amp; Issue Management System — One Platform • Smart Routing • Trackable Resolution • Continuous Improvement</p>
+</footer>
+
+</body>
+</html>
