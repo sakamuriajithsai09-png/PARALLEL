@@ -210,11 +210,10 @@
                     </div>
 
                     <div id="student-login-message" class="hidden rounded-xl px-4 py-3 text-xs font-semibold" role="alert"></div>
-                    <button id="student-login-button" type="submit" class="login-button flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950">
+                    <button id="student-login-button" type="submit" disabled class="login-button flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950 disabled:cursor-not-allowed disabled:opacity-40">
                         <span id="student-login-button-label">Student Login</span>
                     </button>
                 </form>
-                <p class="mt-6 text-center text-[11px] text-slate-500">Demo: 2600040107 / parallel123</p>
             </div>
 
             <div id="admin-login-card" class="login-card admin-card reveal-card rounded-3xl p-6 backdrop-blur-xl sm:p-8">
@@ -252,9 +251,8 @@
                         <a href="#" id="admin-forgot-password" class="font-semibold text-brandAccent2 transition-colors hover:text-white">Forgot Password?</a>
                     </div>
                     <div id="admin-login-message" class="hidden rounded-xl px-4 py-3 text-xs font-semibold" role="alert"></div>
-                    <button id="admin-login-button" type="submit" class="login-button flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950"><span id="admin-login-button-label">Admin Login</span></button>
+                    <button id="admin-login-button" type="submit" disabled class="login-button flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"><span id="admin-login-button-label">Admin Login</span></button>
                 </form>
-                <p class="mt-6 text-center text-[11px] text-slate-500">Demo: admin / parallel123</p>
             </div>
             </div>
 
@@ -267,7 +265,7 @@
         <header class="sticky top-0 z-20 border-b border-white/10 bg-brandBg/90 px-4 py-4 backdrop-blur-xl sm:px-8">
             <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-4"><div class="flex h-11 w-11 items-center justify-center rounded-xl border border-brandAccent/40 bg-brandAccent/10 text-xl text-brandAccent shadow-[0_0_25px_rgba(0,230,118,.2)]">&#9889;</div><div><div class="display-font text-xl tracking-wider text-white">PARALLEL<span class="text-brandAccent">.</span></div><div class="text-[10px] font-bold uppercase tracking-[.2em] text-brandAccent2">AI Admin Control Center</div></div></div>
-                <div class="hidden items-center gap-6 text-right md:flex"><div><div id="admin-date" class="text-xs text-slate-400">--</div><div id="admin-clock" class="font-mono text-sm font-bold text-brandAccent">--:--:--</div></div><button id="admin-notifications-button" class="relative rounded-xl border border-white/10 bg-brandPanel p-3 text-slate-300 hover:border-brandAccent"><span>🔔</span><span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">5</span></button><div class="border-l border-white/10 pl-5 text-left"><div class="text-xs font-bold text-white">System Admin</div><div class="text-[10px] text-slate-500">ADMIN / ONLINE</div></div></div>
+                <div class="hidden items-center gap-6 text-right md:flex"><div><div id="admin-date" class="text-xs text-slate-400">--</div><div id="admin-clock" class="font-mono text-sm font-bold text-brandAccent">--:--:--</div></div><button id="admin-notifications-button" class="relative rounded-xl border border-white/10 bg-brandPanel p-3 text-slate-300 hover:border-brandAccent"><span>🔔</span><span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">5</span></button><div class="border-l border-white/10 pl-5 text-left"><div id="logged-in-admin-name" class="text-xs font-bold text-white">System Admin</div><div class="text-[10px] text-slate-500">ADMIN / ONLINE</div></div></div>
                 <button id="admin-logout" class="rounded-xl border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 transition hover:border-brandAccent hover:text-white">Sign out</button>
             </div>
         </header>
@@ -335,9 +333,10 @@
 
                 <!-- Logged-in Student ID -->
                 <div class="border-l border-white/10 pl-3 text-right">
-                    <div class="text-[10px] uppercase tracking-wider text-slate-500">Student ID</div>
+                    <div id="logged-in-student-name" class="text-[10px] uppercase tracking-wider text-slate-500">Student</div>
                     <div id="logged-in-student-id" class="font-mono text-sm font-bold text-brandAccent">—</div>
                 </div>
+                <button id="student-logout" class="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-slate-300 transition hover:border-brandAccent hover:text-white">Sign out</button>
             </div>
 
         </div>
@@ -917,7 +916,37 @@
             label.innerHTML = `<svg class="login-spinner h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="3" class="opacity-30"></circle><path stroke-linecap="round" stroke-width="3" d="M21 12a9 9 0 0 0-9-9"></path></svg><span>${text}</span>`;
         }
 
-        studentLoginForm.addEventListener('submit', (event) => {
+        function getStoredSession(role) {
+            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            return JSON.parse(localStorage.getItem(key) || sessionStorage.getItem(key) || 'null');
+        }
+
+        function saveSession(role, account, remember) {
+            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
+            (remember ? localStorage : sessionStorage).setItem(key, JSON.stringify(account));
+        }
+
+        async function authenticate(role, identifier, password) {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role, identifier, password })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error);
+            return result;
+        }
+
+        function updateLoginButtons() {
+            studentLoginButton.disabled = !loginStudentId.value.trim() || !loginPassword.value;
+            adminLoginButton.disabled = !adminId.value.trim() || !adminPassword.value;
+        }
+
+        [loginStudentId, loginPassword, adminId, adminPassword].forEach((input) => input.addEventListener('input', updateLoginButtons));
+
+        studentLoginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             clearLoginErrors('student-id-error', 'password-error', studentLoginMessage);
 
@@ -936,26 +965,25 @@
             if (!valid) return;
 
             showSpinner(studentLoginButton, studentLoginButtonLabel, 'Verifying...');
-
-            window.setTimeout(() => {
-                if (studentId !== '2600040107' || password !== 'parallel123') {
-                    showLoginMessage(studentLoginMessage, 'Invalid Student ID or Password', 'error');
-                    studentLoginButton.disabled = false;
-                    studentLoginButtonLabel.innerText = 'Student Login';
-                    return;
-                }
-                document.getElementById('logged-in-student-id').innerText = studentId;
-                if (studentRememberMe.checked) localStorage.setItem('parallelStudentId', studentId);
+            try {
+                const account = await authenticate('student', studentId, password);
+                saveSession('student', account, studentRememberMe.checked);
+                document.getElementById('logged-in-student-name').innerText = `Welcome, ${account.name}`;
+                document.getElementById('logged-in-student-id').innerText = account.identifier;
                 showLoginMessage(studentLoginMessage, 'Login Successful! Redirecting to Student Dashboard...', 'success');
                 window.setTimeout(() => {
                     loginPage.classList.add('hidden');
                     document.body.classList.remove('overflow-hidden');
                     switchTab('new-complaint');
                 }, 700);
-            }, 800);
+            } catch (error) {
+                showLoginMessage(studentLoginMessage, error.message || 'Invalid Student ID or Password.', 'error');
+                studentLoginButton.disabled = false;
+                studentLoginButtonLabel.innerText = 'Student Login';
+            }
         });
 
-        adminLoginForm.addEventListener('submit', (event) => {
+        adminLoginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             clearLoginErrors('admin-id-error', 'admin-password-error', adminLoginMessage);
             const enteredId = adminId.value.trim();
@@ -972,20 +1000,21 @@
             if (!valid) return;
 
             showSpinner(adminLoginButton, adminLoginButtonLabel, 'Verifying...');
-            window.setTimeout(() => {
-                if (enteredId !== 'admin' || password !== 'parallel123') {
-                    showLoginMessage(adminLoginMessage, 'Invalid Admin Credentials', 'error');
-                    adminLoginButton.disabled = false;
-                    adminLoginButtonLabel.innerText = 'Admin Login';
-                    return;
-                }
+            try {
+                const account = await authenticate('admin', enteredId, password);
+                saveSession('admin', account, document.getElementById('admin-remember-me').checked);
+                document.getElementById('logged-in-admin-name').innerText = `Welcome, ${account.name}`;
                 showLoginMessage(adminLoginMessage, 'Login Successful! Redirecting to Admin Dashboard...', 'success');
                 window.setTimeout(() => {
                     loginPage.classList.add('hidden');
                     document.getElementById('admin-dashboard').classList.remove('hidden');
                     renderAdminDashboard();
                 }, 700);
-            }, 800);
+            } catch (error) {
+                showLoginMessage(adminLoginMessage, error.message || 'Invalid Admin Credentials.', 'error');
+                adminLoginButton.disabled = false;
+                adminLoginButtonLabel.innerText = 'Admin Login';
+            }
         });
 
         document.getElementById('toggle-password').addEventListener('click', () => {
@@ -1004,11 +1033,26 @@
             showLoginMessage(adminLoginMessage, 'Please contact the system administrator to reset your password.', 'error');
         });
 
-        const rememberedStudentId = localStorage.getItem('parallelStudentId');
-        if (rememberedStudentId) {
-            loginStudentId.value = rememberedStudentId;
+        const studentSession = getStoredSession('student');
+        if (studentSession) {
+            document.getElementById('logged-in-student-name').innerText = `Welcome, ${studentSession.name}`;
+            document.getElementById('logged-in-student-id').innerText = studentSession.identifier;
+            loginPage.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+        const adminSession = getStoredSession('admin');
+        if (adminSession) {
+            document.getElementById('logged-in-admin-name').innerText = `Welcome, ${adminSession.name}`;
+            loginPage.classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            renderAdminDashboard();
+        }
+        const rememberedStudent = localStorage.getItem('parallelStudentSession');
+        if (rememberedStudent) {
+            loginStudentId.value = JSON.parse(rememberedStudent).identifier;
             studentRememberMe.checked = true;
         }
+        updateLoginButtons();
 
         document.getElementById('toggle-admin-password').addEventListener('click', () => {
             const visible = adminPassword.type === 'text';
@@ -1102,9 +1146,15 @@
             renderAdminDashboard();
         }
 
-        document.getElementById('admin-logout').addEventListener('click', () => {
+        function logout(role) {
+            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
             window.location.reload();
-        });
+        }
+
+        document.getElementById('student-logout').addEventListener('click', () => logout('student'));
+        document.getElementById('admin-logout').addEventListener('click', () => logout('admin'));
 
         ['admin-search', 'admin-category-filter', 'admin-status-filter', 'admin-priority-filter', 'admin-sort'].forEach((id) => document.getElementById(id).addEventListener('input', () => { adminPage = 1; renderAdminTable(); }));
         document.getElementById('admin-prev').addEventListener('click', () => { adminPage -= 1; renderAdminTable(); });

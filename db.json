@@ -1,4 +1,38 @@
 {
+  "students": [
+    {
+      "studentId": "2600040107",
+      "name": "Ajith Sai",
+      "password": "ajith123"
+    },
+    {
+      "studentId": "2600040108",
+      "name": "Rahul Kumar",
+      "password": "rahul123"
+    },
+    {
+      "studentId": "2600040109",
+      "name": "Priya Sharma",
+      "password": "priya123"
+    }
+  ],
+  "admins": [
+    {
+      "adminId": "admin001",
+      "name": "Hostel Admin",
+      "password": "hostel123"
+    },
+    {
+      "adminId": "admin002",
+      "name": "Mess Admin",
+      "password": "mess123"
+    },
+    {
+      "adminId": "superadmin",
+      "name": "System Administrator",
+      "password": "parallel2026"
+    }
+  ],
   "complaints": [
     {
       "id": 1000,

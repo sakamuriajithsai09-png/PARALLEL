@@ -23,6 +23,30 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, "index.html"));
 });
 
+app.post("/api/auth/login", (req, res) => {
+  const { role, identifier, password } = req.body || {};
+  const db = readDB();
+  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : [];
+  const account = accounts.find((candidate) => {
+    const matchesIdentifier = role === "student"
+      ? candidate.studentId === identifier
+      : candidate.adminId === identifier;
+    return matchesIdentifier && candidate.password === password;
+  });
+
+  if (!account) {
+    return res.status(401).json({
+      error: role === "student" ? "Invalid Student ID or Password." : "Invalid Admin Credentials."
+    });
+  }
+
+  res.json({
+    role,
+    name: account.name,
+    identifier: role === "student" ? account.studentId : account.adminId,
+  });
+});
+
 // --- tiny JSON-file "database" ---
 const readDB = () => {
   if (!fs.existsSync(DB_FILE)) return { complaints: [] };
