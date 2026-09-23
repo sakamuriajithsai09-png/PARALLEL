@@ -10,6 +10,7 @@ const app = express();
 const PORT = 5000;
 const DB_FILE = path.join(__dirname, "db.json");
 const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(__dirname, "public");
+let runtimeDB;
 
 app.use(cors());
 app.use(express.json());
@@ -49,12 +50,21 @@ app.post("/api/auth/login", (req, res) => {
 
 // --- tiny JSON-file "database" ---
 const readDB = () => {
+  if (runtimeDB) return runtimeDB;
   if (!fs.existsSync(DB_FILE)) return { complaints: [] };
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  return runtimeDB;
 };
 
-const writeDB = (data) =>
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+const writeDB = (data) => {
+  runtimeDB = data;
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    if (!['EROFS', 'EACCES', 'EPERM'].includes(error.code)) throw error;
+    console.warn('Database file is read-only; keeping this update in server memory.');
+  }
+};
 
 // GET all complaints
 app.get("/api/complaints", (req, res) => {
