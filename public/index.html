@@ -31,6 +31,13 @@
   .status-progress{ background:#0d3a5c; color:var(--accent2); }
   .status-resolved{ background:#0d4d2b; color:var(--accent); }
   .bar{ background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+  .ops-modal{ background:rgba(5,8,16,.82); backdrop-filter:blur(18px); }
+  .ops-modal-card{ background:linear-gradient(135deg,rgba(12,24,42,.94),rgba(10,14,20,.94)); border:1px solid rgba(0,217,255,.3); box-shadow:0 0 90px rgba(0,176,255,.16),0 30px 90px rgba(0,0,0,.55); }
+  .ops-role{ background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.1); transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease; }
+  .ops-role:hover{ transform:translateY(-5px); border-color:rgba(0,230,118,.62); box-shadow:0 0 35px rgba(0,230,118,.14); }
+  .ops-role.admin:hover{ border-color:rgba(0,176,255,.7); box-shadow:0 0 35px rgba(0,176,255,.16); }
+  .ops-modal.show .ops-modal-card{ animation:opsModalIn .35s ease both; }
+  @keyframes opsModalIn{ from{opacity:0;transform:scale(.94) translateY(15px)} to{opacity:1;transform:scale(1) translateY(0)} }
   ::-webkit-scrollbar{ width:10px; } ::-webkit-scrollbar-thumb{ background:#1e2632; border-radius:8px; }
   a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:.5rem; }
   @media (prefers-reduced-motion: reduce){
@@ -54,7 +61,7 @@
       <a href="#flow" class="hover:text-white">End-to-End</a>
       <a href="#team" class="hover:text-white">Team</a>
       <a class="text-[--accent] hover:text-white" href="parallel_student_app.html?role=student">Student Login</a>
-      <a class="text-[--accent2] hover:text-white" href="parallel_student_app.html?role=admin">Admin Login</a>
+      <a class="text-[--accent2] hover:text-white js-admin-access" href="#admin-access">Admin Login</a>
     </div>
     <a class="bg-[--accent] text-black font-bold text-sm px-5 py-2.5 rounded-full hover:opacity-90" href="parallel_student_app.html?role=student">Launch Student Login</a>
   </div>
@@ -71,7 +78,7 @@
     <p class="mt-6 max-w-2xl text-white/60 text-lg">One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.</p>
     <div class="mt-10 flex flex-wrap gap-4">
       <a class="bg-[--accent] text-black font-bold px-8 py-4 rounded-full" href="parallel_student_app.html?role=student">Student Login</a>
-      <a class="border border-brandAccent2/50 text-brandAccent2 px-8 py-4 rounded-full hover:bg-brandAccent2/10" href="parallel_student_app.html?role=admin">Admin Login</a>
+      <a class="border border-brandAccent2/50 text-brandAccent2 px-8 py-4 rounded-full hover:bg-brandAccent2/10 js-admin-access" href="#admin-access">Admin Login</a>
       <a href="#problem" class="border border-white/20 px-8 py-4 rounded-full hover:bg-white/5">Why This Project?</a>
     </div>
     <div class="mt-14 grid grid-cols-3 gap-6 max-w-lg">
@@ -254,6 +261,38 @@
   <span class="display text-lg text-white">PARALLEL<span class="text-[--accent]">.</span></span>
   <p class="mt-2">Smart Campus Complaint &amp; Issue Management System — One Platform • Smart Routing • Trackable Resolution • Continuous Improvement</p>
 </footer>
+
+<div id="admin-access" class="ops-modal fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto p-4" role="dialog" aria-modal="true" aria-labelledby="ops-access-title">
+  <div class="ops-modal-card relative w-full max-w-5xl rounded-[24px] p-6 sm:p-9">
+    <button id="close-admin-access" class="absolute right-5 top-5 rounded-lg p-2 text-xl text-white/50 hover:text-white" aria-label="Close access dialog">&times;</button>
+    <div class="mx-auto max-w-2xl text-center"><div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-brandAccent2/40 bg-brandAccent2/10 text-2xl shadow-[0_0_35px_rgba(0,176,255,.2)]">&#9889;</div><h2 id="ops-access-title" class="display text-3xl uppercase text-white sm:text-5xl">PARALLEL AI Operations Access</h2><p class="mt-3 text-sm text-white/55">Choose your authorized access level.</p><div class="mx-auto mt-5 h-px w-32 bg-gradient-to-r from-brandAccent to-brandAccent2"></div></div>
+    <div id="ops-role-grid" class="mt-8 grid gap-5 md:grid-cols-2">
+      <article class="ops-role admin rounded-2xl p-6"><div class="flex items-start justify-between"><span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-brandAccent2/40 bg-brandAccent2/10 text-2xl text-brandAccent2">&#9881;</span><span class="rounded-full border border-brandAccent2/30 bg-brandAccent2/10 px-2 py-1 text-[10px] font-bold text-brandAccent2">ADMIN ACCESS</span></div><h3 class="mt-6 text-2xl font-bold text-white">Admin Command Center</h3><p class="mt-3 text-sm leading-relaxed text-white/55">Manage complaints, assign staff, verify proofs, analytics, departments, users, notifications, and AI insights.</p><ul class="mt-5 space-y-2 text-xs text-white/60"><li>◈ Complaint Command Center</li><li>◈ Staff Assignment &amp; Operations</li><li>◈ Proof Verification</li><li>◈ Analytics &amp; User Management</li></ul><button data-ops-role="admin" class="mt-6 w-full rounded-xl bg-gradient-to-r from-brandAccent2 to-blue-600 py-3 font-bold uppercase tracking-wider text-slate-950">Enter Admin Command Center</button></article>
+      <article class="ops-role rounded-2xl p-6"><div class="flex items-start justify-between"><span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-brandAccent/40 bg-brandAccent/10 text-2xl text-brandAccent">&#9881;</span><span class="rounded-full border border-brandAccent/30 bg-brandAccent/10 px-2 py-1 text-[10px] font-bold text-brandAccent">STAFF ACCESS</span></div><h3 class="mt-6 text-2xl font-bold text-white">Staff Operations Console</h3><p class="mt-3 text-sm leading-relaxed text-white/55">Handle assigned complaints, update work progress, upload repair proof, receive notifications, and track performance.</p><ul class="mt-5 space-y-2 text-xs text-white/60"><li>◈ Assigned Tasks</li><li>◈ Work Progress &amp; Proof Upload</li><li>◈ Notifications</li><li>◈ Performance Tracker</li></ul><button data-ops-role="staff" class="mt-6 w-full rounded-xl bg-gradient-to-r from-brandAccent to-emerald-400 py-3 font-bold uppercase tracking-wider text-slate-950">Enter Staff Operations</button></article>
+    </div>
+    <div id="ops-login-slot" class="mt-6 hidden"></div>
+    <p class="mt-7 text-center text-[10px] uppercase tracking-[.2em] text-white/35">Secure AI authentication &middot; Campus network protected</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const modal = document.getElementById('admin-access');
+  const grid = document.getElementById('ops-role-grid');
+  const slot = document.getElementById('ops-login-slot');
+  const open = (event) => { event.preventDefault(); modal.classList.remove('hidden'); modal.classList.add('flex','show'); document.body.classList.add('overflow-hidden'); };
+  document.querySelectorAll('.js-admin-access').forEach((link) => link.addEventListener('click', open));
+  document.getElementById('close-admin-access').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex','show'); document.body.classList.remove('overflow-hidden'); });
+  modal.addEventListener('click', (event) => { if (event.target === modal) document.getElementById('close-admin-access').click(); });
+  document.querySelectorAll('[data-ops-role]').forEach((button) => button.addEventListener('click', async () => {
+    const role = button.dataset.opsRole;
+    grid.classList.add('hidden'); slot.classList.remove('hidden');
+    slot.innerHTML = `<div class="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/20 p-6"><button id="ops-back" class="text-xs text-white/50 hover:text-white">← Back to access levels</button><p class="mt-5 text-xs font-bold uppercase tracking-[.2em] ${role === 'admin' ? 'text-brandAccent2' : 'text-brandAccent'}">${role === 'admin' ? 'Admin Command Center' : 'Staff Operations Console'}</p><h3 class="mt-2 text-2xl font-bold text-white">Initialize Secure Access</h3><form id="ops-login-form" class="mt-5 space-y-4"><input id="ops-identifier" required class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-brandAccent2" placeholder="${role === 'admin' ? 'Admin ID' : 'Staff ID'}"><input id="ops-password" required type="password" class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-brandAccent2" placeholder="Password"><label class="flex items-center gap-2 text-xs text-white/55"><input id="ops-remember" type="checkbox"> Remember Device</label><div id="ops-login-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-3 py-2 text-xs text-red-300"></div><button class="w-full rounded-xl bg-gradient-to-r from-brandAccent to-brandAccent2 py-3 font-bold uppercase text-slate-950">Initialize Secure Access</button></form></div>`;
+    document.getElementById('ops-back').addEventListener('click', () => { slot.classList.add('hidden'); grid.classList.remove('hidden'); });
+    document.getElementById('ops-login-form').addEventListener('submit', async (event) => { event.preventDefault(); const message = document.getElementById('ops-login-message'); const response = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role,identifier:document.getElementById('ops-identifier').value.trim(),password:document.getElementById('ops-password').value})}); const result = await response.json(); if(!response.ok){message.innerText=result.error||'Authentication failed';message.classList.remove('hidden');return;} const key=`parallel${role[0].toUpperCase()}${role.slice(1)}Session`; (document.getElementById('ops-remember').checked?localStorage:sessionStorage).setItem(key,JSON.stringify(result)); window.location.href=`parallel_student_app.html?role=${role}`; });
+  }));
+})();
+</script>
 
 </body>
 </html>
