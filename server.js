@@ -39,7 +39,11 @@ app.post("/api/auth/login", (req, res) => {
 
   if (!account) {
     return res.status(401).json({
-      error: role === "student" ? "Invalid Student ID or Password." : "Invalid Admin ID or Password."
+      error: role === "student"
+        ? "Invalid Student ID or Password."
+        : role === "admin"
+          ? "Invalid Admin ID or Password."
+          : "Invalid Staff ID or Password."
     });
   }
 

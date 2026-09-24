@@ -213,6 +213,12 @@
         .staff-priority-critical { border-left: 3px solid #ef4444; } .staff-priority-high { border-left: 3px solid #fb923c; } .staff-priority-medium { border-left: 3px solid #ffc400; } .staff-priority-low { border-left: 3px solid #00e676; }
         .staff-progress-ring { background: conic-gradient(var(--accent2) var(--progress), rgba(255,255,255,.08) 0); }
         .staff-nav-active { color: var(--accent); background: linear-gradient(90deg, rgba(0,230,118,.14), transparent); box-shadow: inset 3px 0 var(--accent); }
+        .staff-scan-ring { animation: staffScan 2.6s linear infinite; }
+        .staff-scan-line { animation: scanLine 2.4s ease-in-out infinite; }
+        .staff-holo { background: linear-gradient(120deg, rgba(0,217,255,.12), rgba(122,92,255,.11), rgba(0,255,157,.08)); background-size: 220% 220%; animation: holoShift 8s ease infinite; }
+        @keyframes staffScan { to { transform: rotate(360deg); } }
+        @keyframes scanLine { 0%, 100% { transform: translateY(-22px); opacity: .1; } 50% { transform: translateY(22px); opacity: .8; } }
+        @keyframes holoShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
         @keyframes notificationPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, .3); } 50% { box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); } }
         @keyframes notificationSent { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -338,7 +344,8 @@
             </div>
             </div>
             <div id="staff-login-card" class="login-card reveal-card hidden rounded-3xl p-6 backdrop-blur-xl sm:p-8">
-                <div class="mb-7 flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.22em] text-purple-300">Operations Crew</p><h2 class="mt-2 text-2xl font-bold text-white">Staff Login</h2></div><div class="rounded-xl border border-purple-400/30 bg-purple-400/10 px-3 py-2 text-right"><div class="text-[10px] uppercase tracking-wider text-slate-400">Workforce access</div><div class="mt-1 text-xs font-bold text-purple-300">ONLINE READY</div></div></div>
+                <div class="mb-7 flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.22em] text-cyan-300">PARALLEL AI STAFF PORTAL</p><h2 class="mt-2 text-2xl font-bold text-white">Initialize Staff Console</h2><p class="mt-2 max-w-sm text-xs leading-relaxed text-slate-400">Authorized Maintenance Operations Console — Smart Campus Network</p></div><div class="relative flex h-16 w-16 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-300/10"><span class="staff-scan-ring absolute inset-1 rounded-full border border-dashed border-cyan-300/70"></span><span class="text-2xl">◉</span><span class="staff-scan-line absolute left-3 right-3 top-1/2 h-px bg-cyan-300"></span></div></div>
+                <div class="mb-6 grid grid-cols-4 gap-2 text-center text-[9px] uppercase tracking-wider"><div class="rounded-lg border border-white/10 bg-white/[.03] p-2"><b class="block text-lg text-brandAccent">24</b>active</div><div class="rounded-lg border border-white/10 bg-white/[.03] p-2"><b class="block text-lg text-brandAccent2">18</b>online</div><div class="rounded-lg border border-white/10 bg-white/[.03] p-2"><b class="block text-lg text-red-300">2</b>alerts</div><div class="rounded-lg border border-white/10 bg-white/[.03] p-2"><b class="block text-lg text-purple-300">98%</b>health</div></div>
                 <form id="staff-login-form" class="space-y-5" novalidate><div><label for="staff-id" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Staff ID</label><input id="staff-id" type="text" autocomplete="username" placeholder="Enter Staff ID" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600"></div><div><label for="staff-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label><input id="staff-password" type="password" autocomplete="current-password" placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600"></div><div class="flex items-center justify-between gap-3 text-xs"><label class="flex cursor-pointer items-center gap-2 text-slate-400"><input id="staff-remember-me" type="checkbox" class="h-4 w-4 accent-brandAccent"> Remember Me</label><span class="text-purple-300">Encrypted access</span></div><div id="staff-login-message" class="hidden rounded-xl px-4 py-3 text-xs font-semibold" role="alert"></div><button id="staff-login-button" type="submit" disabled class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950 disabled:opacity-40">Staff Login</button></form><p class="mt-4 text-center text-[10px] uppercase tracking-wider text-slate-500">Staff demo: staff001 / ravi123</p>
             </div>
 
@@ -931,6 +938,7 @@
         let adminPage = 1;
         let adminSelectedComplaint = null;
         const adminPageSize = 6;
+        let staffWorkStartedAt = null;
         let sampleComplaints = [
             {
                 id: 'CMP1025',
@@ -1288,7 +1296,7 @@
             document.getElementById('staff-complaints').innerHTML = assigned.length ? assigned.map((complaint) => {
                 const priority = String(complaint.priority || 'MEDIUM').toLowerCase();
                 const resolved = complaint.status === 'RESOLVED';
-                return `<article class="staff-card staff-priority-${priority} rounded-2xl p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><span class="font-mono text-sm font-bold text-brandAccent">${complaint.id}</span><h3 class="mt-2 text-lg font-bold text-white">${complaint.category} · ${complaint.subissue || 'Campus Issue'}</h3><p class="mt-1 text-xs text-slate-400">${complaint.name || 'Student'} · ${complaint.location || 'Campus'} · ${complaint.time}</p></div><span class="rounded-full border px-3 py-1 text-[10px] font-bold ${priority === 'high' ? 'border-red-400/30 bg-red-500/10 text-red-300' : priority === 'medium' ? 'border-brandGold/30 bg-brandGold/10 text-brandGold' : 'border-brandAccent/30 bg-brandAccent/10 text-brandAccent'}">${complaint.priority || 'MEDIUM'}</span></div><p class="mt-4 line-clamp-2 text-sm leading-relaxed text-slate-300">${complaint.description || 'No description provided.'}</p><div class="mt-5 flex flex-wrap items-center justify-between gap-3"><span class="text-xs ${resolved ? 'text-brandAccent' : complaint.status === 'IN_PROGRESS' ? 'text-brandAccent2' : 'text-brandGold'}">● ${complaint.status.replace('_', ' ')}</span><div class="flex gap-2"><button data-staff-view="${complaint.id}" class="rounded-lg border border-brandAccent2/30 px-3 py-2 text-xs font-bold text-brandAccent2">View Details</button><button data-staff-start="${complaint.id}" ${resolved ? 'disabled' : ''} class="rounded-lg border border-brandAccent/30 px-3 py-2 text-xs font-bold text-brandAccent disabled:opacity-40">${complaint.status === 'PENDING' ? 'Start Work' : resolved ? 'Completed' : 'Upload Proof'}</button></div></div></article>`;
+                return `<article class="staff-card staff-priority-${priority} rounded-2xl p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><span class="font-mono text-sm font-bold text-brandAccent">${complaint.id}</span><h3 class="mt-2 text-lg font-bold text-white">${complaint.category} · ${complaint.subissue || 'Campus Issue'}</h3><p class="mt-1 text-xs text-slate-400">${complaint.name || 'Student'} · ${complaint.location || 'Campus'} · ${complaint.time}</p></div><span class="rounded-full border px-3 py-1 text-[10px] font-bold ${priority === 'high' ? 'border-red-400/30 bg-red-500/10 text-red-300' : priority === 'medium' ? 'border-brandGold/30 bg-brandGold/10 text-brandGold' : 'border-brandAccent/30 bg-brandAccent/10 text-brandAccent'}">${complaint.priority || 'MEDIUM'}</span></div><div class="mt-4 grid grid-cols-2 gap-2 text-[10px] text-slate-500"><span>Building / Floor <b class="block text-slate-300">${complaint.location || 'Campus'}</b></span><span>Deadline <b class="block text-brandGold">Today · 6:00 PM</b></span></div><p class="mt-4 line-clamp-2 text-sm leading-relaxed text-slate-300">${complaint.description || 'No description provided.'}</p><div class="mt-5 flex flex-wrap items-center justify-between gap-3"><span class="text-xs ${resolved ? 'text-brandAccent' : complaint.status === 'IN_PROGRESS' ? 'text-brandAccent2' : 'text-brandGold'}">● ${complaint.status.replace('_', ' ')} ${complaint.status === 'IN_PROGRESS' ? '· timer active' : ''}</span><div class="flex gap-2"><button data-staff-view="${complaint.id}" class="rounded-lg border border-brandAccent2/30 px-3 py-2 text-xs font-bold text-brandAccent2">View Complaint</button><button data-staff-start="${complaint.id}" ${resolved ? 'disabled' : ''} class="rounded-lg border border-brandAccent/30 px-3 py-2 text-xs font-bold text-brandAccent disabled:opacity-40">${complaint.status === 'PENDING' ? 'Start Work' : resolved ? 'Completed' : 'Verify & Resolve'}</button></div></div></article>`;
             }).join('') : '<div class="staff-card rounded-2xl p-8 text-center text-sm text-slate-500">No assigned complaints match this search.</div>';
             document.getElementById('staff-deadlines').innerHTML = assigned.slice(0, 3).map((complaint) => `<div class="flex items-center justify-between border-b border-white/5 pb-3"><span>${complaint.id}<small class="mt-1 block text-slate-500">${complaint.category}</small></span><b class="text-brandGold">Today</b></div>`).join('') || '<p>No upcoming deadlines.</p>';
             document.querySelectorAll('[data-staff-view]').forEach((button) => button.addEventListener('click', () => openDetailsModal(button.dataset.staffView)));
@@ -1302,6 +1310,7 @@
                 const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'IN_PROGRESS', proof: 'Inspection started and task accepted by staff.' }) });
                 if (!response.ok) return;
                 complaint.status = 'IN_PROGRESS';
+                staffWorkStartedAt = Date.now();
             } else {
                 const proof = window.prompt('Enter proof notes before resolving this complaint:', 'Repair completed and verified on site.');
                 if (!proof || proof.trim().length < 10) return;
@@ -1452,6 +1461,13 @@
         document.getElementById('staff-top-logout').addEventListener('click', () => logout('staff'));
         document.getElementById('staff-search').addEventListener('input', renderStaffDashboard);
         document.getElementById('staff-availability').addEventListener('click', (event) => { event.currentTarget.innerText = event.currentTarget.innerText.includes('Available') ? '● Busy' : '● Available'; event.currentTarget.classList.toggle('text-brandGold'); });
+        setInterval(() => {
+            if (!document.getElementById('staff-dashboard').classList.contains('hidden')) {
+                const now = new Date();
+                document.getElementById('staff-date').innerText = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                document.getElementById('staff-clock').innerText = now.toLocaleTimeString();
+            }
+        }, 1000);
 
         ['admin-search', 'admin-category-filter', 'admin-status-filter', 'admin-priority-filter', 'admin-sort'].forEach((id) => document.getElementById(id).addEventListener('input', () => { adminPage = 1; renderAdminTable(); }));
         document.getElementById('admin-global-search').addEventListener('input', (event) => { document.getElementById('admin-search').value = event.target.value; adminPage = 1; renderAdminTable(); });
