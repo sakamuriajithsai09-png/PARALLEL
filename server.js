@@ -27,11 +27,13 @@ app.get("/", (req, res) => {
 app.post("/api/auth/login", (req, res) => {
   const { role, identifier, password } = req.body || {};
   const db = readDB();
-  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : [];
+  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : role === "staff" ? db.staff : [];
   const account = accounts.find((candidate) => {
     const matchesIdentifier = role === "student"
       ? candidate.studentId === identifier
-      : candidate.adminId === identifier;
+      : role === "admin"
+        ? candidate.adminId === identifier
+        : candidate.staffId === identifier;
     return matchesIdentifier && candidate.password === password;
   });
 
@@ -44,7 +46,8 @@ app.post("/api/auth/login", (req, res) => {
   res.json({
     role,
     name: account.name,
-    identifier: role === "student" ? account.studentId : account.adminId,
+    identifier: role === "student" ? account.studentId : role === "admin" ? account.adminId : account.staffId,
+    department: account.department || "",
   });
 });
 

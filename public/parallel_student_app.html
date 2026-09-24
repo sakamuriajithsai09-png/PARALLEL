@@ -206,6 +206,13 @@
         .notification-sent { animation: notificationSent .55s ease both; }
         .feedback-star { color: #334155; transition: color .2s ease, transform .2s ease, text-shadow .2s ease; }
         .feedback-star:hover, .feedback-star.active { color: var(--gold); transform: translateY(-2px) scale(1.12); text-shadow: 0 0 14px rgba(255, 196, 0, .75); }
+        .staff-dashboard { background: radial-gradient(circle at 82% 12%, rgba(124,58,237,.14), transparent 28%), radial-gradient(circle at 10% 70%, rgba(0,230,118,.1), transparent 30%), #050816; }
+        .staff-sidebar { background: rgba(5, 12, 25, .86); border-right: 1px solid rgba(0,184,255,.16); backdrop-filter: blur(22px); }
+        .staff-card { background: linear-gradient(135deg, rgba(17,24,39,.76), rgba(8,16,30,.78)); border: 1px solid rgba(255,255,255,.09); box-shadow: 0 20px 60px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.04); backdrop-filter: blur(20px); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+        .staff-card:hover { transform: translateY(-3px); border-color: rgba(0,184,255,.42); box-shadow: 0 20px 70px rgba(0,184,255,.12); }
+        .staff-priority-critical { border-left: 3px solid #ef4444; } .staff-priority-high { border-left: 3px solid #fb923c; } .staff-priority-medium { border-left: 3px solid #ffc400; } .staff-priority-low { border-left: 3px solid #00e676; }
+        .staff-progress-ring { background: conic-gradient(var(--accent2) var(--progress), rgba(255,255,255,.08) 0); }
+        .staff-nav-active { color: var(--accent); background: linear-gradient(90deg, rgba(0,230,118,.14), transparent); box-shadow: inset 3px 0 var(--accent); }
         @keyframes notificationPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, .3); } 50% { box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); } }
         @keyframes notificationSent { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -330,9 +337,17 @@
                 <p class="mt-4 text-center text-[10px] font-bold uppercase tracking-[.18em] text-slate-500">Protected by PARALLEL AI monitoring</p>
             </div>
             </div>
+            <div id="staff-login-card" class="login-card reveal-card hidden rounded-3xl p-6 backdrop-blur-xl sm:p-8">
+                <div class="mb-7 flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.22em] text-purple-300">Operations Crew</p><h2 class="mt-2 text-2xl font-bold text-white">Staff Login</h2></div><div class="rounded-xl border border-purple-400/30 bg-purple-400/10 px-3 py-2 text-right"><div class="text-[10px] uppercase tracking-wider text-slate-400">Workforce access</div><div class="mt-1 text-xs font-bold text-purple-300">ONLINE READY</div></div></div>
+                <form id="staff-login-form" class="space-y-5" novalidate><div><label for="staff-id" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Staff ID</label><input id="staff-id" type="text" autocomplete="username" placeholder="Enter Staff ID" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600"></div><div><label for="staff-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label><input id="staff-password" type="password" autocomplete="current-password" placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600"></div><div class="flex items-center justify-between gap-3 text-xs"><label class="flex cursor-pointer items-center gap-2 text-slate-400"><input id="staff-remember-me" type="checkbox" class="h-4 w-4 accent-brandAccent"> Remember Me</label><span class="text-purple-300">Encrypted access</span></div><div id="staff-login-message" class="hidden rounded-xl px-4 py-3 text-xs font-semibold" role="alert"></div><button id="staff-login-button" type="submit" disabled class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950 disabled:opacity-40">Staff Login</button></form><p class="mt-4 text-center text-[10px] uppercase tracking-wider text-slate-500">Staff demo: staff001 / ravi123</p>
+            </div>
 
             <footer class="mt-7 text-center text-xs text-slate-500"><strong class="text-slate-300">PARALLEL AI Control Center &copy; 2026</strong><span class="mx-2 text-slate-700">|</span>Secure Authentication <span class="text-brandAccent">•</span> Smart Campus <span class="text-brandAccent">•</span> Continuous Monitoring <span class="text-brandAccent">•</span> AI Powered</footer>
         </div>
+    </section>
+
+    <section id="staff-dashboard" class="staff-dashboard fixed inset-0 z-[95] hidden min-h-screen overflow-y-auto text-slate-100">
+        <div class="flex min-h-screen"><aside class="staff-sidebar hidden w-64 shrink-0 flex-col p-5 lg:flex"><div class="mb-8 flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-brandAccent/50 bg-brandAccent/10 text-xl">⚡</span><div><div class="display-font text-xl">PARALLEL<span class="text-brandAccent">.</span></div><div class="text-[9px] font-bold tracking-[.2em] text-brandAccent2">STAFF OPS</div></div></div><div class="mb-7 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[.03] p-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brandAccent2 to-purple-600 font-bold">RK</div><div><b id="staff-sidebar-name" class="block text-xs text-white">Ravi Kumar</b><span id="staff-sidebar-department" class="text-[10px] text-brandAccent2">Hostel Maintenance</span><span class="mt-1 flex items-center gap-1 text-[9px] text-brandAccent"><i class="h-1.5 w-1.5 rounded-full bg-brandAccent"></i> Online</span></div></div><nav class="space-y-1 text-xs"><button class="staff-nav-active w-full rounded-xl px-4 py-3 text-left font-bold">⌂ &nbsp; Dashboard</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">▣ &nbsp; Assigned Complaints</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">◉ &nbsp; Active Tasks</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">✓ &nbsp; Completed Tasks</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">◌ &nbsp; Notifications</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">⇧ &nbsp; Upload Proof</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">◈ &nbsp; Performance</button><button class="w-full rounded-xl px-4 py-3 text-left text-slate-400 hover:text-white">◎ &nbsp; Profile</button></nav><button id="staff-sidebar-logout" class="mt-auto rounded-xl border border-white/10 px-4 py-3 text-left text-xs font-bold text-slate-400 hover:border-red-400/50 hover:text-red-300">↪ &nbsp; Logout</button></aside><main class="min-w-0 flex-1 p-4 sm:p-6 lg:p-8"><header class="staff-card mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-4"><div><p class="text-[10px] font-bold uppercase tracking-[.25em] text-brandAccent">Staff Operations Network</p><h1 class="display-font mt-1 text-3xl text-white sm:text-4xl">Welcome Back, <span id="staff-welcome-name" class="text-brandAccent">Ravi Kumar</span></h1><p id="staff-welcome-department" class="mt-1 text-xs text-slate-400">Hostel Maintenance · Today's mission: resolve assigned complaints before deadline.</p></div><div class="flex flex-wrap items-center gap-2"><input id="staff-search" placeholder="Search CMP ID" class="staff-card w-36 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 outline-none focus:border-brandAccent2"><div class="text-right"><div id="staff-date" class="text-[10px] text-slate-400">--</div><div id="staff-clock" class="font-mono text-sm font-bold text-brandAccent">--:--</div></div><button id="staff-availability" class="rounded-xl border border-brandAccent/30 bg-brandAccent/10 px-3 py-2 text-[10px] font-bold text-brandAccent">● Available</button><button id="staff-top-logout" class="rounded-xl border border-white/10 px-3 py-2 text-xs font-bold text-slate-300">Sign out</button></div></header><div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><div class="staff-card rounded-2xl p-5"><span class="text-brandAccent2">ASSIGNED TODAY</span><b id="staff-assigned-count" class="display-font mt-2 block text-4xl text-white">0</b><small class="text-slate-500">active mission queue</small></div><div class="staff-card rounded-2xl border-l-2 border-brandAccent2 p-5"><span class="text-brandAccent2">IN PROGRESS</span><b id="staff-progress-count" class="display-font mt-2 block text-4xl text-brandAccent2">0</b><small class="text-slate-500">currently working</small></div><div class="staff-card rounded-2xl border-l-2 border-brandAccent p-5"><span class="text-brandAccent">COMPLETED TODAY</span><b id="staff-completed-count" class="display-font mt-2 block text-4xl text-brandAccent">0</b><small class="text-slate-500">closed missions</small></div><div class="staff-card rounded-2xl border-l-2 border-red-400 p-5"><span class="text-red-300">HIGH PRIORITY</span><b id="staff-high-count" class="display-font mt-2 block text-4xl text-red-300">0</b><small class="text-slate-500">needs attention</small></div></div><div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]"><section><div class="mb-4 flex items-end justify-between"><div><p class="text-[10px] font-bold uppercase tracking-[.2em] text-brandAccent2">Live queue</p><h2 class="display-font text-2xl text-white">Assigned Complaints</h2></div><span class="rounded-full border border-brandAccent/30 bg-brandAccent/10 px-3 py-1 text-[10px] font-bold text-brandAccent">LIVE SYNC</span></div><div id="staff-complaints" class="grid gap-4"></div></section><aside class="space-y-5"><div class="staff-card rounded-2xl p-5"><div class="flex items-center justify-between"><h2 class="display-font text-lg text-white">PARALLEL AI</h2><span class="text-[10px] text-brandAccent">ONLINE</span></div><div class="mt-4 rounded-xl border border-purple-400/20 bg-purple-500/10 p-4 text-xs leading-relaxed text-slate-300">“Hostel Block B has recurring water complaints. Complete the highest priority task first.”</div><div class="mt-4 space-y-2 text-xs text-slate-400"><p>⚡ Complete the active mission within 2 hours.</p><p>◈ Proof upload unlocks resolution.</p></div></div><div class="staff-card rounded-2xl p-5"><h2 class="display-font text-lg text-white">Performance</h2><div class="mt-4 grid grid-cols-2 gap-3 text-xs"><div><span class="text-slate-500">This week</span><b class="mt-1 block text-xl text-brandAccent">18</b></div><div><span class="text-slate-500">Avg. time</span><b class="mt-1 block text-xl text-brandAccent2">2.4h</b></div><div><span class="text-slate-500">Rating</span><b class="mt-1 block text-xl text-brandGold">4.8 ★</b></div><div><span class="text-slate-500">Accuracy</span><b class="mt-1 block text-xl text-purple-300">94%</b></div></div><div class="mt-5 flex flex-wrap gap-2"><span class="rounded-full border border-brandAccent/30 px-2 py-1 text-[10px] text-brandAccent">🏆 Fast Resolver</span><span class="rounded-full border border-brandGold/30 px-2 py-1 text-[10px] text-brandGold">⭐ Top Rated</span></div></div><div class="staff-card rounded-2xl p-5"><h2 class="display-font text-lg text-white">Upcoming Deadlines</h2><div id="staff-deadlines" class="mt-4 space-y-3 text-xs text-slate-400"></div></div></aside></div><section class="mt-6 grid gap-4 md:grid-cols-3"><div class="staff-card rounded-2xl p-5"><p class="text-[10px] uppercase text-slate-500">Weekly completed</p><div class="mt-4 flex h-20 items-end gap-2"> <i class="h-8 flex-1 rounded-t bg-brandAccent2/40"></i><i class="h-12 flex-1 rounded-t bg-brandAccent2/60"></i><i class="h-10 flex-1 rounded-t bg-brandAccent2/70"></i><i class="h-16 flex-1 rounded-t bg-brandAccent"></i><i class="h-14 flex-1 rounded-t bg-brandAccent"></i><i class="h-20 flex-1 rounded-t bg-brandAccent"></i></div></div><div class="staff-card rounded-2xl p-5"><p class="text-[10px] uppercase text-slate-500">Task completion</p><div class="mx-auto mt-3 flex h-28 w-28 items-center justify-center rounded-full staff-progress-ring" style="--progress:72%"><span class="flex h-20 w-20 items-center justify-center rounded-full bg-[#0b1220] text-2xl font-bold text-white">72%</span></div></div><div class="staff-card rounded-2xl p-5"><p class="text-[10px] uppercase text-slate-500">Notifications</p><div class="mt-4 space-y-3 text-xs"><p class="text-brandAccent">● New complaint assigned</p><p class="text-brandAccent2">● Admin approved your update</p><p class="text-purple-300">● Student added information</p></div></div></section></main></div>
     </section>
 
     <section id="admin-dashboard" class="fixed inset-0 z-[90] hidden min-h-screen overflow-y-auto bg-brandBg">
@@ -969,6 +984,11 @@
         const adminLoginButton = document.getElementById('admin-login-button');
         const adminLoginButtonLabel = document.getElementById('admin-login-button-label');
         const adminLoginMessage = document.getElementById('admin-login-message');
+        const staffLoginForm = document.getElementById('staff-login-form');
+        const staffId = document.getElementById('staff-id');
+        const staffPassword = document.getElementById('staff-password');
+        const staffLoginButton = document.getElementById('staff-login-button');
+        const staffLoginMessage = document.getElementById('staff-login-message');
         let adminLoginAttempts = Number(sessionStorage.getItem('parallelAdminLoginAttempts') || 0);
 
         function renderAdminSecurityStatus() {
@@ -981,13 +1001,19 @@
         const selectedRole = new URLSearchParams(window.location.search).get('role');
         if (selectedRole === 'student' || selectedRole === 'admin') {
             const selectedCard = document.getElementById(`${selectedRole}-login-card`);
-            const otherRole = selectedRole === 'student' ? 'admin' : 'student';
-            document.getElementById(`${otherRole}-login-card`).classList.add('hidden');
+            ['student', 'admin', 'staff'].filter((role) => role !== selectedRole).forEach((role) => document.getElementById(`${role}-login-card`).classList.add('hidden'));
             selectedCard.parentElement.classList.remove('lg:grid-cols-2');
             selectedCard.parentElement.classList.add('max-w-md', 'mx-auto');
             selectedCard.classList.add('role-selected');
             selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             document.getElementById(selectedRole === 'student' ? 'login-student-id' : 'admin-id').focus();
+        }
+        if (selectedRole === 'staff') {
+            document.getElementById('student-login-card').classList.add('hidden');
+            document.getElementById('admin-login-card').classList.add('hidden');
+            document.getElementById('staff-login-card').classList.remove('hidden', 'reveal-card');
+            document.getElementById('staff-login-card').classList.add('role-selected');
+            document.getElementById('staff-id').focus();
         }
 
         function showLoginMessage(element, message, type) {
@@ -1008,17 +1034,16 @@
         }
 
         function getStoredSession(role) {
-            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            const key = `parallel${role[0].toUpperCase()}${role.slice(1)}Session`;
             return JSON.parse(localStorage.getItem(key) || sessionStorage.getItem(key) || 'null');
         }
 
         function saveSession(role, account, remember) {
-            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
-            const otherKey = role === 'student' ? 'parallelAdminSession' : 'parallelStudentSession';
+            const key = `parallel${role[0].toUpperCase()}${role.slice(1)}Session`;
+            const otherKeys = ['student', 'admin', 'staff'].filter((item) => item !== role).map((item) => `parallel${item[0].toUpperCase()}${item.slice(1)}Session`);
             localStorage.removeItem(key);
             sessionStorage.removeItem(key);
-            localStorage.removeItem(otherKey);
-            sessionStorage.removeItem(otherKey);
+            otherKeys.forEach((otherKey) => { localStorage.removeItem(otherKey); sessionStorage.removeItem(otherKey); });
             (remember ? localStorage : sessionStorage).setItem(key, JSON.stringify(account));
         }
 
@@ -1039,6 +1064,7 @@
         }
 
         [loginStudentId, loginPassword, adminId, adminPassword].forEach((input) => input.addEventListener('input', updateLoginButtons));
+        [staffId, staffPassword].forEach((input) => input.addEventListener('input', () => { staffLoginButton.disabled = !staffId.value.trim() || !staffPassword.value; }));
 
         studentLoginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -1118,6 +1144,24 @@
             }
         });
 
+        staffLoginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const identifier = staffId.value.trim();
+            const password = staffPassword.value;
+            if (!identifier || !password) return;
+            staffLoginButton.disabled = true;
+            staffLoginButton.innerText = 'Verifying...';
+            try {
+                const account = await authenticate('staff', identifier, password);
+                saveSession('staff', account, document.getElementById('staff-remember-me').checked);
+                showStaffDashboard(account);
+            } catch (error) {
+                showLoginMessage(staffLoginMessage, error.message || 'Invalid Staff ID or Password.', 'error');
+                staffLoginButton.disabled = false;
+                staffLoginButton.innerText = 'Staff Login';
+            }
+        });
+
         document.getElementById('toggle-password').addEventListener('click', () => {
             const visible = loginPassword.type === 'text';
             loginPassword.type = visible ? 'password' : 'text';
@@ -1136,7 +1180,8 @@
 
         const studentSession = getStoredSession('student');
         const adminSession = getStoredSession('admin');
-        const activeSession = selectedRole === 'admin' ? adminSession : selectedRole === 'student' ? studentSession : adminSession || studentSession;
+        const staffSession = getStoredSession('staff');
+        const activeSession = selectedRole === 'admin' ? adminSession : selectedRole === 'staff' ? staffSession : selectedRole === 'student' ? studentSession : adminSession || staffSession || studentSession;
         if (activeSession && activeSession.role === 'student') {
             document.getElementById('logged-in-student-name').innerText = `Welcome, ${studentSession.name}`;
             document.getElementById('logged-in-student-id').innerText = studentSession.identifier;
@@ -1150,6 +1195,7 @@
             document.getElementById('admin-dashboard').classList.remove('hidden');
             renderAdminDashboard();
         }
+        if (activeSession && activeSession.role === 'staff') showStaffDashboard(staffSession);
         const rememberedStudent = localStorage.getItem('parallelStudentSession');
         if (rememberedStudent) {
             loginStudentId.value = JSON.parse(rememberedStudent).identifier;
@@ -1191,6 +1237,7 @@
 
             renderComplaintsList();
             updateCountBadge();
+            if (!document.getElementById('staff-dashboard').classList.contains('hidden')) renderStaffDashboard();
         }
 
         function renderAdminDashboard() {
@@ -1215,6 +1262,54 @@
             const categoryFilter = document.getElementById('admin-category-filter');
             categoryFilter.innerHTML = '<option value="ALL">All Categories</option>' + categories.map((category) => `<option>${category}</option>`).join('');
             renderAdminTable();
+        }
+
+        function showStaffDashboard(account) {
+            loginPage.classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('staff-dashboard').classList.remove('hidden');
+            document.getElementById('staff-sidebar-name').innerText = account.name;
+            document.getElementById('staff-welcome-name').innerText = account.name;
+            document.getElementById('staff-sidebar-department').innerText = account.department || 'Campus Operations';
+            document.getElementById('staff-welcome-department').innerText = `${account.department || 'Campus Operations'} · Today's mission: resolve assigned complaints before deadline.`;
+            renderStaffDashboard();
+        }
+
+        function renderStaffDashboard() {
+            const query = document.getElementById('staff-search').value.trim().toLowerCase();
+            const assigned = sampleComplaints.filter((complaint) => !query || complaint.id.toLowerCase().includes(query));
+            const progress = assigned.filter((complaint) => complaint.status === 'IN_PROGRESS').length;
+            const completed = assigned.filter((complaint) => complaint.status === 'RESOLVED').length;
+            const high = assigned.filter((complaint) => complaint.priority === 'HIGH').length;
+            document.getElementById('staff-assigned-count').innerText = assigned.length;
+            document.getElementById('staff-progress-count').innerText = progress;
+            document.getElementById('staff-completed-count').innerText = completed;
+            document.getElementById('staff-high-count').innerText = high;
+            document.getElementById('staff-complaints').innerHTML = assigned.length ? assigned.map((complaint) => {
+                const priority = String(complaint.priority || 'MEDIUM').toLowerCase();
+                const resolved = complaint.status === 'RESOLVED';
+                return `<article class="staff-card staff-priority-${priority} rounded-2xl p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><span class="font-mono text-sm font-bold text-brandAccent">${complaint.id}</span><h3 class="mt-2 text-lg font-bold text-white">${complaint.category} · ${complaint.subissue || 'Campus Issue'}</h3><p class="mt-1 text-xs text-slate-400">${complaint.name || 'Student'} · ${complaint.location || 'Campus'} · ${complaint.time}</p></div><span class="rounded-full border px-3 py-1 text-[10px] font-bold ${priority === 'high' ? 'border-red-400/30 bg-red-500/10 text-red-300' : priority === 'medium' ? 'border-brandGold/30 bg-brandGold/10 text-brandGold' : 'border-brandAccent/30 bg-brandAccent/10 text-brandAccent'}">${complaint.priority || 'MEDIUM'}</span></div><p class="mt-4 line-clamp-2 text-sm leading-relaxed text-slate-300">${complaint.description || 'No description provided.'}</p><div class="mt-5 flex flex-wrap items-center justify-between gap-3"><span class="text-xs ${resolved ? 'text-brandAccent' : complaint.status === 'IN_PROGRESS' ? 'text-brandAccent2' : 'text-brandGold'}">● ${complaint.status.replace('_', ' ')}</span><div class="flex gap-2"><button data-staff-view="${complaint.id}" class="rounded-lg border border-brandAccent2/30 px-3 py-2 text-xs font-bold text-brandAccent2">View Details</button><button data-staff-start="${complaint.id}" ${resolved ? 'disabled' : ''} class="rounded-lg border border-brandAccent/30 px-3 py-2 text-xs font-bold text-brandAccent disabled:opacity-40">${complaint.status === 'PENDING' ? 'Start Work' : resolved ? 'Completed' : 'Upload Proof'}</button></div></div></article>`;
+            }).join('') : '<div class="staff-card rounded-2xl p-8 text-center text-sm text-slate-500">No assigned complaints match this search.</div>';
+            document.getElementById('staff-deadlines').innerHTML = assigned.slice(0, 3).map((complaint) => `<div class="flex items-center justify-between border-b border-white/5 pb-3"><span>${complaint.id}<small class="mt-1 block text-slate-500">${complaint.category}</small></span><b class="text-brandGold">Today</b></div>`).join('') || '<p>No upcoming deadlines.</p>';
+            document.querySelectorAll('[data-staff-view]').forEach((button) => button.addEventListener('click', () => openDetailsModal(button.dataset.staffView)));
+            document.querySelectorAll('[data-staff-start]').forEach((button) => button.addEventListener('click', () => startStaffWork(button.dataset.staffStart)));
+        }
+
+        async function startStaffWork(complaintId) {
+            const complaint = sampleComplaints.find((item) => item.id === complaintId);
+            if (!complaint) return;
+            if (complaint.status === 'PENDING') {
+                const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'IN_PROGRESS', proof: 'Inspection started and task accepted by staff.' }) });
+                if (!response.ok) return;
+                complaint.status = 'IN_PROGRESS';
+            } else {
+                const proof = window.prompt('Enter proof notes before resolving this complaint:', 'Repair completed and verified on site.');
+                if (!proof || proof.trim().length < 10) return;
+                const response = await fetch(`/api/complaints/${complaint.backendId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'RESOLVED', proof: proof.trim(), proofFile: 'staff-resolution-proof' }) });
+                if (!response.ok) return;
+                complaint.status = 'RESOLVED';
+            }
+            renderStaffDashboard();
         }
 
         function getAdminFilteredComplaints() {
@@ -1345,7 +1440,7 @@
         }
 
         function logout(role) {
-            const key = role === 'student' ? 'parallelStudentSession' : 'parallelAdminSession';
+            const key = `parallel${role[0].toUpperCase()}${role.slice(1)}Session`;
             localStorage.removeItem(key);
             sessionStorage.removeItem(key);
             window.location.reload();
@@ -1353,6 +1448,10 @@
 
         document.getElementById('student-logout').addEventListener('click', () => logout('student'));
         document.getElementById('admin-logout').addEventListener('click', () => logout('admin'));
+        document.getElementById('staff-sidebar-logout').addEventListener('click', () => logout('staff'));
+        document.getElementById('staff-top-logout').addEventListener('click', () => logout('staff'));
+        document.getElementById('staff-search').addEventListener('input', renderStaffDashboard);
+        document.getElementById('staff-availability').addEventListener('click', (event) => { event.currentTarget.innerText = event.currentTarget.innerText.includes('Available') ? '● Busy' : '● Available'; event.currentTarget.classList.toggle('text-brandGold'); });
 
         ['admin-search', 'admin-category-filter', 'admin-status-filter', 'admin-priority-filter', 'admin-sort'].forEach((id) => document.getElementById(id).addEventListener('input', () => { adminPage = 1; renderAdminTable(); }));
         document.getElementById('admin-global-search').addEventListener('input', (event) => { document.getElementById('admin-search').value = event.target.value; adminPage = 1; renderAdminTable(); });

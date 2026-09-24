@@ -38,6 +38,14 @@
       "password": "parallel2026"
     }
   ],
+  "staff": [
+    {
+      "staffId": "staff001",
+      "name": "Ravi Kumar",
+      "department": "Hostel Maintenance",
+      "password": "ravi123"
+    }
+  ],
   "complaints": [
     {
       "id": 1000,
