@@ -213,7 +213,6 @@
         .staff-priority-critical { border-left: 3px solid #ef4444; } .staff-priority-high { border-left: 3px solid #fb923c; } .staff-priority-medium { border-left: 3px solid #ffc400; } .staff-priority-low { border-left: 3px solid #00e676; }
         .staff-progress-ring { background: conic-gradient(var(--accent2) var(--progress), rgba(255,255,255,.08) 0); }
         .staff-nav-active { color: var(--accent); background: linear-gradient(90deg, rgba(0,230,118,.14), transparent); box-shadow: inset 3px 0 var(--accent); }
-        #staff-login-card, #staff-dashboard { display: none !important; }
         .ops-kanban { min-height: 190px; }
         .ops-column { background: rgba(4, 7, 11, .48); border: 1px solid rgba(255,255,255,.07); }
         .ops-ticket { background: linear-gradient(135deg, rgba(17,24,39,.9), rgba(8,16,30,.86)); border: 1px solid rgba(0,217,255,.18); transition: transform .2s ease, border-color .2s ease; }
@@ -1030,9 +1029,10 @@
         }
         if (selectedRole === 'staff') {
             document.getElementById('student-login-card').classList.add('hidden');
-            document.getElementById('admin-login-card').classList.remove('hidden');
-            document.getElementById('admin-login-card').classList.add('role-selected');
-            document.getElementById('admin-id').focus();
+            document.getElementById('admin-login-card').classList.add('hidden');
+            document.getElementById('staff-login-card').classList.remove('hidden', 'reveal-card');
+            document.getElementById('staff-login-card').classList.add('role-selected');
+            document.getElementById('staff-id').focus();
         }
 
         function showLoginMessage(element, message, type) {
@@ -1214,12 +1214,7 @@
             document.getElementById('admin-dashboard').classList.remove('hidden');
             renderAdminDashboard();
         }
-        if (activeSession && activeSession.role === 'staff') {
-            loginPage.classList.add('hidden');
-            document.getElementById('logged-in-admin-name').innerText = `Staff Ops · ${staffSession.name}`;
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            renderAdminDashboard();
-        }
+        if (activeSession && activeSession.role === 'staff') showStaffDashboard(staffSession);
         const rememberedStudent = localStorage.getItem('parallelStudentSession');
         if (rememberedStudent) {
             loginStudentId.value = JSON.parse(rememberedStudent).identifier;
