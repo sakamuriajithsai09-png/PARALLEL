@@ -44,6 +44,30 @@
       "name": "Ravi Kumar",
       "department": "Hostel Maintenance",
       "password": "ravi123"
+    },
+    {
+      "staffId": "staff002",
+      "name": "Priya Sharma",
+      "department": "Mess Operations",
+      "password": "priya123"
+    },
+    {
+      "staffId": "staff003",
+      "name": "Arjun Reddy",
+      "department": "Transport Operations",
+      "password": "arjun123"
+    },
+    {
+      "staffId": "staff004",
+      "name": "Kiran Kumar",
+      "department": "Electrical Maintenance",
+      "password": "kiran123"
+    },
+    {
+      "staffId": "staff005",
+      "name": "Anitha Devi",
+      "department": "Water & Utilities",
+      "password": "anitha123"
     }
   ],
   "complaints": [
