@@ -9,8 +9,28 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brandBg: '#0a0e14',
+          brandPanel: '#11161f',
+          brandPanelBorder: 'rgba(255, 255, 255, 0.08)',
+          brandAccent: '#00e676',
+          brandAccent2: '#00b0ff',
+          brandGold: '#ffc400',
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Anton', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
 
 <style>
   :root{

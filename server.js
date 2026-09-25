@@ -27,14 +27,18 @@ app.get("/", (req, res) => {
 app.post("/api/auth/login", (req, res) => {
   const { role, identifier, password } = req.body || {};
   const db = readDB();
-  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : role === "staff" ? db.staff : [];
+  const accounts = role === "student" ? (db.students || []) : role === "admin" ? (db.admins || []) : role === "staff" ? (db.staff || []) : [];
+  const normalizedId = String(identifier || "").trim().toLowerCase();
+  const rawPassword = String(password || "").trim();
+
   const account = accounts.find((candidate) => {
-    const matchesIdentifier = role === "student"
-      ? candidate.studentId === identifier
+    const candidateId = role === "student"
+      ? String(candidate.studentId || "").trim().toLowerCase()
       : role === "admin"
-        ? candidate.adminId === identifier
-        : candidate.staffId === identifier;
-    return matchesIdentifier && candidate.password === password;
+        ? String(candidate.adminId || "").trim().toLowerCase()
+        : String(candidate.staffId || "").trim().toLowerCase();
+    const candidatePass = String(candidate.password || "").trim();
+    return candidateId === normalizedId && (candidatePass === rawPassword || candidatePass.toLowerCase() === rawPassword.toLowerCase());
   });
 
   if (!account) {
@@ -58,8 +62,12 @@ app.post("/api/auth/login", (req, res) => {
 // --- tiny JSON-file "database" ---
 const readDB = () => {
   if (runtimeDB) return runtimeDB;
-  if (!fs.existsSync(DB_FILE)) return { complaints: [] };
+  if (!fs.existsSync(DB_FILE)) return { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
   runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  runtimeDB.students = runtimeDB.students || [];
+  runtimeDB.admins = runtimeDB.admins || [];
+  runtimeDB.staff = runtimeDB.staff || [];
+  runtimeDB.complaints = runtimeDB.complaints || [];
   return runtimeDB;
 };
 
@@ -138,18 +146,24 @@ app.put("/api/complaints/:id", (req, res) => {
     if (!Object.prototype.hasOwnProperty.call(statuses, nextStatus)) {
       return res.status(400).json({ error: "Invalid complaint status" });
     }
-    if (statuses[nextStatus] <= (statuses[currentStatus] ?? 0)) {
+    const isStatusUpgrade = statuses[nextStatus] > (statuses[currentStatus] ?? 0);
+    const isStatusDowngrade = statuses[nextStatus] < (statuses[currentStatus] ?? 0);
+
+    if (isStatusDowngrade) {
       return res.status(400).json({ error: "Status can only be upgraded" });
     }
-    if (proof.length < 10) {
+    if (isStatusUpgrade && proof.length < 10) {
       return res.status(400).json({ error: "Valid proof is required to upgrade the complaint status." });
     }
 
     complaint.status = nextStatus;
-    complaint.proof = proof;
-    complaint.proofFile = typeof req.body.proofFile === "string" ? req.body.proofFile.trim() : "";
-    complaint.proofAt = new Date().toISOString();
+    if (proof) {
+      complaint.proof = proof;
+      complaint.proofFile = typeof req.body.proofFile === "string" ? req.body.proofFile.trim() : (complaint.proofFile || "");
+      complaint.proofAt = new Date().toISOString();
+    }
   }
+  if (req.body.feedback !== undefined) complaint.feedback = req.body.feedback;
   if (req.body.rating !== undefined) complaint.rating = req.body.rating;
   if (req.body.staff) complaint.staff = req.body.staff;
   if (req.body.department) complaint.department = req.body.department;

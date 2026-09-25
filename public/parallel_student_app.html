@@ -858,16 +858,16 @@
 
             <!-- Detail Summary Grid -->
             <div class="grid sm:grid-cols-2 gap-4 bg-brandBg/60 p-4 rounded-xl border border-white/5 text-xs">
-                <div><span class="text-slate-500">Location:</span> <strong id="detail-location" class="text-white">Hostel Mess 1</strong></div>
-                <div><span class="text-slate-500">Priority:</span> <strong id="detail-priority" class="text-brandGold">Medium</strong></div>
-                <div><span class="text-slate-500">Department:</span> <strong id="detail-dept" class="text-brandAccent">Mess Management</strong></div>
-                <div><span class="text-slate-500">Assigned Staff:</span> <strong id="detail-staff" class="text-white">Ramesh Kumar (Staff #12)</strong></div>
+                <div><span class="text-slate-500">Location:</span> <strong id="student-detail-location" class="text-white">Hostel Mess 1</strong></div>
+                <div><span class="text-slate-500">Priority:</span> <strong id="student-detail-priority" class="text-brandGold">Medium</strong></div>
+                <div><span class="text-slate-500">Department:</span> <strong id="student-detail-dept" class="text-brandAccent">Mess Management</strong></div>
+                <div><span class="text-slate-500">Assigned Staff:</span> <strong id="student-detail-staff" class="text-white">Ramesh Kumar (Staff #12)</strong></div>
             </div>
 
             <!-- Description -->
             <div>
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Issue Description</h4>
-                <p id="detail-desc" class="text-sm text-slate-200 bg-brandBg/40 p-3 rounded-xl border border-white/5 leading-relaxed"></p>
+                <p id="student-detail-desc" class="text-sm text-slate-200 bg-brandBg/40 p-3 rounded-xl border border-white/5 leading-relaxed"></p>
             </div>
 
             <!-- Lifecycle Step Progress Bar -->
@@ -1410,6 +1410,18 @@
             panel.classList.remove('hidden');
             panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
             panel.dataset.complaintId = complaint.id;
+            panel.dataset.proofFile = complaint.proofFile || '';
+            const existingFileInput = panel.querySelector('#detail-proof-file');
+            if (existingFileInput) existingFileInput.value = '';
+            const existingPreview = panel.querySelector('#detail-file-preview');
+            if (existingPreview) {
+                existingPreview.innerText = complaint.proofFile ? `Selected: ${complaint.proofFile}` : '';
+                existingPreview.classList.toggle('hidden', !complaint.proofFile);
+            }
+            const existingVerified = panel.querySelector('#detail-proof-verified');
+            if (existingVerified) {
+                existingVerified.classList.toggle('hidden', !complaint.proofFile && !complaint.proof);
+            }
             const proofNotes = panel.querySelector('#detail-proof');
             if (!panel.querySelector('#detail-proof-file')) {
                 proofNotes.insertAdjacentHTML('beforebegin', '<label class="mt-4 block text-xs font-bold text-brandAccent2">Upload Resolution Proof <span class="text-slate-500">(JPG, PNG, PDF)</span></label><input id="detail-proof-file" type="file" accept="image/jpeg,image/png,application/pdf" class="login-input mt-2 w-full rounded-lg border border-dashed border-brandAccent2/50 bg-black/20 p-3 text-xs text-slate-400"><p id="detail-file-preview" class="mt-2 hidden text-[10px] text-brandAccent2"></p><span id="detail-proof-verified" class="mt-2 hidden rounded-full border border-brandAccent/30 bg-brandAccent/10 px-2 py-1 text-[10px] font-bold text-brandAccent">✓ Proof Verified</span>');
@@ -1540,6 +1552,15 @@
 
         function openAssignModal(complaintId) {
             adminSelectedComplaint = sampleComplaints.find((complaint) => complaint.id === complaintId);
+            if (!adminSelectedComplaint) return;
+            const statusSelect = document.getElementById('assign-status');
+            if (statusSelect) {
+                statusSelect.value = adminSelectedComplaint.status === 'RESOLVED' ? 'RESOLVED' : 'IN_PROGRESS';
+            }
+            const proofTextarea = document.getElementById('assign-proof');
+            if (proofTextarea) {
+                proofTextarea.value = adminSelectedComplaint.proof || 'Status updated by campus admin.';
+            }
             document.getElementById('assign-modal').classList.remove('hidden');
             document.getElementById('assign-modal').classList.add('flex');
         }
@@ -1722,19 +1743,23 @@
             const desc = document.getElementById('form-description').value;
             const subissue = document.querySelector('input[name="subissue"]:checked')?.value || cat;
 
+            const studentSession = getStoredSession('student');
+            const studentId = studentSession?.identifier || loginStudentId.value.trim() || '2600040107';
+            const studentName = studentSession?.name || document.getElementById('logged-in-student-name')?.innerText.replace('Welcome, ', '').trim() || 'Student';
+
             try {
                 const response = await fetch('/api/complaints', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        studentId: loginStudentId.value.trim(),
-                        name: loginStudentId.value.trim(),
+                        studentId,
+                        name: studentName,
                         category: cat,
                         location: loc,
                         description: desc,
                         subissue,
-                        priority: document.getElementById('ai-priority').innerText,
-                        department: document.getElementById('ai-dept').innerText
+                        priority: document.getElementById('ai-priority').innerText || 'MEDIUM',
+                        department: document.getElementById('ai-dept').innerText || 'General Maintenance'
                     })
                 });
 
@@ -1855,17 +1880,62 @@
             switchTab('my-complaints');
         }
 
+        let activeModalComplaintId = null;
+
         function openDetailsModal(cmpId) {
             const complaint = sampleComplaints.find(c => c.id === cmpId);
             if (!complaint) return;
+            activeModalComplaintId = cmpId;
 
             document.getElementById('detail-cmp-id').innerText = complaint.id;
             document.getElementById('detail-category-badge').innerText = complaint.category;
-            document.getElementById('detail-location').innerText = complaint.location;
-            document.getElementById('detail-priority').innerText = complaint.priority;
-            document.getElementById('detail-dept').innerText = complaint.department;
-            document.getElementById('detail-staff').innerText = complaint.staff;
-            document.getElementById('detail-desc').innerText = complaint.description;
+            document.getElementById('student-detail-location').innerText = complaint.location || 'Campus';
+            document.getElementById('student-detail-priority').innerText = complaint.priority || 'MEDIUM';
+            document.getElementById('student-detail-dept').innerText = complaint.department || 'General Maintenance';
+            document.getElementById('student-detail-staff').innerText = complaint.staff || 'Pending Assignment';
+            document.getElementById('student-detail-desc').innerText = complaint.description || 'No description provided.';
+
+            // Dynamic Step Timeline Updates
+            const step2Icon = document.getElementById('step-2-icon');
+            const step2Title = document.getElementById('step-2-title');
+            const step2Time = document.getElementById('step-2-time');
+            const step3Icon = document.getElementById('step-3-icon');
+            const step3Title = document.getElementById('step-3-title');
+            const step3Time = document.getElementById('step-3-time');
+
+            if (step2Icon && step2Title && step2Time && step3Icon && step3Title && step3Time) {
+                if (complaint.status === 'PENDING') {
+                    step2Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-slate-700 text-slate-400 font-bold text-xs flex items-center justify-center';
+                    step2Icon.innerText = '2';
+                    step2Title.className = 'text-xs font-bold text-slate-400';
+                    step2Time.innerText = 'Pending staff assignment';
+
+                    step3Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-slate-700 text-slate-400 font-bold text-xs flex items-center justify-center';
+                    step3Icon.innerText = '3';
+                    step3Title.className = 'text-xs font-bold text-slate-400';
+                    step3Time.innerText = 'Pending resolution';
+                } else if (complaint.status === 'IN_PROGRESS') {
+                    step2Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-brandAccent2 text-black font-bold text-xs flex items-center justify-center';
+                    step2Icon.innerText = '✓';
+                    step2Title.className = 'text-xs font-bold text-white';
+                    step2Time.innerText = `In Progress · ${complaint.staff}`;
+
+                    step3Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-slate-700 text-slate-400 font-bold text-xs flex items-center justify-center';
+                    step3Icon.innerText = '3';
+                    step3Title.className = 'text-xs font-bold text-slate-400';
+                    step3Time.innerText = 'Work in progress';
+                } else if (complaint.status === 'RESOLVED') {
+                    step2Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-brandAccent text-black font-bold text-xs flex items-center justify-center';
+                    step2Icon.innerText = '✓';
+                    step2Title.className = 'text-xs font-bold text-white';
+                    step2Time.innerText = `Completed · ${complaint.staff}`;
+
+                    step3Icon.className = 'absolute -left-6 w-5 h-5 rounded-full bg-brandAccent text-black font-bold text-xs flex items-center justify-center';
+                    step3Icon.innerText = '✓';
+                    step3Title.className = 'text-xs font-bold text-brandAccent';
+                    step3Time.innerText = complaint.proofAt ? new Date(complaint.proofAt).toLocaleString() : 'Resolved';
+                }
+            }
 
             // Feedback Toggle for Resolved
             const feedbackSection = document.getElementById('feedback-section');
@@ -1878,7 +1948,7 @@
                 document.getElementById('feedback-date').innerText = complaint.proofAt ? new Date(complaint.proofAt).toLocaleString() : complaint.time;
                 document.getElementById('feedback-proof-badge').classList.toggle('hidden', !complaint.proofFile && !complaint.proof);
                 document.getElementById('send-notification-button').disabled = false;
-                document.getElementById('submit-feedback-button').disabled = true;
+                document.getElementById('submit-feedback-button').disabled = !selectedFeedbackAnswer;
                 document.getElementById('notification-success').classList.add('hidden');
                 document.getElementById('feedback-success').classList.add('hidden');
             } else {
@@ -1900,7 +1970,33 @@
         document.querySelectorAll('#feedback-stars .feedback-star').forEach((star) => star.addEventListener('click', () => { selectedFeedbackRating = Number(star.dataset.rating); document.querySelectorAll('#feedback-stars .feedback-star').forEach((item) => item.classList.toggle('active', Number(item.dataset.rating) <= selectedFeedbackRating)); }));
         document.getElementById('feedback-comments').addEventListener('input', (event) => { document.getElementById('feedback-character-count').innerText = `${event.target.value.length}/250`; });
         document.getElementById('send-notification-button').addEventListener('click', (event) => { event.currentTarget.disabled = true; event.currentTarget.innerText = 'Notification Sent'; document.getElementById('notification-success').classList.remove('hidden'); document.getElementById('notification-success').classList.add('notification-sent'); document.getElementById('submit-feedback-button').disabled = false; });
-        document.getElementById('submit-feedback-button').addEventListener('click', () => { if (!selectedFeedbackAnswer) return; document.getElementById('feedback-received-badge').classList.remove('hidden'); document.getElementById('feedback-success').classList.remove('hidden'); document.getElementById('submit-feedback-button').disabled = true; });
+        document.getElementById('submit-feedback-button').addEventListener('click', async () => {
+            if (!selectedFeedbackAnswer) return;
+            const complaint = sampleComplaints.find(c => c.id === activeModalComplaintId);
+            const comments = document.getElementById('feedback-comments')?.value.trim() || '';
+            const feedbackText = `Resolution Confirmed: ${selectedFeedbackAnswer}. Rating: ${selectedFeedbackRating || 5}/5. Comments: ${comments}`;
+
+            if (complaint && complaint.backendId) {
+                try {
+                    await fetch(`/api/complaints/${complaint.backendId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            rating: selectedFeedbackRating || 5,
+                            feedback: feedbackText
+                        })
+                    });
+                    complaint.rating = selectedFeedbackRating || 5;
+                    complaint.feedback = feedbackText;
+                } catch (err) {
+                    console.error('Failed to submit feedback to backend:', err);
+                }
+            }
+
+            document.getElementById('feedback-received-badge').classList.remove('hidden');
+            document.getElementById('feedback-success').classList.remove('hidden');
+            document.getElementById('submit-feedback-button').disabled = true;
+        });
 
         function toggleNotifications() {
             const drawer = document.getElementById('notifications-drawer');

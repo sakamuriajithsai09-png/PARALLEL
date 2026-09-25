@@ -1,6 +1,11 @@
 {
   "students": [
     {
+      "studentId": "2600040101",
+      "name": "Abhiram R.",
+      "password": "abhiram123"
+    },
+    {
       "studentId": "2600040107",
       "name": "Ajith Sai",
       "password": "ajith123"
@@ -14,6 +19,36 @@
       "studentId": "2600040109",
       "name": "Priya Sharma",
       "password": "priya123"
+    },
+    {
+      "studentId": "2600040615",
+      "name": "Sudheer",
+      "password": "sudheer123"
+    },
+    {
+      "studentId": "2600080016",
+      "name": "Snehitha Reddy",
+      "password": "snehitha123"
+    },
+    {
+      "studentId": "2600040270",
+      "name": "Manikanta",
+      "password": "manikanta123"
+    },
+    {
+      "studentId": "2600040396",
+      "name": "Lavanya",
+      "password": "lavanya123"
+    },
+    {
+      "studentId": "2600040312",
+      "name": "Aravind",
+      "password": "aravind123"
+    },
+    {
+      "studentId": "2600040165",
+      "name": "Sravani",
+      "password": "sravani123"
     }
   ],
   "admins": [
