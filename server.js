@@ -12,6 +12,34 @@ const DB_FILE = path.join(__dirname, "db.json");
 const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(__dirname, "public");
 let runtimeDB;
 
+// --- tiny JSON-file "database" ---
+// NOTE: readDB/writeDB MUST be defined before any route that uses them.
+function readDB() {
+  if (runtimeDB) return runtimeDB;
+  if (!fs.existsSync(DB_FILE)) return { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
+  runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  runtimeDB.students = runtimeDB.students || [];
+  runtimeDB.admins = runtimeDB.admins || [];
+  runtimeDB.staff = runtimeDB.staff || [];
+  runtimeDB.complaints = runtimeDB.complaints || [];
+  // Bug fix: ensure nextId is always a valid number
+  if (!runtimeDB.nextId || typeof runtimeDB.nextId !== 'number') {
+    const maxId = runtimeDB.complaints.reduce((max, c) => Math.max(max, Number(c.id) || 0), 999);
+    runtimeDB.nextId = maxId + 1;
+  }
+  return runtimeDB;
+}
+
+function writeDB(data) {
+  runtimeDB = data;
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    if (!['EROFS', 'EACCES', 'EPERM'].includes(error.code)) throw error;
+    console.warn('Database file is read-only; keeping this update in server memory.');
+  }
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
@@ -58,28 +86,6 @@ app.post("/api/auth/login", (req, res) => {
     department: account.department || "",
   });
 });
-
-// --- tiny JSON-file "database" ---
-const readDB = () => {
-  if (runtimeDB) return runtimeDB;
-  if (!fs.existsSync(DB_FILE)) return { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
-  runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
-  runtimeDB.students = runtimeDB.students || [];
-  runtimeDB.admins = runtimeDB.admins || [];
-  runtimeDB.staff = runtimeDB.staff || [];
-  runtimeDB.complaints = runtimeDB.complaints || [];
-  return runtimeDB;
-};
-
-const writeDB = (data) => {
-  runtimeDB = data;
-  try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-  } catch (error) {
-    if (!['EROFS', 'EACCES', 'EPERM'].includes(error.code)) throw error;
-    console.warn('Database file is read-only; keeping this update in server memory.');
-  }
-};
 
 // GET all complaints
 app.get("/api/complaints", (req, res) => {
@@ -139,8 +145,9 @@ app.put("/api/complaints/:id", (req, res) => {
 
   if (req.body.status) {
     const statuses = { PENDING: 0, IN_PROGRESS: 1, RESOLVED: 2 };
-    const nextStatus = String(req.body.status).toUpperCase().replace(" ", "_");
-    const currentStatus = String(complaint.status || "PENDING").toUpperCase().replace(" ", "_");
+    // Bug fix: use replace(/ /g, "_") so ALL spaces are replaced (not just first)
+    const nextStatus = String(req.body.status).toUpperCase().replace(/ /g, "_");
+    const currentStatus = String(complaint.status || "PENDING").toUpperCase().replace(/ /g, "_");
     const proof = typeof req.body.proof === "string" ? req.body.proof.trim() : "";
 
     if (!Object.prototype.hasOwnProperty.call(statuses, nextStatus)) {

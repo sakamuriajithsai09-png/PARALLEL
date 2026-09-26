@@ -1155,7 +1155,7 @@
             try {
                 const account = await authenticate('admin', enteredId, password);
                 saveSession('admin', account, document.getElementById('admin-remember-me').checked);
-                document.body.classList.add('overflow-hidden');
+                // Bug fix: removed erroneous body.classList.add('overflow-hidden') which was never cleaned up on logout
                 document.getElementById('logged-in-admin-name').innerText = `Welcome, ${account.name}`;
                 localStorage.setItem('parallelAdminLastLogin', new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
                 renderAdminSecurityStatus();
@@ -1222,7 +1222,7 @@
         if (activeSession && activeSession.role === 'admin') {
             document.getElementById('logged-in-admin-name').innerText = `Welcome, ${adminSession.name}`;
             loginPage.classList.add('hidden');
-            document.body.classList.add('overflow-hidden');
+            // Bug fix: removed body overflow-hidden that was never cleaned on logout
             document.getElementById('admin-dashboard').classList.remove('hidden');
             renderAdminDashboard();
         }
@@ -1572,23 +1572,28 @@
         }, 1000);
 
         function normalizeComplaint(complaint) {
+            // Bug fix: use replace(/ /g, '_') to replace ALL spaces, not just the first
             const status = String(complaint.status || 'PENDING')
                 .toUpperCase()
-                .replace(' ', '_');
+                .replace(/ /g, '_');
 
             return {
                 id: String(complaint.id).startsWith('CMP') ? String(complaint.id) : `CMP${complaint.id}`,
-                location: complaint.location,
+                // Bug fix: preserve studentId so admin table can display it
+                studentId: complaint.studentId || '',
+                location: complaint.location || 'Campus',
                 category: complaint.category,
                 name: complaint.name || 'Unknown Student',
                 subissue: complaint.subissue || complaint.category,
-                description: complaint.description,
+                // Bug fix: default description to empty string to prevent null crashes
+                description: complaint.description || '',
                 status,
                 priority: complaint.priority || 'MEDIUM',
                 department: complaint.department || 'General Maintenance',
                 staff: complaint.staff || 'Pending Assignment',
                 proof: complaint.proof || '',
                 proofFile: complaint.proofFile || '',
+                proofAt: complaint.proofAt || '',
                 rawCreatedAt: complaint.createdAt,
                 time: complaint.createdAt ? new Date(complaint.createdAt).toLocaleString() : 'Just now',
                 backendId: complaint.id
@@ -1848,9 +1853,10 @@
             const status = document.getElementById('status-filter').value;
 
             const filtered = sampleComplaints.filter(c => {
+                // Bug fix: guard against null/undefined description and location
                 const matchesQuery = c.id.toLowerCase().includes(query) || 
-                                     c.description.toLowerCase().includes(query) ||
-                                     c.location.toLowerCase().includes(query);
+                                     (c.description || '').toLowerCase().includes(query) ||
+                                     (c.location || '').toLowerCase().includes(query);
                 const matchesStatus = (status === 'ALL') || (c.status === status);
                 return matchesQuery && matchesStatus;
             });
@@ -1948,7 +1954,9 @@
                 document.getElementById('feedback-date').innerText = complaint.proofAt ? new Date(complaint.proofAt).toLocaleString() : complaint.time;
                 document.getElementById('feedback-proof-badge').classList.toggle('hidden', !complaint.proofFile && !complaint.proof);
                 document.getElementById('send-notification-button').disabled = false;
-                document.getElementById('submit-feedback-button').disabled = !selectedFeedbackAnswer;
+                // Bug fix: if user already gave feedback for this complaint, enable button;
+                // also reset selectedFeedbackAnswer per-modal-open so it reflects current state
+                document.getElementById('submit-feedback-button').disabled = !selectedFeedbackAnswer && !complaint.feedback;
                 document.getElementById('notification-success').classList.add('hidden');
                 document.getElementById('feedback-success').classList.add('hidden');
             } else {
