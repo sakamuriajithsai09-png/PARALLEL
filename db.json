@@ -121,6 +121,36 @@
       "name": "Captain Singh",
       "department": "Security",
       "password": "singh123"
+    },
+    {
+      "staffId": "staff1",
+      "name": "Ravi Kumar",
+      "department": "Hostel Maintenance",
+      "password": "1234"
+    },
+    {
+      "staffId": "staff2",
+      "name": "Priya Sharma",
+      "department": "Mess Management",
+      "password": "1234"
+    },
+    {
+      "staffId": "staff3",
+      "name": "Arjun Reddy",
+      "department": "Electrical",
+      "password": "1234"
+    },
+    {
+      "staffId": "staff4",
+      "name": "Suresh V.",
+      "department": "Wi-Fi",
+      "password": "1234"
+    },
+    {
+      "staffId": "staff5",
+      "name": "Kiran Kumar",
+      "department": "Transport",
+      "password": "1234"
     }
   ],
   "complaints": [

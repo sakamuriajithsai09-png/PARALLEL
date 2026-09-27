@@ -116,7 +116,7 @@ app.post("/api/auth/login", (req, res) => {
         ? "Invalid Student ID or Password."
         : role === "admin"
           ? "Invalid Admin ID or Password."
-          : "Invalid Staff ID or Password."
+          : "Incorrect Staff ID or Password. Please use the demo credentials provided below."
     });
   }
 
