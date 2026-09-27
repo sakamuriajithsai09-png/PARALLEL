@@ -1,5 +1,5 @@
-// PARALLEL — Backend Server (Express)
-// Run: npm install  →  node server.js   (serves API on http://localhost:5000)
+// PARALLEL v2.0 — Enterprise Backend Server (Express)
+// Serves API on http://localhost:5000 and powers Vercel Serverless Function (api/index.js)
 
 const express = require("express");
 const cors = require("cors");
@@ -7,23 +7,29 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const DB_FILE = path.join(__dirname, "db.json");
 const PUBLIC_DIR = process.env.PUBLIC_DIR || path.join(__dirname, "public");
-let runtimeDB;
+let runtimeDB = null;
 
-// --- tiny JSON-file "database" ---
-// NOTE: readDB/writeDB MUST be defined before any route that uses them.
 function readDB() {
   if (runtimeDB) return runtimeDB;
-  if (!fs.existsSync(DB_FILE)) return { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
-  runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  if (!fs.existsSync(DB_FILE)) {
+    runtimeDB = { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
+    return runtimeDB;
+  }
+  try {
+    runtimeDB = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+  } catch (err) {
+    console.error("Error reading db.json:", err);
+    runtimeDB = { students: [], admins: [], staff: [], complaints: [], nextId: 1000 };
+  }
   runtimeDB.students = runtimeDB.students || [];
   runtimeDB.admins = runtimeDB.admins || [];
   runtimeDB.staff = runtimeDB.staff || [];
   runtimeDB.complaints = runtimeDB.complaints || [];
-  // Bug fix: ensure nextId is always a valid number
-  if (!runtimeDB.nextId || typeof runtimeDB.nextId !== 'number') {
+
+  if (!runtimeDB.nextId || typeof runtimeDB.nextId !== "number") {
     const maxId = runtimeDB.complaints.reduce((max, c) => Math.max(max, Number(c.id) || 0), 999);
     runtimeDB.nextId = maxId + 1;
   }
@@ -36,26 +42,61 @@ function writeDB(data) {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
   } catch (error) {
     if (!['EROFS', 'EACCES', 'EPERM'].includes(error.code)) throw error;
-    console.warn('Database file is read-only; keeping this update in server memory.');
+    console.warn('Database file read-only; keeping update in server memory.');
   }
 }
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(PUBLIC_DIR));
 
-app.get("/student-app", (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, "parallel_student_app.html"));
-});
+// Helper: AI Classification Logic
+function generateAiInsight(category, location, description) {
+  const text = (description || "").toLowerCase();
+  let dept = "Hostel Maintenance";
+  let priority = "MEDIUM";
+  let estTime = "3 Hours";
+  let shortSummary = description.length > 60 ? description.substring(0, 57) + "..." : description;
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
-});
+  const cat = (category || "").toLowerCase();
+  if (cat.includes("water") || text.includes("leak") || text.includes("pipe") || text.includes("tap")) {
+    dept = "Water Supply";
+    priority = text.includes("burst") || text.includes("profus") || text.includes("flood") ? "HIGH" : "MEDIUM";
+    estTime = "2 Hours";
+  } else if (cat.includes("electr") || text.includes("spark") || text.includes("fan") || text.includes("wire") || text.includes("power") || text.includes("ac")) {
+    dept = "Electrical";
+    priority = text.includes("spark") || text.includes("shock") || text.includes("smoke") ? "CRITICAL" : "HIGH";
+    estTime = "1.5 Hours";
+  } else if (cat.includes("mess") || cat.includes("food") || text.includes("lunch") || text.includes("dinner") || text.includes("canteen")) {
+    dept = "Mess Management";
+    priority = text.includes("sick") || text.includes("uncooked") || text.includes("stale") ? "HIGH" : "MEDIUM";
+    estTime = "2 Hours";
+  } else if (cat.includes("wifi") || cat.includes("wi-fi") || text.includes("network") || text.includes("internet") || text.includes("router")) {
+    dept = "Wi-Fi";
+    priority = text.includes("exam") || text.includes("lab") ? "HIGH" : "LOW";
+    estTime = "2 Hours";
+  } else if (cat.includes("clean") || text.includes("garbage") || text.includes("trash") || text.includes("washroom")) {
+    dept = "Cleaning";
+    priority = text.includes("overflow") || text.includes("foul") ? "HIGH" : "MEDIUM";
+    estTime = "1 Hour";
+  } else if (cat.includes("transport") || text.includes("bus") || text.includes("shuttle")) {
+    dept = "Transport";
+    priority = "MEDIUM";
+    estTime = "4 Hours";
+  } else if (cat.includes("security") || text.includes("gate") || text.includes("camera") || text.includes("theft")) {
+    dept = "Security";
+    priority = text.includes("theft") || text.includes("intrud") ? "CRITICAL" : "HIGH";
+    estTime = "1 Hour";
+  }
 
+  return { dept, priority, estTime, shortSummary };
+}
+
+// ROUTE: Auth Login
 app.post("/api/auth/login", (req, res) => {
   const { role, identifier, password } = req.body || {};
   const db = readDB();
-  const accounts = role === "student" ? (db.students || []) : role === "admin" ? (db.admins || []) : role === "staff" ? (db.staff || []) : [];
+  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : role === "staff" ? db.staff : [];
   const normalizedId = String(identifier || "").trim().toLowerCase();
   const rawPassword = String(password || "").trim();
 
@@ -87,13 +128,37 @@ app.post("/api/auth/login", (req, res) => {
   });
 });
 
-// GET all complaints
+// ROUTE: Get Complaints (with optional filtering)
 app.get("/api/complaints", (req, res) => {
   const db = readDB();
-  res.json(db.complaints);
+  const { studentId, staffId, department, status } = req.query;
+  let result = db.complaints;
+
+  if (studentId) {
+    result = result.filter(c => String(c.studentId).toLowerCase() === String(studentId).toLowerCase());
+  }
+  if (staffId) {
+    result = result.filter(c => String(c.staffId).toLowerCase() === String(staffId).toLowerCase());
+  }
+  if (department && department !== 'All Departments' && department !== 'ALL') {
+    result = result.filter(c => String(c.department).toLowerCase().includes(String(department).toLowerCase()));
+  }
+  if (status && status !== 'ALL') {
+    result = result.filter(c => String(c.status).toLowerCase() === String(status).toLowerCase());
+  }
+
+  res.json(result);
 });
 
-// POST new complaint
+// ROUTE: Get Single Complaint Details
+app.get("/api/complaints/:id", (req, res) => {
+  const db = readDB();
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+  res.json(complaint);
+});
+
+// ROUTE: Post New Complaint (Step 1: Student Submission + AI Detection)
 app.post("/api/complaints", (req, res) => {
   const db = readDB();
   const {
@@ -103,88 +168,215 @@ app.post("/api/complaints", (req, res) => {
     location,
     description,
     subissue,
-    priority,
-    department,
+    photoUrl
   } = req.body;
 
   if (!studentId || !name || !category || !location || !description) {
-    return res.status(400).json({ error: "All fields are required" });
+    return res.status(400).json({ error: "Required fields missing: studentId, name, category, location, description" });
   }
+
+  const ai = generateAiInsight(category, location, description);
 
   const newComplaint = {
     id: db.nextId || 1000,
-    studentId,
-    name,
-    category,
-    location,
-    description,
+    studentId: String(studentId).trim(),
+    name: String(name).trim(),
+    category: String(category).trim(),
+    location: String(location).trim(),
+    description: String(description).trim(),
     subissue: subissue || category,
-    priority: priority || "MEDIUM",
-    department: department || "General Maintenance",
-    status: "Pending",
-    createdAt: new Date().toISOString(),
+    priority: ai.priority,
+    department: ai.dept,
+    aiSummary: ai.shortSummary,
+    estimatedTime: ai.estTime,
+    status: "Pending Admin Verification",
+    photoUrl: photoUrl || "",
+    createdAt: new Date().toISOString()
   };
 
   db.nextId = newComplaint.id + 1;
-  db.complaints.push(newComplaint);
+  db.complaints.unshift(newComplaint);
   writeDB(db);
 
   res.status(201).json(newComplaint);
 });
 
-// PUT update complaint status
-app.put("/api/complaints/:id", (req, res) => {
+// ROUTE: Admin Verify Complaint (Step 3)
+app.put("/api/complaints/:id/verify", (req, res) => {
   const db = readDB();
-  const complaint = db.complaints.find(
-    (c) => c.id === parseInt(req.params.id)
-  );
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
 
-  if (!complaint) {
-    return res.status(404).json({ error: "Complaint not found" });
+  const { action, notes, priority, department } = req.body;
+  if (action === "reject") {
+    complaint.status = "Rejected";
+    complaint.adminNotes = notes || "Rejected by Admin";
+  } else {
+    complaint.status = "Verified";
+    if (priority) complaint.priority = priority;
+    if (department) complaint.department = department;
+    if (notes) complaint.adminNotes = notes;
+    complaint.verifiedAt = new Date().toISOString();
   }
-
-  if (req.body.status) {
-    const statuses = { PENDING: 0, IN_PROGRESS: 1, RESOLVED: 2 };
-    // Bug fix: use replace(/ /g, "_") so ALL spaces are replaced (not just first)
-    const nextStatus = String(req.body.status).toUpperCase().replace(/ /g, "_");
-    const currentStatus = String(complaint.status || "PENDING").toUpperCase().replace(/ /g, "_");
-    const proof = typeof req.body.proof === "string" ? req.body.proof.trim() : "";
-
-    if (!Object.prototype.hasOwnProperty.call(statuses, nextStatus)) {
-      return res.status(400).json({ error: "Invalid complaint status" });
-    }
-    const isStatusUpgrade = statuses[nextStatus] > (statuses[currentStatus] ?? 0);
-    const isStatusDowngrade = statuses[nextStatus] < (statuses[currentStatus] ?? 0);
-
-    if (isStatusDowngrade) {
-      return res.status(400).json({ error: "Status can only be upgraded" });
-    }
-    if (isStatusUpgrade && proof.length < 10) {
-      return res.status(400).json({ error: "Valid proof is required to upgrade the complaint status." });
-    }
-
-    complaint.status = nextStatus;
-    if (proof) {
-      complaint.proof = proof;
-      complaint.proofFile = typeof req.body.proofFile === "string" ? req.body.proofFile.trim() : (complaint.proofFile || "");
-      complaint.proofAt = new Date().toISOString();
-    }
-  }
-  if (req.body.feedback !== undefined) complaint.feedback = req.body.feedback;
-  if (req.body.rating !== undefined) complaint.rating = req.body.rating;
-  if (req.body.staff) complaint.staff = req.body.staff;
-  if (req.body.department) complaint.department = req.body.department;
-  if (req.body.priority) complaint.priority = req.body.priority;
-  if (req.body.dueDate) complaint.dueDate = req.body.dueDate;
 
   writeDB(db);
   res.json(complaint);
 });
 
+// ROUTE: Admin Assign Staff (Step 4)
+app.put("/api/complaints/:id/assign", (req, res) => {
+  const db = readDB();
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+
+  const { staffId, staffName, department, adminNotes } = req.body;
+  if (!staffId || !staffName) {
+    return res.status(400).json({ error: "Staff ID and Staff Name are required for assignment" });
+  }
+
+  complaint.staffId = staffId;
+  complaint.staff = staffName;
+  if (department) complaint.department = department;
+  if (adminNotes) complaint.adminNotes = adminNotes;
+  complaint.status = "Staff Assigned";
+  complaint.assignedAt = new Date().toISOString();
+
+  writeDB(db);
+  res.json(complaint);
+});
+
+// ROUTE: Staff Action - Accept Task / Start Work / Upload Proof (Step 5 & 6)
+app.put("/api/complaints/:id/staff-action", (req, res) => {
+  const db = readDB();
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+
+  const { action, beforeImage, afterImage, videoUrl, notes } = req.body;
+
+  if (action === "accept" || action === "start") {
+    complaint.status = "Staff Working";
+    complaint.workStartedAt = new Date().toISOString();
+  } else if (action === "upload_proof") {
+    if (!afterImage && (!notes || notes.length < 5)) {
+      return res.status(400).json({ error: "Proof photo or completion notes required" });
+    }
+    complaint.status = "Proof Under Admin Verification";
+    if (beforeImage) complaint.beforeImage = beforeImage;
+    if (afterImage) complaint.afterImage = afterImage;
+    if (videoUrl) complaint.videoUrl = videoUrl;
+    complaint.repairNotes = notes || "Repair completed successfully.";
+    complaint.proofAt = new Date().toISOString();
+  } else {
+    return res.status(400).json({ error: "Invalid staff action" });
+  }
+
+  writeDB(db);
+  res.json(complaint);
+});
+
+// ROUTE: Admin Proof Verification (Step 6 -> Step 7)
+app.put("/api/complaints/:id/admin-proof-verify", (req, res) => {
+  const db = readDB();
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+
+  const { action, comment } = req.body;
+
+  if (action === "approve") {
+    complaint.status = "Waiting Student Review";
+    complaint.approvedByAdminAt = new Date().toISOString();
+  } else if (action === "reject" || action === "rework") {
+    complaint.status = "Staff Working";
+    complaint.reworkComment = comment || "Admin requested rework. Please re-check resolution proof.";
+  } else {
+    return res.status(400).json({ error: "Invalid admin proof verification action" });
+  }
+
+  writeDB(db);
+  res.json(complaint);
+});
+
+// ROUTE: Student Satisfaction Review & Rating / Auto-Reopen (Step 7 -> Step 8)
+app.put("/api/complaints/:id/satisfaction", (req, res) => {
+  const db = readDB();
+  const complaint = db.complaints.find(c => c.id === parseInt(req.params.id));
+  if (!complaint) return res.status(404).json({ error: "Complaint not found" });
+
+  const { satisfied, rating, feedback } = req.body;
+
+  if (satisfied === true || satisfied === "yes" || satisfied === "YES") {
+    complaint.status = "Closed";
+    complaint.rating = rating || 5;
+    complaint.feedback = feedback || "Resolved to student satisfaction.";
+    complaint.closedAt = new Date().toISOString();
+  } else {
+    complaint.status = "Reopened";
+    complaint.priority = "CRITICAL"; // Automatically escalated to top priority
+    complaint.feedback = feedback || "Student not satisfied with resolution.";
+    complaint.reopenedAt = new Date().toISOString();
+    complaint.reopenReason = feedback || "Resolution did not meet student satisfaction.";
+    complaint.adminAlert = "URGENT: Reopened by student. High priority rework required!";
+  }
+
+  writeDB(db);
+  res.json(complaint);
+});
+
+// ROUTE: Get Staff Members per Department
+app.get("/api/staff", (req, res) => {
+  const db = readDB();
+  const staffList = db.staff.map(s => {
+    const activeTasks = db.complaints.filter(c => c.staffId === s.staffId && (c.status === "Staff Assigned" || c.status === "Staff Working")).length;
+    return {
+      ...s,
+      activeTasks,
+      workload: activeTasks === 0 ? "AVAILABLE" : activeTasks < 3 ? "MODERATE" : "BUSY"
+    };
+  });
+  res.json(staffList);
+});
+
+// ROUTE: Get Analytics Data
+app.get("/api/analytics", (req, res) => {
+  const db = readDB();
+  const complaints = db.complaints;
+
+  const total = complaints.length;
+  const pendingVerification = complaints.filter(c => c.status === "Pending Admin Verification" || c.status === "Submitted").length;
+  const staffAssigned = complaints.filter(c => c.status === "Staff Assigned").length;
+  const staffWorking = complaints.filter(c => c.status === "Staff Working").length;
+  const proofPending = complaints.filter(c => c.status === "Proof Under Admin Verification").length;
+  const waitingStudentReview = complaints.filter(c => c.status === "Waiting Student Review").length;
+  const closed = complaints.filter(c => c.status === "Closed").length;
+  const reopened = complaints.filter(c => c.status === "Reopened").length;
+
+  const inProgressTotal = staffAssigned + staffWorking + proofPending;
+  const resolutionRate = total > 0 ? Math.round((closed / total) * 100) : 100;
+
+  res.json({
+    total,
+    pendingVerification,
+    inProgressTotal,
+    proofPending,
+    waitingStudentReview,
+    closed,
+    reopened,
+    resolutionRate,
+    staffCount: db.staff.length
+  });
+});
+
+// Universal Catch-All HTML routes
+app.get("/student-app", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "parallel_student_app.html"));
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+});
+
 if (require.main === module) {
-  app.listen(PORT, () =>
-    console.log(`PARALLEL server running on http://localhost:${PORT}`)
-  );
+  app.listen(PORT, () => console.log(`PARALLEL v2.0 Enterprise server running on http://localhost:${PORT}`));
 }
 
 module.exports = app;
