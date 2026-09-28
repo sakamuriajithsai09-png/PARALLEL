@@ -3,34 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PARALLEL — Smart Campus Complaint & Issue Management System</title>
+<title>KLU Campus Care — Smart Campus Complaint & Issue Management</title>
 <meta name="description" content="One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          brandBg: '#0a0e14',
-          brandPanel: '#11161f',
-          brandPanelBorder: 'rgba(255, 255, 255, 0.08)',
-          brandAccent: '#00e676',
-          brandAccent2: '#00b0ff',
-          brandGold: '#ffc400',
-        },
-        fontFamily: {
-          sans: ['Inter', 'sans-serif'],
-          display: ['Anton', 'sans-serif'],
-        }
-      }
-    }
-  }
-</script>
 
 <style>
   :root{
@@ -62,6 +42,8 @@
   .ops-access-button.staff-button:hover{ box-shadow:0 0 32px rgba(0,230,118,.65), inset 0 1px rgba(255,255,255,.6); }
   .ops-modal.show .ops-modal-card{ animation:opsModalIn .35s ease both; }
   @keyframes opsModalIn{ from{opacity:0;transform:scale(.94) translateY(15px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .topbtn{ border:1px solid; border-radius:.5rem; padding:.5rem .9rem; font-size:.8rem; font-weight:700; background:rgba(255,255,255,.03); transition:background .2s; }
+  .topbtn:hover{ background:rgba(255,255,255,.1); }
   ::-webkit-scrollbar{ width:10px; } ::-webkit-scrollbar-thumb{ background:#1e2632; border-radius:8px; }
   a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:.5rem; }
   @media (prefers-reduced-motion: reduce){
@@ -73,249 +55,66 @@
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#0a0e14cc] border-b border-white/5">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="#top" class="flex items-center gap-2">
-      <span class="display text-2xl tracking-wide">PARALLEL<span class="text-[--accent]">.</span></span>
+<!-- TOP BAR -->
+<nav class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-[#0a0e14e6] border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <a href="#top" class="flex items-center gap-3 min-w-0">
+      <span class="text-sm sm:text-base font-bold leading-tight text-white">KLU Campus Care<br><span class="text-xs font-normal text-white/60">Complaint &amp; Issue Portal</span></span>
     </a>
-    <div class="hidden md:flex items-center gap-8 text-sm text-white/70">
-      <a href="#problem" class="hover:text-white">Problem</a>
-      <a href="#workflow" class="hover:text-white">Workflow</a>
-      <a href="#flow" class="hover:text-white">End-to-End</a>
-      <a href="#team" class="hover:text-white">Team</a>
-      <a class="text-[--accent] hover:text-white" href="parallel_student_app.html?role=student">Student Login</a>
-      <a class="text-[--accent2] hover:text-white js-admin-access" href="#admin-access">Admin Login</a>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <a class="topbtn border-[--accent2] text-[--accent2]" href="parallel_student_app.html?role=admin" data-i18n="adminLogin">Admin Login</a>
+      <a class="topbtn border-[--accent] text-[--accent]" href="parallel_student_app.html?role=staff" data-i18n="staffLogin">Staff Login</a>
+      <label class="sr-only" for="lang">Language</label>
+      <select id="lang" class="rounded-md bg-[#11161f] border border-white/20 text-xs sm:text-sm px-2 py-2 text-white/90">
+        <option value="en" selected>English</option>
+        <option value="te">తెలుగు</option>
+        <option value="hi">हिन्दी</option>
+      </select>
     </div>
-    <a class="bg-[--accent] text-black font-bold text-sm px-5 py-2.5 rounded-full hover:opacity-90" href="parallel_student_app.html?role=student">Launch Student Login</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<header id="top" class="relative pt-40 pb-24 overflow-hidden">
+<!-- HERO: banner + student login -->
+<header id="top" class="relative pt-28 md:pt-32 pb-20 overflow-hidden">
   <div class="absolute inset-0 opacity-[0.07]" style="background:radial-gradient(circle at 70% 30%, #00e676, transparent 40%), radial-gradient(circle at 20% 80%, #00b0ff, transparent 40%);"></div>
-  <div class="max-w-7xl mx-auto px-6 relative">
-    <p class="text-[--accent] font-bold tracking-[.3em] text-sm mb-4">PARALLEL TEAM · PROJECT PRESENTATION</p>
-    <h1 class="display text-5xl md:text-8xl leading-[0.95] uppercase">
-      Smart Campus<br><span class="grad-text glow">Complaint &amp;</span><br>Issue Management
-    </h1>
-    <p class="mt-6 max-w-2xl text-white/60 text-lg">One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.</p>
-    <!-- Hero buttons: Student Login, Admin Login, Why This Project? -->
-    <div class="mt-10 flex flex-wrap gap-4">
-      <a class="bg-[--accent] text-black font-bold px-8 py-4 rounded-full" href="parallel_student_app.html?role=student">Student Login</a>
-      <a class="border border-brandAccent2/50 text-brandAccent2 px-8 py-4 rounded-full hover:bg-brandAccent2/10 js-admin-access" href="#admin-access">Admin Login</a>
-      <a href="#problem" class="border border-white/20 px-8 py-4 rounded-full hover:bg-white/5">Why This Project?</a>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 relative grid lg:grid-cols-[1.4fr_1fr] gap-8 items-stretch">
+    <div class="card p-8 md:p-12 flex flex-col justify-center" style="transform:none">
+      <p class="text-[--accent] font-bold text-sm mb-3" data-i18n="heroEyebrow">Smart Campus</p>
+      <h1 class="display text-4xl md:text-6xl leading-[1] uppercase"><span data-i18n="heroHeadingStart">Smart Campus</span> <span class="grad-text" data-i18n="heroHeadingMiddle">Complaint &amp;</span> <span data-i18n="heroHeadingEnd">Issue Management</span></h1>
+      <p class="mt-5 max-w-xl text-white/60 text-base md:text-lg" data-i18n="tagline">One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.</p>
+      <div class="mt-8 grid grid-cols-3 gap-6 max-w-md">
+        <div><div class="display text-3xl text-[--accent]">13</div><div class="text-xs text-white/50 mt-1" data-i18n="workflowSteps">WORKFLOW STEPS</div></div>
+        <div><div class="display text-3xl text-[--accent2]">100%</div><div class="text-xs text-white/50 mt-1" data-i18n="trackable">TRACKABLE</div></div>
+        <div><div class="display text-3xl text-[--gold]">AI</div><div class="text-xs text-white/50 mt-1" data-i18n="aiRouted">CLASSIFIED &amp; ROUTED</div></div>
+      </div>
     </div>
-    <div class="mt-14 grid grid-cols-3 gap-6 max-w-lg">
-      <div><div class="display text-4xl text-[--accent]">13</div><div class="text-xs text-white/50 mt-1">WORKFLOW STEPS</div></div>
-      <div><div class="display text-4xl text-[--accent2]">100%</div><div class="text-xs text-white/50 mt-1">TRACKABLE</div></div>
-      <div><div class="display text-4xl text-[--gold]">AI</div><div class="text-xs text-white/50 mt-1">CLASSIFIED &amp; ROUTED</div></div>
+    <div class="card p-8 flex flex-col justify-center" style="transform:none">
+      <h2 class="display text-3xl uppercase" data-i18n="studentLogin">Student Login</h2>
+      <p class="mt-2 text-sm text-white/55" data-i18n="studentHint">Sign in with your student credentials to report and track complaints.</p>
+      <a href="parallel_student_app.html?role=student" class="mt-6 block text-center bg-[--accent] text-black font-bold py-3 rounded-lg hover:opacity-90" data-i18n="loginBtn">Login</a>
+      <p class="mt-5 text-center text-sm text-white/55"><span data-i18n="noAccount">Don't have an account?</span> <a class="text-[--accent2] underline" href="parallel_student_app.html?role=student" data-i18n="signUp">Click here to sign up</a></p>
     </div>
   </div>
 </header>
 
-<!-- MARQUEE -->
-<div class="border-y border-white/10 py-4 overflow-hidden bg-[#0d1219]" aria-hidden="true">
-  <div class="marquee display text-xl uppercase text-white/40">
-    <span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span><span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span>
-    <span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span><span>Smart Ideas ✦ One Team ✦ Parallel Progress ✦</span>
-  </div>
-</div>
-
-<!-- PROBLEM / ANSWER -->
-<section id="problem" class="py-24">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Problem <span class="grad-text">→</span> Answer</h2>
-    <p class="text-white/50 mb-12">Why this project?</p>
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="card p-8">
-        <h3 class="display text-2xl text-red-400 uppercase mb-6">✕ The Problem</h3>
-        <ul class="space-y-4 text-white/75">
-          <li class="flex gap-3"><span class="text-red-400">•</span> Students may not know where to report campus issues.</li>
-          <li class="flex gap-3"><span class="text-red-400">•</span> Complaints can be delayed, misplaced, or hard to track.</li>
-          <li class="flex gap-3"><span class="text-red-400">•</span> Manual routing to the correct department takes time.</li>
-          <li class="flex gap-3"><span class="text-red-400">•</span> Students receive little visibility after submitting.</li>
-        </ul>
-      </div>
-      <div class="card p-8 border-[rgba(0,230,118,.3)]">
-        <h3 class="display text-2xl text-[--accent] uppercase mb-6">✓ Our Answer</h3>
-        <ul class="space-y-4 text-white/75">
-          <li class="flex gap-3"><span class="text-[--accent]">•</span> One digital platform for complaints across campus.</li>
-          <li class="flex gap-3"><span class="text-[--accent]">•</span> AI classifies the issue, priority, and department.</li>
-          <li class="flex gap-3"><span class="text-[--accent]">•</span> Admin assigns staff and tracks resolution status.</li>
-          <li class="flex gap-3"><span class="text-[--accent]">•</span> Notifications, feedback, and analytics close the loop.</li>
-        </ul>
-      </div>
-    </div>
-    <p class="mt-8 text-center display text-xl uppercase text-white/50">A transparent complaint-to-resolution cycle</p>
-  </div>
-</section>
-
-<!-- WORKFLOW -->
-<section id="workflow" class="py-24 bg-[#0d1219]">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Smart Campus <span class="grad-text">Workflow</span></h2>
-    <p class="text-white/50 mb-14">13 steps — from opening the app to AI analytics.</p>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      <div class="card p-7 relative"><div class="step-num">01</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Open the App</h3>
-        <p class="text-white/60 text-sm">Login with student credentials or register as a new user. A simple entry point for all campus issues.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Goal: easy to start</span></div>
-
-      <div class="card p-7"><div class="step-num">02</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Dashboard</h3>
-        <p class="text-white/60 text-sm">Welcome message, profile access, existing complaints and notifications — with a "New Complaint" button front and center.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Goal: everything in one place</span></div>
-
-      <div class="card p-7"><div class="step-num">03</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Select Complaint Type</h3>
-        <p class="text-white/60 text-sm">Choose the campus area: College, Hostel, Mess, Transport, Wi-Fi, Electricity, Water — or Cleaning, Maintenance, Security, Other. E.g. <b class="text-white">"Mess"</b>.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Narrows to the right service area</span></div>
-
-      <div class="card p-7"><div class="step-num">04</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Select the Problem</h3>
-        <p class="text-white/60 text-sm">Issue types relevant to the category appear: Food Quality, Quantity, Hygiene, Taste, Menu, Timing, Other. E.g. <b class="text-white">"Food Quality"</b> selected.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Less typing • clearer classification</span></div>
-
-      <div class="card p-7"><div class="step-num">05</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Describe the Problem</h3>
-        <p class="text-white/60 text-sm">"The food served today was not properly cooked." Upload a photo 📷, pick a location 📍 (e.g. Hostel Mess 1), and submit. Good details help staff solve it.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Evidence + context</span></div>
-
-      <div class="card p-7"><div class="step-num">06</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">AI Checks the Complaint</h3>
-        <div class="mt-3 text-sm space-y-1.5">
-          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Category</span><b>Mess</b></div>
-          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Problem</span><b>Food Quality</b></div>
-          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Priority</span><b class="text-[--gold]">Medium</b></div>
-          <div class="flex justify-between bg-black/40 rounded px-3 py-1.5"><span class="text-white/50">Department</span><b class="text-[--accent]">Mess Management</b></div>
-        </div>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">No manual department selection</span></div>
-
-      <div class="card p-7"><div class="step-num">07</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Complaint ID</h3>
-        <div class="mt-3 bg-black/40 rounded-xl p-5 text-center">
-          <div class="display text-3xl grad-text">CMP1025</div>
-          <span class="status-pending text-xs font-bold px-3 py-1 rounded-full inline-block mt-2">🟡 PENDING</span>
-        </div>
-        <p class="text-white/60 text-sm mt-3">Every complaint becomes traceable from start to finish.</p></div>
-
-      <div class="card p-7"><div class="step-num">08</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Admin Dashboard</h3>
-        <p class="text-white/60 text-sm">The manager receives CMP1025 — Food Quality • Hostel Mess 1 • Priority: Medium — and can <b class="text-white">Accept → Assign Staff → Start Work</b>.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Right team, clear task, full context</span></div>
-
-      <div class="card p-7"><div class="step-num">09</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Staff Resolves It</h3>
-        <p class="text-white/60 text-sm">Assigned staff investigates the actual problem, work begins, and progress is recorded. Clear ownership reduces delays and missed complaints.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Ownership = speed</span></div>
-
-      <div class="card p-7"><div class="step-num">10</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Track Resolution Status</h3>
-        <div class="mt-4 flex items-center gap-2 text-xs font-bold">
-          <span class="status-pending px-3 py-1.5 rounded-full">1 · PENDING</span>→
-          <span class="status-progress px-3 py-1.5 rounded-full">2 · IN PROGRESS</span>→
-          <span class="status-resolved px-3 py-1.5 rounded-full">3 · RESOLVED</span>
-        </div>
-        <p class="text-white/60 text-sm mt-4">A visible lifecycle — students and admins always know where a complaint stands.</p></div>
-
-      <div class="card p-7"><div class="step-num">11</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Notification 🔔</h3>
-        <div class="mt-3 bg-black/40 rounded-xl p-4 text-sm text-white/80 border-l-4 border-[--accent]">"Complaint CMP1025 has been resolved."</div>
-        <p class="text-white/60 text-sm mt-3">No repeated trips to the office — the loop closes with timely communication.</p></div>
-
-      <div class="card p-7"><div class="step-num">12</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">Student Feedback</h3>
-        <p class="text-white/60 text-sm">Was your problem solved? <b class="text-white">Yes ✓ / No ✕</b> plus a star rating ⭐⭐⭐⭐⭐. Feedback evaluates service quality and feeds future improvement.</p>
-        <span class="chip inline-block mt-4 text-xs px-3 py-1 rounded-full">Quality input</span></div>
-
-      <div class="card p-7 lg:col-span-3 md:col-span-2"><div class="step-num">13</div>
-        <h3 class="display text-xl mt-3 mb-2 uppercase">AI Analytics</h3>
-        <p class="text-white/60 text-sm mb-4">Complaint history becomes actionable insight. Mess 1 example:</p>
-        <div class="grid sm:grid-cols-3 gap-4">
-          <div><div class="flex justify-between text-sm mb-1"><span>Food</span><b>45</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:90%"></div></div></div>
-          <div><div class="flex justify-between text-sm mb-1"><span>Hygiene</span><b>20</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:45%"></div></div></div>
-          <div><div class="flex justify-between text-sm mb-1"><span>Timing</span><b>12</b></div><div class="h-2 bg-white/10 rounded-full"><div class="bar h-2 rounded-full" style="width:27%"></div></div></div>
-        </div>
-        <p class="mt-4 text-sm"><span class="status-pending text-xs font-bold px-3 py-1.5 rounded-full">⚠ Food complaints ↑ rising</span></p>
-        <p class="text-white/60 text-sm mt-3">Management can act before a small issue becomes a bigger one. From complaints → data → preventive action.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- END TO END FLOW -->
-<section id="flow" class="py-24">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Final Project <span class="grad-text">Flow</span></h2>
-    <p class="text-white/50 mb-14">End-to-end cycle — from student complaint to smart campus improvement.</p>
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-4 text-center">
-      <div class="card p-4"><div class="text-3xl">📱</div><div class="text-xs font-bold mt-2 uppercase">Student App</div></div>
-      <div class="card p-4"><div class="text-3xl">📝</div><div class="text-xs font-bold mt-2 uppercase">Submit Complaint</div></div>
-      <div class="card p-4"><div class="text-3xl">🤖</div><div class="text-xs font-bold mt-2 uppercase">AI Classification</div></div>
-      <div class="card p-4"><div class="text-3xl">💻</div><div class="text-xs font-bold mt-2 uppercase">Admin Dashboard</div></div>
-      <div class="card p-4"><div class="text-3xl">👨‍🔧</div><div class="text-xs font-bold mt-2 uppercase">Assign Staff</div></div>
-      <div class="card p-4"><div class="text-3xl">✅</div><div class="text-xs font-bold mt-2 uppercase">Problem Solved</div></div>
-      <div class="card p-4"><div class="text-3xl">🔔</div><div class="text-xs font-bold mt-2 uppercase">Notification</div></div>
-      <div class="card p-4"><div class="text-3xl">⭐</div><div class="text-xs font-bold mt-2 uppercase">Feedback</div></div>
-      <div class="card p-4"><div class="text-3xl">📊</div><div class="text-xs font-bold mt-2 uppercase">AI Analytics</div></div>
-    </div>
-    <p class="mt-10 text-center display text-lg uppercase text-white/40">One Platform • Smart Routing • Trackable Resolution • Continuous Improvement</p>
-  </div>
-</section>
-
-<!-- TEAM -->
-<section id="team" class="py-24 bg-[#0d1219]">
-  <div class="max-w-7xl mx-auto px-6">
-    <h2 class="display text-4xl md:text-6xl uppercase mb-3">Team <span class="grad-text">Parallel</span></h2>
-    <p class="text-white/50 mb-14">Smart Ideas • One Team • Parallel Progress</p>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="card p-6 text-center"><div class="display text-2xl text-[--accent] mb-1">ABHIRAM</div><div class="text-xs text-white/50">2600040101</div><span class="chip inline-block mt-3 text-xs px-3 py-1 rounded-full font-bold">TEAM LEADER</span></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">AJITH</div><div class="text-xs text-white/50">2600040107</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SUDHEER</div><div class="text-xs text-white/50">2600040615</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SNEHITHA REDDY</div><div class="text-xs text-white/50">2600080016</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">MANIKANTA</div><div class="text-xs text-white/50">2600040270</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">LAVANYA</div><div class="text-xs text-white/50">2600040396</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">ARAVIND</div><div class="text-xs text-white/50">2600040312</div></div>
-      <div class="card p-6 text-center"><div class="display text-2xl mb-1">SRAVANI</div><div class="text-xs text-white/50">2600040165</div></div>
-    </div>
-  </div>
-</section>
-
-<footer class="py-10 border-t border-white/10 text-center text-white/40 text-sm">
-  <span class="display text-lg text-white">PARALLEL<span class="text-[--accent]">.</span></span>
-  <p class="mt-2">Smart Campus Complaint &amp; Issue Management System — One Platform • Smart Routing • Trackable Resolution • Continuous Improvement</p>
-</footer>
-
-<div id="admin-access" class="ops-modal fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto p-4" role="dialog" aria-modal="true" aria-labelledby="ops-access-title">
-  <div class="ops-modal-card relative w-full max-w-5xl rounded-[24px] p-6 sm:p-9">
-    <button id="close-admin-access" class="absolute right-5 top-5 rounded-lg p-2 text-xl text-white/50 hover:text-white" aria-label="Close access dialog">&times;</button>
-    <div class="mx-auto max-w-2xl text-center"><div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-brandAccent2/40 bg-brandAccent2/10 text-2xl shadow-[0_0_35px_rgba(0,176,255,.2)]">&#9889;</div><h2 id="ops-access-title" class="display text-3xl uppercase text-white sm:text-5xl">PARALLEL AI Operations Access</h2><p class="mt-3 text-sm text-white/55">Choose your authorized access level.</p><div class="mx-auto mt-5 h-px w-32 bg-gradient-to-r from-brandAccent to-brandAccent2"></div></div>
-    <div id="ops-role-grid" class="mt-8 grid gap-5 md:grid-cols-2">
-      <article class="ops-role admin rounded-2xl p-6"><div class="flex items-start justify-between"><span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-brandAccent2/40 bg-brandAccent2/10 text-2xl text-brandAccent2">&#9881;</span><span class="rounded-full border border-brandAccent2/30 bg-brandAccent2/10 px-2 py-1 text-[10px] font-bold text-brandAccent2">ADMIN ACCESS</span></div><h3 class="mt-6 text-2xl font-bold text-white">Admin Command Center</h3><p class="mt-3 text-sm leading-relaxed text-white/55">Manage complaints, assign staff, verify proofs, analytics, departments, users, notifications, and AI insights.</p><ul class="mt-5 space-y-2 text-xs text-white/60"><li>◈ Complaint Command Center</li><li>◈ Staff Assignment &amp; Operations</li><li>◈ Proof Verification</li><li>◈ Analytics &amp; User Management</li></ul><button data-ops-role="admin" class="ops-access-button admin-button mt-6 w-full rounded-xl bg-gradient-to-r from-brandAccent2 to-blue-600 py-3 font-bold uppercase tracking-wider text-white">Enter Admin Command Center</button></article>
-      <article class="ops-role rounded-2xl p-6"><div class="flex items-start justify-between"><span class="flex h-12 w-12 items-center justify-center rounded-2xl border border-brandAccent/40 bg-brandAccent/10 text-2xl text-brandAccent">&#9881;</span><span class="rounded-full border border-brandAccent/30 bg-brandAccent/10 px-2 py-1 text-[10px] font-bold text-brandAccent">STAFF ACCESS</span></div><h3 class="mt-6 text-2xl font-bold text-white">Staff Operations Console</h3><p class="mt-3 text-sm leading-relaxed text-white/55">Handle assigned complaints, update work progress, upload repair proof, receive notifications, and track performance.</p><ul class="mt-5 space-y-2 text-xs text-white/60"><li>◈ Assigned Tasks</li><li>◈ Work Progress &amp; Proof Upload</li><li>◈ Notifications</li><li>◈ Performance Tracker</li></ul><button data-ops-role="staff" class="ops-access-button staff-button mt-6 w-full rounded-xl bg-gradient-to-r from-brandAccent to-emerald-400 py-3 font-bold uppercase tracking-wider text-slate-950">Enter Staff Operations</button></article>
-    </div>
-    <div id="ops-login-slot" class="mt-6 hidden"></div>
-    <p class="mt-7 text-center text-[10px] uppercase tracking-[.2em] text-white/35">Secure AI authentication &middot; Campus network protected</p>
-  </div>
-</div>
-
 <script>
 (() => {
-  const modal = document.getElementById('admin-access');
-  const grid = document.getElementById('ops-role-grid');
-  const slot = document.getElementById('ops-login-slot');
-  const open = (event) => { event.preventDefault(); modal.classList.remove('hidden'); modal.classList.add('flex','show'); document.body.classList.add('overflow-hidden'); };
-  document.querySelectorAll('.js-admin-access').forEach((link) => link.addEventListener('click', open));
-  document.getElementById('close-admin-access').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex','show'); document.body.classList.remove('overflow-hidden'); });
-  modal.addEventListener('click', (event) => { if (event.target === modal) document.getElementById('close-admin-access').click(); });
-  document.querySelectorAll('[data-ops-role]').forEach((button) => button.addEventListener('click', async () => {
-    const role = button.dataset.opsRole;
-    grid.classList.add('hidden'); slot.classList.remove('hidden');
-    slot.innerHTML = `<div class="mx-auto max-w-md rounded-2xl border border-white/10 bg-black/20 p-6"><button id="ops-back" class="text-xs text-white/50 hover:text-white">← Back to access levels</button><p class="mt-5 text-xs font-bold uppercase tracking-[.2em] ${role === 'admin' ? 'text-brandAccent2' : 'text-brandAccent'}">${role === 'admin' ? 'Admin Command Center' : 'Staff Operations Console'}</p><h3 class="mt-2 text-2xl font-bold text-white">Initialize Secure Access</h3><form id="ops-login-form" class="mt-5 space-y-4"><input id="ops-identifier" required class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-brandAccent2" placeholder="${role === 'admin' ? 'Admin ID' : 'Staff ID'}"><input id="ops-password" required type="password" class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-brandAccent2" placeholder="Password"><label class="flex items-center gap-2 text-xs text-white/55"><input id="ops-remember" type="checkbox"> Remember Device</label><div id="ops-login-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-3 py-2 text-xs text-red-300"></div><button class="w-full rounded-xl bg-gradient-to-r from-brandAccent to-brandAccent2 py-3 font-bold uppercase text-slate-950">Initialize Secure Access</button></form></div>`;
-    document.getElementById('ops-back').addEventListener('click', () => { slot.classList.add('hidden'); grid.classList.remove('hidden'); });
-    document.getElementById('ops-login-form').addEventListener('submit', async (event) => { event.preventDefault(); const message = document.getElementById('ops-login-message'); const response = await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role,identifier:document.getElementById('ops-identifier').value.trim(),password:document.getElementById('ops-password').value})}); const result = await response.json(); if(!response.ok){message.innerText=result.error||'Authentication failed';message.classList.remove('hidden');return;} const key=`parallel${role[0].toUpperCase()}${role.slice(1)}Session`; (document.getElementById('ops-remember').checked?localStorage:sessionStorage).setItem(key,JSON.stringify(result)); window.location.href=`parallel_student_app.html?role=${role}`; });
-  }));
+  const T = {
+    en:{adminLogin:'Admin Login',staffLogin:'Staff Login',studentLogin:'Student Login',loginBtn:'Login',noAccount:"Don't have an account?",signUp:'Click here to sign up',studentHint:'Sign in with your student credentials to report and track complaints.',tagline:'One digital platform for every campus complaint — AI-classified, smartly routed, and tracked from submission to resolution.',heroEyebrow:'Smart Campus',heroHeadingStart:'Smart Campus',heroHeadingMiddle:'Complaint &',heroHeadingEnd:'Issue Management',workflowSteps:'WORKFLOW STEPS',trackable:'TRACKABLE',aiRouted:'CLASSIFIED & ROUTED'},
+    te:{adminLogin:'అడ్మిన్ లాగిన్',staffLogin:'స్టాఫ్ లాగిన్',studentLogin:'విద్యార్థి లాగిన్',loginBtn:'లాగిన్',noAccount:'ఖాతా లేదా?',signUp:'సైన్ అప్ చేయడానికి ఇక్కడ క్లిక్ చేయండి',studentHint:'ఫిర్యాదులు నమోదు చేయడానికి, ట్రాక్ చేయడానికి మీ విద్యార్థి వివరాలతో లాగిన్ అవ్వండి.',tagline:'ప్రతి క్యాంపస్ ఫిర్యాదుకు ఒకే డిజిటల్ వేదిక — AI వర్గీకరణ, సరైన విభాగానికి పంపడం, పరిష్కారం వరకు ట్రాకింగ్.',heroEyebrow:'స్మార్ట్ క్యాంపస్',heroHeadingStart:'స్మార్ట్ క్యాంపస్',heroHeadingMiddle:'ఫిర్యాదులు &',heroHeadingEnd:'సమస్యల నిర్వహణ',workflowSteps:'పని దశలు',trackable:'ట్రాక్ చేయవచ్చు',aiRouted:'AI వర్గీకరణ & విభాగానికి పంపడం'},
+    hi:{adminLogin:'एडमिन लॉगिन',staffLogin:'स्टाफ लॉगिन',studentLogin:'छात्र लॉगिन',loginBtn:'लॉगिन',noAccount:'खाता नहीं है?',signUp:'साइन अप करने के लिए यहाँ क्लिक करें',studentHint:'शिकायत दर्ज करने और ट्रैक करने के लिए अपने छात्र क्रेडेंशियल से लॉगिन करें।',tagline:'हर कैंपस शिकायत के लिए एक डिजिटल प्लेटफ़ॉर्म — AI द्वारा वर्गीकृत, सही विभाग को भेजी गई और समाधान तक ट्रैक की गई।',heroEyebrow:'स्मार्ट कैंपस',heroHeadingStart:'स्मार्ट कैंपस',heroHeadingMiddle:'शिकायत &',heroHeadingEnd:'समस्या प्रबंधन',workflowSteps:'कार्यप्रवाह चरण',trackable:'ट्रैक करने योग्य',aiRouted:'AI वर्गीकृत और भेजी गई'}
+  };
+  const sel = document.getElementById('lang');
+  const apply = (l) => {
+    const d = T[l] || T.en;
+    document.documentElement.lang = T[l] ? l : 'en';
+    document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = d[el.dataset.i18n]; });
+    sel.value = T[l] ? l : 'en';
+  };
+  let saved = 'en';
+  try { saved = localStorage.getItem('parallelLang') || 'en'; } catch (e) {}
+  apply(saved); // English is the default language
+  sel.addEventListener('change', () => { apply(sel.value); try { localStorage.setItem('parallelLang', sel.value); } catch (e) {} });
 })();
 </script>
 

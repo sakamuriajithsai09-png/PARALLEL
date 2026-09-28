@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>PARALLEL v2.0 — Smart Campus Complaint & Operations System</title>
-    <meta name="description" content="Enterprise AI-Powered Student Complaint & Issue Lifecycle Management System for PARALLEL Smart Campus.">
+    <title>KLU Campus Care — Smart Campus Complaint & Operations System</title>
+    <meta name="description" content="AI-powered student complaint and issue lifecycle management for KLU Campus Care.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
     
     <!-- Google Fonts -->
@@ -167,6 +167,12 @@
 
     <!-- ==================== AUTHENTICATION GATE ==================== -->
     <section id="login-page" class="login-shell fixed inset-0 z-[100] flex min-h-screen items-center justify-center overflow-y-auto px-4 py-8 sm:px-6">
+        <label class="sr-only" for="app-language-auth">Language</label>
+        <select id="app-language-auth" class="app-language-select absolute right-4 top-4 z-[120] w-14 rounded-md border border-white/20 bg-[#11161f] px-1.5 py-2 text-xs text-white" aria-label="Language">
+            <option value="en">EN</option>
+            <option value="te">తె</option>
+            <option value="hi">हि</option>
+        </select>
         <div class="login-grid pointer-events-none absolute inset-0 opacity-70"></div>
         <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
             <i class="login-particle left-[12%] top-[68%]"></i>
@@ -177,7 +183,7 @@
         <div class="relative w-full max-w-6xl">
             <div class="mb-7 text-center">
                 <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-brandAccent/40 bg-brandAccent/10 text-2xl shadow-[0_0_35px_rgba(0,230,118,.18)]">&#9889;</div>
-                <h1 class="display-font text-5xl tracking-[.12em] text-white sm:text-6xl">PARALLEL<span class="text-brandAccent">.</span></h1>
+                <h1 class="display-font text-4xl tracking-[.12em] text-white sm:text-5xl">KLU Campus Care</h1>
                 <p class="mx-auto mt-3 text-sm leading-relaxed text-slate-400">Smart Campus Complaint &amp; Lifecycle Management System</p>
                 <p class="mt-2 text-xs font-semibold tracking-widest text-brandAccent2">Student <span class="text-brandAccent">•</span> Admin <span class="text-brandAccent">•</span> Staff <span class="text-brandAccent">•</span> End-to-End Verification</p>
             </div>
@@ -209,69 +215,53 @@
                     </form>
                 </div>
 
-                <!-- Hidden admin form (keeps JS working) -->
-                <div id="admin-login-card" class="hidden">
-                    <form id="admin-login-form" onsubmit="handleLogin(event, 'admin')">
-                        <input id="admin-id" type="text" />
-                        <input id="admin-password" type="password" />
-                        <div id="admin-login-message"></div>
+                <div id="admin-login-card" class="login-card hidden rounded-3xl p-6 backdrop-blur-xl sm:p-8">
+                    <div class="mb-7 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-[.22em] text-brandAccent2">Admin Portal</p>
+                            <h2 class="mt-2 text-2xl font-bold text-white">Admin Login</h2>
+                        </div>
+                        <span class="rounded-xl border border-brandAccent2/30 bg-brandAccent2/10 px-3 py-1.5 text-xs font-bold text-brandAccent2">● Portal Active</span>
+                    </div>
+                    <form id="admin-login-form" class="space-y-5" onsubmit="handleLogin(event, 'admin')">
+                        <div>
+                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Admin ID</label>
+                            <input id="admin-id" type="text" required placeholder="Enter Admin ID" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
+                            <input id="admin-password" type="password" required placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                        </div>
+                        <div id="admin-login-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-4 py-3 text-xs text-red-300"></div>
+                        <button type="submit" class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950">Admin Login</button>
                     </form>
                 </div>
             </div>
 
-            <!-- STAFF LOGIN ACCESS BAR -->
-            <div class="mt-6 text-center">
-                <button onclick="toggleStaffLoginForm()" class="text-xs font-bold text-cyan-300 hover:text-white uppercase tracking-widest border border-cyan-400/30 bg-cyan-400/10 px-5 py-2.5 rounded-full">
-                    👨‍🔧 Authorized Maintenance Staff Login Console →
-                </button>
-            </div>
-
-            <!-- STAFF LOGIN CARD (COLLAPSIBLE) -->
-            <div id="staff-login-card" class="mt-4 login-card hidden rounded-3xl p-6 border-cyan-400/30">
-                <h3 class="text-lg font-bold text-white">Staff Operations Console Login</h3>
-                <form id="staff-login-form" class="mt-4 space-y-4" onsubmit="handleLogin(event, 'staff')">
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <input id="staff-id" type="text" required placeholder="Enter Staff ID (Example: staff1)" class="login-input rounded-xl p-3 text-sm text-white placeholder-slate-600" />
-                        <input id="staff-password" type="password" required placeholder="Enter Password" class="login-input rounded-xl p-3 text-sm text-white placeholder-slate-600" />
+            <!-- STAFF LOGIN CARD -->
+            <div id="staff-login-card" class="mx-auto mt-4 w-full max-w-md login-card hidden rounded-3xl p-6 backdrop-blur-xl sm:p-8">
+                <div class="mb-7 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[.22em] text-cyan-300">Staff Portal</p>
+                        <h2 class="mt-2 text-2xl font-bold text-white">Staff Login</h2>
                     </div>
-
-                    <!-- DEMO CREDENTIALS CARD -->
-                    <div style="background: rgba(0,184,255,.06); border: 1px solid rgba(0,184,255,.25); backdrop-filter: blur(12px);" class="rounded-2xl p-4 space-y-3">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-cyan-400 text-sm">🔑</span>
-                            <span class="text-xs font-bold text-cyan-300 uppercase tracking-widest">Demo Staff Credentials</span>
-                        </div>
-                        <div class="grid gap-1.5 text-[11px] font-mono">
-                            <div class="flex items-center justify-between px-3 py-1.5 rounded-lg" style="background:rgba(0,0,0,.3)">
-                                <span class="text-slate-400">Hostel Maintenance</span>
-                                <span class="text-cyan-300 font-bold">staff1 <span class="text-slate-500 mx-1">/</span> 1234</span>
-                            </div>
-                            <div class="flex items-center justify-between px-3 py-1.5 rounded-lg" style="background:rgba(0,0,0,.3)">
-                                <span class="text-slate-400">Mess Management</span>
-                                <span class="text-cyan-300 font-bold">staff2 <span class="text-slate-500 mx-1">/</span> 1234</span>
-                            </div>
-                            <div class="flex items-center justify-between px-3 py-1.5 rounded-lg" style="background:rgba(0,0,0,.3)">
-                                <span class="text-slate-400">Electrical Department</span>
-                                <span class="text-cyan-300 font-bold">staff3 <span class="text-slate-500 mx-1">/</span> 1234</span>
-                            </div>
-                            <div class="flex items-center justify-between px-3 py-1.5 rounded-lg" style="background:rgba(0,0,0,.3)">
-                                <span class="text-slate-400">Wi-Fi Team</span>
-                                <span class="text-cyan-300 font-bold">staff4 <span class="text-slate-500 mx-1">/</span> 1234</span>
-                            </div>
-                            <div class="flex items-center justify-between px-3 py-1.5 rounded-lg" style="background:rgba(0,0,0,.3)">
-                                <span class="text-slate-400">Transport Department</span>
-                                <span class="text-cyan-300 font-bold">staff5 <span class="text-slate-500 mx-1">/</span> 1234</span>
-                            </div>
-                        </div>
-                        <p class="text-[10px] text-slate-500 text-center pt-1 tracking-wide uppercase">For PARALLEL Project Demo Only</p>
+                    <span class="rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-bold text-cyan-300">● Portal Active</span>
+                </div>
+                <form id="staff-login-form" class="space-y-5" onsubmit="handleLogin(event, 'staff')">
+                    <div>
+                        <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Staff ID</label>
+                        <input id="staff-id" type="text" required placeholder="Enter Staff ID" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
                     </div>
-
+                    <div>
+                        <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
+                        <input id="staff-password" type="password" required placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                    </div>
                     <div id="staff-login-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 p-3 text-xs text-red-300"></div>
-                    <button type="submit" class="login-button w-full rounded-xl py-3 text-xs font-bold uppercase text-slate-950">Initialize Staff Console</button>
+                    <button type="submit" class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950">Staff Login</button>
                 </form>
             </div>
 
-            <footer class="mt-7 text-center text-xs text-slate-500">PARALLEL AI Operations Network &copy; 2026</footer>
+            <footer class="mt-7 text-center text-xs text-slate-500">KLU Campus Care &copy; 2026</footer>
         </div>
     </section>
 
@@ -282,7 +272,7 @@
                 <div class="flex items-center gap-3">
                     <a href="#" class="flex items-center gap-2">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandAccent/20 to-brandAccent2/20 border border-brandAccent/40 flex items-center justify-center text-lg">🛰️</div>
-                        <span class="display-font text-2xl tracking-wider text-white">PARALLEL<span class="text-brandAccent">.</span></span>
+                        <span class="display-font text-2xl tracking-wider text-white">KLU Campus Care</span>
                     </a>
                     <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brandAccent/10 text-brandAccent border border-brandAccent/20">
                         Student Portal
@@ -302,6 +292,12 @@
                 </nav>
 
                 <div class="flex items-center gap-3">
+                    <label class="sr-only" for="app-language-student">Language</label>
+                    <select id="app-language-student" class="app-language-select w-14 rounded-md border border-white/20 bg-[#11161f] px-1.5 py-2 text-xs text-white" aria-label="Language">
+                        <option value="en">EN</option>
+                        <option value="te">తె</option>
+                        <option value="hi">हि</option>
+                    </select>
                     <button onclick="toggleNotificationsDrawer()" class="relative p-2.5 rounded-xl bg-brandPanel border border-white/10 text-slate-300 hover:text-white">
                         🔔 <span id="student-unread-badge" class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-brandAccent text-[9px] font-bold text-black">0</span>
                     </button>
@@ -469,11 +465,17 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-brandAccent2/20 border border-brandAccent2/40 flex items-center justify-center text-xl text-brandAccent2">⚡</div>
                 <div>
-                    <div class="display-font text-xl text-white">PARALLEL<span class="text-brandAccent">.</span></div>
+                    <div class="display-font text-xl text-white">KLU Campus Care</div>
                     <div class="text-[9px] font-bold tracking-widest text-brandAccent2">ADMIN COMMAND CENTER</div>
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                <label class="sr-only" for="app-language-admin">Language</label>
+                <select id="app-language-admin" class="app-language-select w-14 rounded-md border border-white/20 bg-[#11161f] px-1.5 py-2 text-xs text-white" aria-label="Language">
+                    <option value="en">EN</option>
+                    <option value="te">తె</option>
+                    <option value="hi">हि</option>
+                </select>
                 <div class="text-right">
                     <div id="admin-name-display" class="text-xs font-bold text-white">Hostel Admin</div>
                     <div class="text-[10px] text-slate-400">System Administrator</div>
@@ -565,11 +567,17 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-xl text-cyan-300">👨‍🔧</div>
                 <div>
-                    <div class="display-font text-xl text-white">PARALLEL<span class="text-brandAccent">.</span></div>
+                    <div class="display-font text-xl text-white">KLU Campus Care</div>
                     <div class="text-[9px] font-bold tracking-widest text-cyan-300">STAFF OPERATIONS CONSOLE</div>
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                <label class="sr-only" for="app-language-staff">Language</label>
+                <select id="app-language-staff" class="app-language-select w-14 rounded-md border border-white/20 bg-[#11161f] px-1.5 py-2 text-xs text-white" aria-label="Language">
+                    <option value="en">EN</option>
+                    <option value="te">తె</option>
+                    <option value="hi">हि</option>
+                </select>
                 <div class="text-right">
                     <div id="staff-name-display" class="text-xs font-bold text-white">Ravi Kumar</div>
                     <div id="staff-dept-display" class="text-[10px] text-cyan-300">Hostel Maintenance</div>
@@ -803,22 +811,280 @@
         let selectedComplaintForAction = null;
         let currentSelectedRating = 5;
 
+        const APP_TRANSLATIONS = {
+            "smart campus complaint & lifecycle management system": ["స్మార్ట్ క్యాంపస్ ఫిర్యాదులు మరియు పరిష్కార నిర్వహణ వ్యవస్థ", "स्मार्ट कैंपस शिकायत और समाधान प्रबंधन प्रणाली"],
+            "student • admin • staff • end-to-end verification": ["విద్యార్థి • అడ్మిన్ • సిబ్బంది • పూర్తి ధృవీకరణ", "छात्र • एडमिन • स्टाफ • संपूर्ण सत्यापन"],
+            "student portal": ["విద్యార్థి పోర్టల్", "छात्र पोर्टल"], "student login": ["విద్యార్థి లాగిన్", "छात्र लॉगिन"],
+            "admin portal": ["అడ్మిన్ పోర్టల్", "एडमिन पोर्टल"], "admin login": ["అడ్మిన్ లాగిన్", "एडमिन लॉगिन"],
+            "staff portal": ["సిబ్బంది పోర్టల్", "स्टाफ पोर्टल"], "staff login": ["సిబ్బంది లాగిన్", "स्टाफ लॉगिन"],
+            "portal active": ["పోర్టల్ యాక్టివ్", "पोर्टल सक्रिय"], "● portal active": ["● పోర్టల్ యాక్టివ్", "● पोर्टल सक्रिय"],
+            "language": ["భాష", "भाषा"], "student id": ["విద్యార్థి ఐడి", "छात्र आईडी"], "admin id": ["అడ్మిన్ ఐడి", "एडमिन आईडी"],
+            "staff id": ["సిబ్బంది ఐడి", "स्टाफ आईडी"], "password": ["పాస్‌వర్డ్", "पासवर्ड"],
+            "enter student id (e.g. 2600040101)": ["విద్యార్థి ఐడి నమోదు చేయండి", "छात्र आईडी दर्ज करें"],
+            "enter admin id": ["అడ్మిన్ ఐడి నమోదు చేయండి", "एडमिन आईडी दर्ज करें"], "enter staff id": ["సిబ్బంది ఐడి నమోదు చేయండి", "स्टाफ आईडी दर्ज करें"],
+            "enter password": ["పాస్‌వర్డ్ నమోదు చేయండి", "पासवर्ड दर्ज करें"], "sign out": ["లాగ్ అవుట్", "साइन आउट"],
+            "new complaint": ["కొత్త ఫిర్యాదు", "नई शिकायत"], "⚡ new complaint": ["⚡ కొత్త ఫిర్యాదు", "⚡ नई शिकायत"],
+            "📋 my complaints (": ["📋 నా ఫిర్యాదులు (", "📋 मेरी शिकायतें ("], "analytics": ["విశ్లేషణలు", "विश्लेषण"],
+            "🔔 notifications": ["🔔 నోటిఫికేషన్లు", "🔔 सूचनाएं"], "close": ["మూసివేయి", "बंद करें"],
+            "step 01 - 05 • direct ai submission": ["దశ 01 - 05 • నేరుగా AI సమర్పణ", "चरण 01 - 05 • सीधे AI सबमिशन"],
+            "submit campus complaint": ["క్యాంపస్ ఫిర్యాదును సమర్పించండి", "कैंपस शिकायत दर्ज करें"],
+            "report issues directly to administration. gemini ai automatically classifies, predicts priority, and routes your complaint.": ["సమస్యలను నేరుగా పరిపాలనకు నివేదించండి. Gemini AI ఫిర్యాదును వర్గీకరించి, ప్రాధాన్యతను అంచనా వేసి, సరైన విభాగానికి పంపుతుంది.", "समस्याएं सीधे प्रशासन को बताएं। Gemini AI शिकायत का वर्गीकरण, प्राथमिकता का अनुमान और सही विभाग को भेजने का काम करता है।"],
+            "📍 location *": ["📍 స్థలం *", "📍 स्थान *"], "🏷️ category *": ["🏷️ వర్గం *", "🏷️ श्रेणी *"],
+            "select location...": ["స్థలాన్ని ఎంచుకోండి...", "स्थान चुनें..."], "select category...": ["వర్గాన్ని ఎంచుకోండి...", "श्रेणी चुनें..."],
+            "boys hostel block a": ["బాయ్స్ హాస్టల్ బ్లాక్ A", "बॉयज़ हॉस्टल ब्लॉक A"], "girls hostel block b": ["గర్ల్స్ హాస్టల్ బ్లాక్ B", "गर्ल्स हॉस्टल ब्लॉक B"],
+            "hostel mess 1": ["హాస్టల్ మెస్ 1", "हॉस्टल मेस 1"], "hostel mess 2": ["హాస్టల్ మెస్ 2", "हॉस्टल मेस 2"],
+            "main academic block": ["ప్రధాన విద్యా భవనం", "मुख्य शैक्षणिक भवन"], "library & resource hub": ["గ్రంథాలయం మరియు వనరుల కేంద్రం", "पुस्तकालय और संसाधन केंद्र"],
+            "main campus gate 2": ["ప్రధాన క్యాంపస్ గేట్ 2", "मुख्य कैंपस गेट 2"], "campus bus / transport": ["క్యాంపస్ బస్సు / రవాణా", "कैंपस बस / परिवहन"],
+            "hostel maintenance": ["హాస్టల్ నిర్వహణ", "हॉस्टल रखरखाव"], "mess management": ["మెస్ నిర్వహణ", "मेस प्रबंधन"],
+            "electrical": ["విద్యుత్", "इलेक्ट्रिकल"], "wi-fi": ["వై-ఫై", "वाई-फ़ाई"], "water supply": ["నీటి సరఫరా", "जल आपूर्ति"],
+            "transport": ["రవాణా", "परिवहन"], "cleaning": ["శుభ్రత", "सफाई"], "security": ["భద్రత", "सुरक्षा"],
+            "📝 description *": ["📝 వివరణ *", "📝 विवरण *"], "describe the problem in detail...": ["సమస్యను వివరంగా తెలియజేయండి...", "समस्या का विस्तार से वर्णन करें..."],
+            "📷 photo evidence (optional)": ["📷 ఫోటో ఆధారం (ఐచ్ఛికం)", "📷 फोटो प्रमाण (वैकल्पिक)"],
+            "paste photo image url (or upload simulation)": ["ఫోటో URLను అతికించండి", "फोटो URL पेस्ट करें"],
+            "submit complaint to admin →": ["ఫిర్యాదును అడ్మిన్‌కు పంపండి →", "शिकायत एडमिन को भेजें →"],
+            "ai routing & saving ticket...": ["AI ద్వారా పంపుతోంది మరియు భద్రపరుస్తోంది...", "AI रूटिंग और टिकट सेव हो रहा है..."],
+            "🤖": ["🤖", "🤖"], "gemini ai auto-detector": ["GEMINI AI ఆటో డిటెక్టర్", "GEMINI AI ऑटो डिटेक्टर"],
+            "active": ["యాక్టివ్", "सक्रिय"], "real-time gemini ai classification predicts issue parameters before final submission:": ["సమర్పణకు ముందు Gemini AI సమస్య వివరాలను తక్షణమే వర్గీకరిస్తుంది:", "सबमिट करने से पहले Gemini AI समस्या का तुरंत वर्गीकरण करता है:"],
+            "category:": ["వర్గం:", "श्रेणी:"], "department:": ["విభాగం:", "विभाग:"], "priority:": ["ప్రాధాన్యత:", "प्राथमिकता:"], "est. sla:": ["అంచనా సమయం:", "अनुमानित समय:"],
+            "pending...": ["పెండింగ్...", "लंबित..."], "within 2 hours": ["2 గంటల్లోపు", "2 घंटे के भीतर"], "medium": ["మధ్యస్థం", "मध्यम"],
+            "💡": ["💡", "💡"], "smart campus guarantee:": ["స్మార్ట్ క్యాంపస్ హామీ:", "स्मार्ट कैंपस गारंटी:"],
+            "every complaint follows student satisfaction verification before closing.": ["ప్రతి ఫిర్యాదు మూసివేసే ముందు విద్యార్థి సంతృప్తి నిర్ధారణ పొందుతుంది.", "हर शिकायत बंद होने से पहले छात्र की संतुष्टि की पुष्टि होती है।"],
+            "my complaints & trackers": ["నా ఫిర్యాదులు మరియు ట్రాకింగ్", "मेरी शिकायतें और ट्रैकर"],
+            "monitor live 8-step lifecycle progress and submit satisfaction reviews.": ["8 దశల పరిష్కార పురోగతిని ట్రాక్ చేసి, మీ అభిప్రాయాన్ని పంపండి.", "8 चरणों की प्रगति देखें और संतुष्टि समीक्षा दें।"],
+            "↻ refresh status": ["↻ స్థితిని రిఫ్రెష్ చేయండి", "↻ स्थिति रीफ़्रेश करें"], "search complaints...": ["ఫిర్యాదులను వెతకండి...", "शिकायतें खोजें..."],
+            "all statuses": ["అన్ని స్థితులు", "सभी स्थितियां"], "submitted": ["సమర్పించబడింది", "सबमिट की गई"],
+            "pending verification": ["ధృవీకరణ పెండింగ్‌లో ఉంది", "सत्यापन लंबित"], "pending admin verification": ["అడ్మిన్ ధృవీకరణ పెండింగ్‌లో ఉంది", "एडमिन सत्यापन लंबित"],
+            "staff assigned": ["సిబ్బందిని కేటాయించారు", "स्टाफ नियुक्त"], "staff working": ["సిబ్బంది పని చేస్తున్నారు", "स्टाफ काम कर रहा है"],
+            "proof pending": ["ఆధారం పెండింగ్‌లో ఉంది", "प्रमाण लंबित"], "proof submitted": ["ఆధారం సమర్పించబడింది", "प्रमाण सबमिट"],
+            "waiting review": ["సమీక్ష కోసం వేచి ఉంది", "समीक्षा की प्रतीक्षा"], "waiting student review": ["విద్యార్థి సమీక్ష కోసం వేచి ఉంది", "छात्र समीक्षा की प्रतीक्षा"],
+            "closed": ["మూసివేయబడింది", "बंद"], "reopened": ["మళ్లీ తెరవబడింది", "फिर से खोली गई"], "all priorities": ["అన్ని ప్రాధాన్యతలు", "सभी प्राथमिकताएं"],
+            "🔴 critical": ["🔴 అత్యవసరం", "🔴 अति आवश्यक"], "🟠 high": ["🟠 అధికం", "🟠 उच्च"], "🟡 medium": ["🟡 మధ్యస్థం", "🟡 मध्यम"], "🟢 low": ["🟢 తక్కువ", "🟢 कम"],
+            "campus resolution insights": ["క్యాంపస్ పరిష్కార విశ్లేషణలు", "कैंपस समाधान विश्लेषण"],
+            "real-time complaint workflow metrics across all 8 departments.": ["8 విభాగాల ఫిర్యాదు పురోగతి వివరాలు తక్షణమే.", "सभी 8 विभागों की शिकायत प्रक्रिया के आंकड़े।"],
+            "admin command center": ["అడ్మిన్ కమాండ్ సెంటర్", "एडमिन कमांड सेंटर"], "system administrator": ["సిస్టమ్ నిర్వాహకుడు", "सिस्टम एडमिनिस्ट्रेटर"],
+            "admin command & operations center": ["అడ్మిన్ కమాండ్ మరియు కార్యకలాపాల కేంద్రం", "एडमिन कमांड और संचालन केंद्र"], "complaint command center": ["ఫిర్యాదు కమాండ్ సెంటర్", "शिकायत कमांड सेंटर"],
+            "● real-time monitoring online": ["● తక్షణ పర్యవేక్షణ ఆన్‌లైన్‌లో ఉంది", "● रीयल-टाइम निगरानी चालू"],
+            "total": ["మొత్తం", "कुल"], "pending verify": ["ధృవీకరణ పెండింగ్", "सत्यापन लंबित"], "in progress": ["పురోగతిలో ఉంది", "प्रगति पर"],
+            "proof verification": ["ఆధార ధృవీకరణ", "प्रमाण सत्यापन"], "waiting student review": ["విద్యార్థి సమీక్ష కోసం వేచి ఉంది", "छात्र समीक्षा की प्रतीक्षा"],
+            "reopened urgent": ["మళ్లీ తెరిచిన అత్యవసర ఫిర్యాదులు", "फिर से खोली गईं: अति आवश्यक"], "reopened complaint command center": ["మళ్లీ తెరిచిన ఫిర్యాదుల కమాండ్ సెంటర్", "फिर से खोली गई शिकायतों का कमांड सेंटर"],
+            "top priority action required": ["అత్యధిక ప్రాధాన్యత: వెంటనే చర్య అవసరం", "सर्वोच्च प्राथमिकता: तुरंत कार्रवाई आवश्यक"],
+            "live complaint management queue": ["తక్షణ ఫిర్యాదు నిర్వహణ జాబితా", "लाइव शिकायत प्रबंधन सूची"], "search id, student, desc...": ["ఐడి, విద్యార్థి లేదా వివరణ వెతకండి...", "आईडी, छात्र या विवरण खोजें..."],
+            "all departments": ["అన్ని విభాగాలు", "सभी विभाग"], "assign staff": ["సిబ్బందిని కేటాయించండి", "स्टाफ नियुक्त करें"],
+            "verify complaint": ["ఫిర్యాదును ధృవీకరించండి", "शिकायत सत्यापित करें"], "view lifecycle": ["పరిష్కార దశలను చూడండి", "समाधान प्रक्रिया देखें"],
+            "maintenance tasks & proof submission": ["నిర్వహణ పనులు మరియు ఆధార సమర్పణ", "रखरखाव कार्य और प्रमाण सबमिशन"],
+            "assigned maintenance tasks": ["కేటాయించిన నిర్వహణ పనులు", "सौंपे गए रखरखाव कार्य"], "assigned tasks": ["కేటాయించిన పనులు", "सौंपे गए कार्य"],
+            "waiting admin proof verification": ["అడ్మిన్ ఆధార ధృవీకరణ కోసం వేచి ఉంది", "एडमिन प्रमाण सत्यापन की प्रतीक्षा"], "completed": ["పూర్తయింది", "पूर्ण"],
+            "search tasks...": ["పనులను వెతకండి...", "कार्य खोजें..."], "no active maintenance tasks assigned.": ["ప్రస్తుతం నిర్వహణ పనులు కేటాయించబడలేదు.", "अभी कोई सक्रिय रखरखाव कार्य नहीं सौंपा गया है।"],
+            "accept task & start work": ["పనిని స్వీకరించి ప్రారంభించండి", "कार्य स्वीकारें और शुरू करें"], "upload proof & complete work": ["ఆధారాన్ని అప్‌లోడ్ చేసి పనిని పూర్తి చేయండి", "प्रमाण अपलोड करके कार्य पूरा करें"],
+            "8-stage complaint timeline progress": ["ఫిర్యాదు పరిష్కార 8 దశల పురోగతి", "शिकायत समाधान की 8-चरणीय प्रगति"],
+            "satisfaction review & resolution inspection": ["సంతృప్తి సమీక్ష మరియు పరిష్కార తనిఖీ", "संतुष्टि समीक्षा और समाधान निरीक्षण"],
+            "review the repair proof uploaded by staff and approved by admin:": ["సిబ్బంది అప్‌లోడ్ చేసి అడ్మిన్ ఆమోదించిన మరమ్మత్తు ఆధారాన్ని పరిశీలించండి:", "स्टाफ द्वारा अपलोड और एडमिन द्वारा स्वीकृत मरम्मत प्रमाण देखें:"],
+            "before repair": ["మరమ్మత్తుకు ముందు", "मरम्मत से पहले"], "after repair (verified)": ["మరమ్మత్తు తర్వాత (ధృవీకరించబడింది)", "मरम्मत के बाद (सत्यापित)"],
+            "repair notes:": ["మరమ్మత్తు గమనికలు:", "मरम्मत नोट्स:"], "are you satisfied with the resolution?": ["ఈ పరిష్కారంతో మీరు సంతృప్తిగా ఉన్నారా?", "क्या आप समाधान से संतुष्ट हैं?"],
+            "yes — satisfied (close complaint)": ["అవును — సంతృప్తి (ఫిర్యాదును మూసివేయండి)", "हां — संतुष्ट (शिकायत बंद करें)"],
+            "no — not satisfied (reopen)": ["కాదు — సంతృప్తి లేదు (మళ్లీ తెరవండి)", "नहीं — संतुष्ट नहीं (फिर से खोलें)"], "rating (1 to 5 stars)": ["రేటింగ్ (1 నుండి 5 నక్షత్రాలు)", "रेटिंग (1 से 5 स्टार)"],
+            "provide feedback message or reason for reopening...": ["అభిప్రాయం లేదా మళ్లీ తెరవడానికి కారణం రాయండి...", "अपनी प्रतिक्रिया या दोबारा खोलने का कारण लिखें..."],
+            "staff assignment center": ["సిబ్బంది కేటాయింపు కేంద్రం", "स्टाफ नियुक्ति केंद्र"], "choose staff member from department for complaint": ["ఫిర్యాదు కోసం విభాగం నుంచి సిబ్బందిని ఎంచుకోండి", "शिकायत के लिए विभाग से स्टाफ चुनें"],
+            "department": ["విభాగం", "विभाग"], "available staff": ["అందుబాటులో ఉన్న సిబ్బంది", "उपलब्ध स्टाफ"], "admin notes": ["అడ్మిన్ గమనికలు", "एडमिन नोट्स"],
+            "instructions for staff member...": ["సిబ్బందికి సూచనలు...", "स्टाफ के लिए निर्देश..."], "confirm assignment →": ["కేటాయింపును నిర్ధారించండి →", "नियुक्ति की पुष्टि करें →"],
+            "proof verification center": ["ఆధార ధృవీకరణ కేంద్రం", "प्रमाण सत्यापन केंद्र"], "inspect repair proof submitted by staff before forwarding to student:": ["విద్యార్థికి పంపే ముందు సిబ్బంది సమర్పించిన మరమ్మత్తు ఆధారాన్ని పరిశీలించండి:", "छात्र को भेजने से पहले स्टाफ द्वारा जमा मरम्मत प्रमाण जांचें:"],
+            "staff notes:": ["సిబ్బంది గమనికలు:", "स्टाफ नोट्स:"], "▶ view video proof": ["▶ వీడియో ఆధారాన్ని చూడండి", "▶ वीडियो प्रमाण देखें"],
+            "approve resolution →": ["పరిష్కారాన్ని ఆమోదించండి →", "समाधान स्वीकृत करें →"], "reject & rework": ["తిరస్కరించి మళ్లీ పని చేయించండి", "अस्वीकार करें और दोबारा काम कराएं"],
+            "upload repair proof": ["మరమ్మత్తు ఆధారాన్ని అప్‌లోడ్ చేయండి", "मरम्मत प्रमाण अपलोड करें"], "attach before & after images + notes for complaint": ["ఫిర్యాదుకు ముందు/తర్వాత చిత్రాలు మరియు గమనికలు జోడించండి", "शिकायत के लिए पहले/बाद की तस्वीरें और नोट्स जोड़ें"],
+            "before repair image url": ["మరమ్మత్తుకు ముందు చిత్ర URL", "मरम्मत से पहले की तस्वीर का URL"], "after repair image url *": ["మరమ్మత్తు తర్వాత చిత్ర URL *", "मरम्मत के बाद की तस्वीर का URL *"],
+            "optional video proof url": ["ఐచ్ఛిక వీడియో ఆధార URL", "वैकल्पिक वीडियो प्रमाण URL"], "repair completion notes *": ["మరమ్మత్తు పూర్తి వివరాలు *", "मरम्मत पूर्ण होने के नोट्स *"],
+            "url or paste image link": ["URL లేదా చిత్ర లింక్ అతికించండి", "URL या तस्वीर का लिंक पेस्ट करें"], "youtube or video link (optional)": ["YouTube లేదా వీడియో లింక్ (ఐచ్ఛికం)", "YouTube या वीडियो लिंक (वैकल्पिक)"],
+            "describe what repair work was completed...": ["చేసిన మరమ్మత్తు పనిని వివరించండి...", "किए गए मरम्मत कार्य का विवरण दें..."], "submit proof for admin verification →": ["అడ్మిన్ ధృవీకరణకు ఆధారం పంపండి →", "एडमिन सत्यापन के लिए प्रमाण भेजें →"],
+            "no complaints match the selected filters.": ["ఎంచుకున్న ఫిల్టర్‌లకు సరిపోయే ఫిర్యాదులు లేవు.", "चुने गए फ़िल्टर से मेल खाने वाली शिकायतें नहीं हैं।"],
+            "no active maintenance tasks assigned.": ["ప్రస్తుతం నిర్వహణ పనులు కేటాయించబడలేదు.", "अभी कोई सक्रिय रखरखाव कार्य नहीं सौंपा गया है।"],
+            "status updated": ["స్థితి నవీకరించబడింది", "स्थिति अपडेट हुई"], "current status:": ["ప్రస్తుత స్థితి:", "वर्तमान स्थिति:"],
+            "location:": ["స్థలం:", "स्थान:"], "category:": ["వర్గం:", "श्रेणी:"], "staff:": ["సిబ్బంది:", "स्टाफ:"], "student:": ["విద్యార్థి:", "छात्र:"], "priority:": ["ప్రాధాన్యత:", "प्राथमिकता:"], "dept:": ["విభాగం:", "विभाग:"],
+            "view 8-stage lifecycle timeline →": ["8 దశల పరిష్కార కాలక్రమాన్ని చూడండి →", "8-चरणीय समाधान टाइमलाइन देखें →"], "reopened by student": ["విద్యార్థి మళ్లీ తెరిచారు", "छात्र ने फिर से खोली"], "critical priority": ["అత్యవసర ప్రాధాన్యత", "अति आवश्यक प्राथमिकता"],
+            "student feedback / reopen reason:": ["విద్యార్థి అభిప్రాయం / మళ్లీ తెరవడానికి కారణం:", "छात्र प्रतिक्रिया / दोबारा खोलने का कारण:"], "reassign staff": ["సిబ్బందిని మళ్లీ కేటాయించండి", "स्टाफ फिर से नियुक्त करें"], "+ add admin note": ["+ అడ్మిన్ గమనిక జోడించండి", "+ एडमिन नोट जोड़ें"],
+            "inspect proof": ["ఆధారాన్ని పరిశీలించండి", "प्रमाण जांचें"], "view lifecycle": ["పరిష్కార దశలను చూడండి", "समाधान प्रक्रिया देखें"], "none": ["ఏదీ లేదు", "कोई नहीं"],
+            "work finished.": ["పని పూర్తయింది.", "काम पूरा हुआ।"], "repair completed.": ["మరమ్మత్తు పూర్తయింది.", "मरम्मत पूरी हुई।"], "auto-classified": ["ఆటోమేటిక్‌గా వర్గీకరించబడింది", "स्वचालित रूप से वर्गीकृत"],
+            "final stage": ["చివరి దశ", "अंतिम चरण"], "verified": ["ధృవీకరించబడింది", "सत्यापित"], "assigned": ["కేటాయించబడింది", "नियुक्त"], "in progress": ["పురోగతిలో ఉంది", "प्रगति पर"],
+            "repair completed.": ["మరమ్మత్తు పూర్తయింది.", "मरम्मत पूरी हुई।"], "close complaint": ["ఫిర్యాదును మూసివేయండి", "शिकायत बंद करें"],
+            "complaints": ["ఫిర్యాదులు", "शिकायतें"], "proof pending": ["ఆధారం పెండింగ్‌లో ఉంది", "प्रमाण लंबित"], "proof under admin verification": ["అడ్మిన్ ఆధార ధృవీకరణ పెండింగ్‌లో ఉంది", "एडमिन प्रमाण सत्यापन लंबित"],
+            "no complaints match the selected filters.": ["ఎంచుకున్న ఫిల్టర్‌లకు సరిపోయే ఫిర్యాదులు లేవు.", "चुने गए फ़िल्टर से मेल खाने वाली शिकायतें नहीं हैं।"],
+            "📍 location": ["📍 స్థలం", "📍 स्थान"], "🏷️ category": ["🏷️ వర్గం", "🏷️ श्रेणी"], "📊 analytics": ["📊 విశ్లేషణలు", "📊 विश्लेषण"],
+            "● active": ["● యాక్టివ్", "● सक्रिय"], "critical": ["అత్యవసరం", "अति आवश्यक"], "high": ["అధికం", "उच्च"], "low": ["తక్కువ", "कम"],
+            "no complaints found.": ["ఫిర్యాదులు కనబడలేదు.", "कोई शिकायत नहीं मिली।"], "no complaints yet.": ["ఇంకా ఫిర్యాదులు లేవు.", "अभी तक कोई शिकायत नहीं है।"],
+            "no active maintenance tasks assigned.": ["ప్రస్తుతం నిర్వహణ పనులు కేటాయించబడలేదు.", "अभी कोई सक्रिय रखरखाव कार्य नहीं सौंपा गया है।"],
+            "hostel maintenance": ["హాస్టల్ నిర్వహణ", "हॉस्टल रखरखाव"], "mess management": ["మెస్ నిర్వహణ", "मेस प्रबंधन"],
+            "electrical department": ["విద్యుత్ విభాగం", "इलेक्ट्रिकल विभाग"], "wi-fi team": ["వై-ఫై బృందం", "वाई-फ़ाई टीम"], "transport department": ["రవాణా విభాగం", "परिवहन विभाग"],
+            "admin operations center": ["అడ్మిన్ కార్యకలాపాల కేంద్రం", "एडमिन संचालन केंद्र"], "complaint command center": ["ఫిర్యాదు కమాండ్ సెంటర్", "शिकायत कमांड सेंटर"],
+            "pending verify": ["ధృవీకరణ పెండింగ్", "सत्यापन लंबित"], "proof verification": ["ఆధార ధృవీకరణ", "प्रमाण सत्यापन"],
+            "reopened urgent": ["మళ్లీ తెరిచిన అత్యవసర ఫిర్యాదులు", "फिर से खोली गईं: अति आवश्यक"], "live complaint management queue": ["తక్షణ ఫిర్యాదు నిర్వహణ జాబితా", "लाइव शिकायत प्रबंधन सूची"],
+            "reopened by student": ["విద్యార్థి మళ్లీ తెరిచారు", "छात्र ने फिर से खोली"], "reopened by student —": ["విద్యార్థి మళ్లీ తెరిచారు —", "छात्र ने फिर से खोली —"],
+            "critical priority": ["అత్యవసర ప్రాధాన్యత", "अति आवश्यक प्राथमिकता"], "student feedback / reopen reason:": ["విద్యార్థి అభిప్రాయం / మళ్లీ తెరవడానికి కారణం:", "छात्र प्रतिक्रिया / दोबारा खोलने का कारण:"],
+            "pending admin assignment": ["అడ్మిన్ కేటాయింపు పెండింగ్‌లో ఉంది", "एडमिन नियुक्ति लंबित"], "view lifecycle": ["పరిష్కార దశలను చూడండి", "समाधान प्रक्रिया देखें"],
+            "staff operations console": ["సిబ్బంది కార్యకలాపాల కన్సోల్", "स्टाफ संचालन कंसोल"], "system administrator": ["సిస్టమ్ నిర్వాహకుడు", "सिस्टम एडमिनिस्ट्रेटर"],
+            "assigned maintenance tasks": ["కేటాయించిన నిర్వహణ పనులు", "सौंपे गए रखरखाव कार्य"], "waiting admin proof verification": ["అడ్మిన్ ఆధార ధృవీకరణ కోసం వేచి ఉంది", "एडमिन प्रमाण सत्यापन की प्रतीक्षा"],
+            "proof submitted": ["ఆధారం సమర్పించబడింది", "प्रमाण सबमिट"], "waiting review": ["సమీక్ష కోసం వేచి ఉంది", "समीक्षा की प्रतीक्षा"],
+            "staff assigned": ["సిబ్బందిని కేటాయించారు", "स्टाफ नियुक्त"], "staff working": ["సిబ్బంది పని చేస్తున్నారు", "स्टाफ काम कर रहा है"],
+            "accept task & start work": ["పనిని స్వీకరించి ప్రారంభించండి", "कार्य स्वीकारें और शुरू करें"], "upload proof & complete work": ["ఆధారాన్ని అప్‌లోడ్ చేసి పనిని పూర్తి చేయండి", "प्रमाण अपलोड करके कार्य पूरा करें"],
+            "are you satisfied with the resolution?": ["ఈ పరిష్కారంతో మీరు సంతృప్తిగా ఉన్నారా?", "क्या आप समाधान से संतुष्ट हैं?"],
+            "thank you! complaint marked closed.": ["ధన్యవాదాలు! ఫిర్యాదు మూసివేయబడింది.", "धन्यवाद! शिकायत बंद कर दी गई है।"],
+            "complaint marked reopened. urgent notification sent to admin!": ["ఫిర్యాదు మళ్లీ తెరవబడింది. అడ్మిన్‌కు అత్యవసర సమాచారం పంపబడింది!", "शिकायत फिर से खोली गई। एडमिन को तत्काल सूचना भेजी गई!"],
+            "proof approved! complaint moved to waiting student review.": ["ఆధారం ఆమోదించబడింది! ఫిర్యాదు విద్యార్థి సమీక్షకు పంపబడింది.", "प्रमाण स्वीकृत! शिकायत छात्र समीक्षा के लिए भेजी गई।"],
+            "proof rejected. rework task sent back to staff.": ["ఆధారం తిరస్కరించబడింది. మళ్లీ పని చేయడానికి సిబ్బందికి పంపబడింది.", "प्रमाण अस्वीकृत। दोबारा काम के लिए स्टाफ को भेजा गया।"],
+            "proof submitted! complaint status is now waiting admin verification.": ["ఆధారం సమర్పించబడింది! ఫిర్యాదు అడ్మిన్ ధృవీకరణ కోసం వేచి ఉంది.", "प्रमाण सबमिट! शिकायत अब एडमिन सत्यापन की प्रतीक्षा में है।"],
+            "work finished.": ["పని పూర్తయింది.", "काम पूरा हुआ।"], "repair completed.": ["మరమ్మత్తు పూర్తయింది.", "मरम्मत पूरी हुई।"],
+            "work completed successfully.": ["పని విజయవంతంగా పూర్తయింది.", "काम सफलतापूर्वक पूरा हुआ।"],
+            "KLU Campus Care — Smart Campus Complaint & Operations System": ["KLU క్యాంపస్ కేర్ — స్మార్ట్ క్యాంపస్ ఫిర్యాదుల నిర్వహణ", "KLU कैंपस केयर — स्मार्ट कैंपस शिकायत प्रबंधन"],
+        };
+        Object.assign(APP_TRANSLATIONS, {
+            "📝 description": ["📝 వివరణ", "📝 विवरण"], "smart campus guarantee:": ["స్మార్ట్ క్యాంపస్ హామీ:", "स्मार्ट कैंपस गारंटी:"],
+            "student portal": ["విద్యార్థి పోర్టల్", "छात्र पोर्टल"], "admin portal": ["అడ్మిన్ పోర్టల్", "एडमिन पोर्टल"], "staff portal": ["సిబ్బంది పోర్టల్", "स्टाफ पोर्टल"],
+            "admin command & operations center": ["అడ్మిన్ కమాండ్ మరియు కార్యకలాపాల కేంద్రం", "एडमिन कमांड और संचालन केंद्र"], "● real-time monitoring online": ["● తక్షణ పర్యవేక్షణ ఆన్‌లైన్‌లో ఉంది", "● रीयल-टाइम निगरानी चालू"],
+            "total": ["మొత్తం", "कुल"], "pending verify": ["ధృవీకరణ పెండింగ్", "सत्यापन लंबित"], "in progress": ["పురోగతిలో ఉంది", "प्रगति पर"], "proof verification": ["ఆధార ధృవీకరణ", "प्रमाण सत्यापन"],
+            "reopened complaint command center": ["మళ్లీ తెరిచిన ఫిర్యాదుల కమాండ్ సెంటర్", "फिर से खोली गई शिकायतों का कमांड सेंटर"], "top priority action required": ["అత్యధిక ప్రాధాన్యత: వెంటనే చర్య అవసరం", "सर्वोच्च प्राथमिकता: तुरंत कार्रवाई आवश्यक"],
+            "search id, student, desc...": ["ఐడి, విద్యార్థి లేదా వివరణ వెతకండి...", "आईडी, छात्र या विवरण खोजें..."], "inspect proof": ["ఆధారాన్ని పరిశీలించండి", "प्रमाण जांचें"],
+            "staff operations console": ["సిబ్బంది కార్యకలాపాల కన్సోల్", "स्टाफ संचालन कंसोल"], "reopened by student": ["విద్యార్థి మళ్లీ తెరిచారు", "छात्र ने फिर से खोली"],
+            "student": ["విద్యార్థి", "छात्र"], "• admin": ["• అడ్మిన్", "• एडमिन"], "• staff": ["• సిబ్బంది", "• स्टाफ"], "• end-to-end verification": ["• పూర్తి ధృవీకరణ", "• संपूर्ण सत्यापन"],
+            "department": ["విభాగం", "विभाग"], "priority": ["ప్రాధాన్యత", "प्राथमिकता"], "before repair image url": ["మరమ్మత్తుకు ముందు చిత్ర URL", "मरम्मत से पहले की तस्वीर का URL"],
+            "after repair image url": ["మరమ్మత్తు తర్వాత చిత్ర URL", "मरम्मत के बाद की तस्वीर का URL"], "optional video proof url": ["ఐచ్ఛిక వీడియో ఆధార URL", "वैकल्पिक वीडियो प्रमाण URL"],
+            "repair completion notes": ["మరమ్మత్తు పూర్తి వివరాలు", "मरम्मत पूर्ण होने के नोट्स"], "instructions for staff member...": ["సిబ్బందికి సూచనలు...", "स्टाफ के लिए निर्देश..."],
+            "youtube or video link (optional)": ["YouTube లేదా వీడియో లింక్ (ఐచ్ఛికం)", "YouTube या वीडियो लिंक (वैकल्पिक)"],
+            "url or paste image link": ["URL లేదా చిత్ర లింక్ అతికించండి", "URL या तस्वीर का लिंक पेस्ट करें"],
+            "within 1 hour": ["1 గంటలోపు", "1 घंटे के भीतर"], "within 1.5 hours": ["1.5 గంటల్లోపు", "1.5 घंटे के भीतर"], "within 2 hours": ["2 గంటల్లోపు", "2 घंटे के भीतर"],
+            "within 3 hours": ["3 గంటల్లోపు", "3 घंटे के भीतर"], "within 4 hours": ["4 గంటల్లోపు", "4 घंटे के भीतर"], "within 12 hours": ["12 గంటల్లోపు", "12 घंटे के भीतर"],
+            "default staff": ["డిఫాల్ట్ సిబ్బంది", "डिफ़ॉल्ट स्टाफ"], "active": ["యాక్టివ్", "सक्रिय"],
+            "you are not assigned to this task.": ["ఈ పని మీకు కేటాయించబడలేదు.", "यह कार्य आपको सौंपा नहीं गया है।"],
+            "invalid staff id or password. please use the demo credentials provided below.": ["సిబ్బంది ఐడి లేదా పాస్‌వర్డ్ తప్పు.", "स्टाफ आईडी या पासवर्ड गलत है।"],
+            "invalid student id or password.": ["విద్యార్థి ఐడి లేదా పాస్‌వర్డ్ తప్పు.", "छात्र आईडी या पासवर्ड गलत है।"],
+            "invalid admin id or password.": ["అడ్మిన్ ఐడి లేదా పాస్‌వర్డ్ తప్పు.", "एडमिन आईडी या पासवర్డ్ తప్పు है।"],
+            "complaint submitted successfully! ticket id:": ["ఫిర్యాదు విజయవంతంగా సమర్పించబడింది! టికెట్ ఐడి:", "शिकायत सफलतापूर्वक दर्ज हुई! टिकट आईडी:"],
+            "complaint cmp": ["ఫిర్యాదు CMP", "शिकायत CMP"], " assigned to ": ["కు కేటాయించబడింది ", "को सौंपा गया "],
+            "dept:": ["విభాగం:", "विभाग:"], "staff:": ["సిబ్బంది:", "स्टाफ:"], "student:": ["విద్యార్థి:", "छात्र:"], "location:": ["స్థలం:", "स्थान:"], "category:": ["వర్గం:", "श्रेणी:"],
+            "view video proof": ["వీడియో ఆధారాన్ని చూడండి", "वीडियो प्रमाण देखें"], "proof uploaded": ["ఆధారం అప్‌లోడ్ చేయబడింది", "प्रमाण अपलोड हुआ"],
+            "admin": ["అడ్మిన్", "एडमिन"], "staff": ["సిబ్బంది", "स्टाफ"], "end-to-end verification": ["పూర్తి ధృవీకరణ", "संपूर्ण सत्यापन"],
+            "complaint submitted": ["ఫిర్యాదు సమర్పించబడింది", "शिकायत दर्ज की गई"], "ai classified": ["AI ద్వారా వర్గీకరించబడింది", "AI द्वारा वर्गीकृत"],
+            "pending admin verification": ["అడ్మిన్ ధృవీకరణ పెండింగ్‌లో ఉంది", "एडमिन सत्यापन लंबित"], "staff working": ["సిబ్బంది పని చేస్తున్నారు", "स्टाफ काम कर रहा है"],
+            "proof under admin verification": ["అడ్మిన్ ఆధార ధృవీకరణ పెండింగ్‌లో ఉంది", "एडमिन प्रमाण सत्यापन लंबित"], "closed / satisfied": ["మూసివేయబడింది / సంతృప్తి", "बंद / संतुष्ट"],
+            "approved by admin": ["అడ్మిన్ ఆమోదించారు", "एडमिन द्वारा स्वीकृत"], "pending": ["పెండింగ్‌లో ఉంది", "लंबित"],
+            "all departments": ["అన్ని విభాగాలు", "सभी विभाग"], "pending verification": ["ధృవీకరణ పెండింగ్‌లో ఉంది", "सत्यापन लंबित"],
+            "waiting student review": ["విద్యార్థి సమీక్ష కోసం వేచి ఉంది", "छात्र समीक्षा की प्रतीक्षा"], "final stage": ["చివరి దశ", "अंतिम चरण"],
+            "verified": ["ధృవీకరించబడింది", "सत्यापित"], "assigned": ["కేటాయించబడింది", "नियुक्त"],
+            "no complaints match the selected filters.": ["ఎంచుకున్న ఫిల్టర్‌లకు సరిపోయే ఫిర్యాదులు లేవు.", "चुने गए फ़िल्टर से मेल खाने वाली शिकायतें नहीं हैं।"],
+        });
+        let appLanguage = 'en';
+        const originalAppText = new WeakMap();
+        const originalAppAttributes = new WeakMap();
+
+        function getAppTranslation(source) {
+            const value = source.trim();
+            if (appLanguage === 'en') return value;
+            const match = APP_TRANSLATIONS[value.toLowerCase()];
+            if (match) return match[appLanguage === 'te' ? 0 : 1];
+            const statusNotice = value.match(/^(CMP\d+\s+)Status Updated$/i);
+            if (statusNotice) {
+                const translatedStatus = APP_TRANSLATIONS['status updated'][appLanguage === 'te' ? 0 : 1];
+                return `${statusNotice[1]}${translatedStatus}`;
+            }
+            const assignedNotice = value.match(/^(Complaint CMP\d+) assigned to (.+)!$/i);
+            if (assignedNotice) {
+                const prefix = appLanguage === 'te' ? 'ఫిర్యాదు' : 'शिकायत';
+                const assigned = appLanguage === 'te' ? 'కు కేటాయించబడింది' : 'को सौंपा गया';
+                return `${prefix} ${assignedNotice[1].replace(/^Complaint /i, '')} ${assigned} ${assignedNotice[2]}!`;
+            }
+            return value;
+        }
+
+        function translateAppTextNode(node) {
+            if (!node.parentElement || node.parentElement.closest('script, style')) return;
+            if (!originalAppText.has(node)) originalAppText.set(node, node.nodeValue);
+            const source = originalAppText.get(node);
+            const leading = source.match(/^\s*/)[0];
+            const trailing = source.match(/\s*$/)[0];
+            const translated = `${leading}${getAppTranslation(source)}${trailing}`;
+            if (node.nodeValue !== translated) node.nodeValue = translated;
+        }
+
+        function translateAppNode(root) {
+            if (root.nodeType === Node.TEXT_NODE) {
+                translateAppTextNode(root);
+                return;
+            }
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) translateAppTextNode(walker.currentNode);
+
+            const elements = [];
+            if (root.nodeType === Node.ELEMENT_NODE) elements.push(root);
+            if (root.querySelectorAll) elements.push(...root.querySelectorAll('[placeholder], [aria-label], [title], [alt]'));
+            elements.forEach(element => {
+                const attributes = ['placeholder', 'aria-label', 'title', 'alt'];
+                let originals = originalAppAttributes.get(element);
+                if (!originals) {
+                    originals = {};
+                    originalAppAttributes.set(element, originals);
+                }
+                attributes.forEach(attribute => {
+                    if (!element.hasAttribute(attribute)) return;
+                    if (!(attribute in originals)) originals[attribute] = element.getAttribute(attribute);
+                    const translated = getAppTranslation(originals[attribute]);
+                    if (element.getAttribute(attribute) !== translated) element.setAttribute(attribute, translated);
+                });
+            });
+        }
+
+        function setAppLanguage(language) {
+            appLanguage = ['en', 'te', 'hi'].includes(language) ? language : 'en';
+            document.documentElement.lang = appLanguage;
+            document.title = {
+                en: 'KLU Campus Care — Smart Campus Complaint & Operations System',
+                te: 'KLU క్యాంపస్ కేర్ — స్మార్ట్ క్యాంపస్ ఫిర్యాదుల నిర్వహణ',
+                hi: 'KLU कैंपस केयर — स्मार्ट कैंपस शिकायत प्रबंधन'
+            }[appLanguage];
+            document.querySelectorAll('.app-language-select').forEach(select => { select.value = appLanguage; });
+            translateAppNode(document.body);
+            try { localStorage.setItem('parallelLang', appLanguage); } catch (error) {}
+        }
+
+        document.querySelectorAll('.app-language-select').forEach(select => {
+            select.addEventListener('change', () => setAppLanguage(select.value));
+        });
+        let savedAppLanguage = 'en';
+        try { savedAppLanguage = localStorage.getItem('parallelLang') || 'en'; } catch (error) {}
+        setAppLanguage(savedAppLanguage);
+        const nativeAppAlert = window.alert.bind(window);
+        window.alert = message => nativeAppAlert(getAppTranslation(String(message)));
+
+        const appTranslationObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.type === 'characterData') translateAppTextNode(mutation.target);
+                mutation.addedNodes.forEach(translateAppNode);
+            });
+        });
+        appTranslationObserver.observe(document.body, { childList: true, characterData: true, subtree: true });
+
         // Init on page load
         window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const roleParam = urlParams.get('role');
+            const roleLoginCards = {
+                student: document.getElementById('student-login-card'),
+                admin: document.getElementById('admin-login-card'),
+                staff: document.getElementById('staff-login-card'),
+            };
+            if (roleLoginCards[roleParam]) {
+                Object.values(roleLoginCards).forEach(card => card.classList.add('hidden'));
+                roleLoginCards[roleParam].classList.remove('hidden');
+            }
 
             const storedStudent = localStorage.getItem('parallelStudentSession') || sessionStorage.getItem('parallelStudentSession');
             const storedAdmin = localStorage.getItem('parallelAdminSession') || sessionStorage.getItem('parallelAdminSession');
             const storedStaff = localStorage.getItem('parallelStaffSession') || sessionStorage.getItem('parallelStaffSession');
 
-            if (roleParam === 'admin' && storedAdmin) {
-                currentUser = JSON.parse(storedAdmin);
-            } else if (roleParam === 'staff' && storedStaff) {
-                currentUser = JSON.parse(storedStaff);
-            } else if (storedStudent) {
-                currentUser = JSON.parse(storedStudent);
-            }
+            const storedSession = roleParam === 'admin'
+                ? storedAdmin
+                : roleParam === 'staff'
+                    ? storedStaff
+                    : roleParam === 'student'
+                        ? storedStudent
+                        : storedStudent;
+            if (storedSession) currentUser = JSON.parse(storedSession);
 
             if (currentUser) {
                 showPortalForRole(currentUser.role);
@@ -892,10 +1158,6 @@
             sessionStorage.clear();
             currentUser = null;
             showLoginGate();
-        }
-
-        function toggleStaffLoginForm() {
-            document.getElementById('staff-login-card').classList.toggle('hidden');
         }
 
         async function loadComplaints() {
