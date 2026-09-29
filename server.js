@@ -257,8 +257,8 @@ app.put("/api/complaints/:id/staff-action", (req, res) => {
     complaint.status = "Staff Working";
     complaint.workStartedAt = new Date().toISOString();
   } else if (action === "upload_proof") {
-    if (!afterImage && (!notes || notes.length < 5)) {
-      return res.status(400).json({ error: "Proof photo or completion notes required" });
+    if (!afterImage) {
+      return res.status(400).json({ error: "Please add a repair photo before submitting." });
     }
     complaint.status = "Proof Under Admin Verification";
     if (beforeImage) complaint.beforeImage = beforeImage;

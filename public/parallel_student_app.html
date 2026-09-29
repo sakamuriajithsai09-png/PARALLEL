@@ -764,29 +764,27 @@
 
     <!-- PROOF UPLOAD MODAL (STAFF) -->
     <div id="staff-upload-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-        <div class="card-glass max-w-md w-full p-6 space-y-4 border-cyan-400/40">
+        <div class="card-glass max-h-[90vh] max-w-md w-full overflow-y-auto p-6 space-y-4 border-cyan-400/40">
             <div class="flex items-center justify-between">
                 <h3 class="display-font text-2xl text-white">UPLOAD REPAIR PROOF</h3>
                 <button onclick="closeStaffUploadModal()" class="text-slate-400 hover:text-white">✕</button>
             </div>
-            <p class="text-xs text-slate-400">Attach Before &amp; After images + notes for complaint <strong id="staff-modal-cmp-id" class="text-cyan-300">#--</strong></p>
+            <p class="text-xs text-slate-400">Attach repair photo + optional notes for complaint <strong id="staff-modal-cmp-id" class="text-cyan-300">#--</strong></p>
 
             <form onsubmit="submitStaffProof(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Before Repair Image URL</label>
-                    <input id="staff-before-img" type="text" placeholder="URL or paste image link" class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none" />
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-2">ADD PHOTO</label>
+                    <label for="staff-repair-photo" class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-4 py-3 text-xs font-extrabold uppercase text-cyan-200 hover:bg-cyan-300/20">Add Photo</label>
+                    <input id="staff-repair-photo" type="file" accept="image/*" class="sr-only" onchange="previewStaffProofPhoto(event)" />
+                    <div id="staff-photo-preview" class="mt-3 hidden items-center gap-3 rounded-xl border border-white/10 bg-brandBg p-2">
+                        <img id="staff-photo-preview-image" alt="Selected repair photo preview" class="h-14 w-14 shrink-0 rounded-lg object-cover" />
+                        <span id="staff-photo-filename" class="min-w-0 break-all text-xs text-slate-300"></span>
+                    </div>
+                    <p id="staff-photo-error" role="alert" class="mt-2 hidden text-xs text-red-300">Please add a repair photo before submitting.</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">After Repair Image URL <span class="text-brandAccent">*</span></label>
-                    <input id="staff-after-img" type="text" required placeholder="URL or paste image link" class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none" />
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Optional Video Proof URL</label>
-                    <input id="staff-video-url" type="text" placeholder="YouTube or video link (optional)" class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none" />
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Repair Completion Notes <span class="text-brandAccent">*</span></label>
-                    <textarea id="staff-repair-notes" rows="3" required placeholder="Describe what repair work was completed..." class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none"></textarea>
+                    <label for="staff-repair-notes" class="block text-xs font-bold text-slate-300 uppercase mb-1">DESCRIPTION (OPTIONAL)</label>
+                    <textarea id="staff-repair-notes" rows="3" placeholder="Describe the repair work completed... (optional)" class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none"></textarea>
                 </div>
                 <button type="submit" class="w-full bg-brandAccent text-slate-950 font-extrabold py-3 rounded-xl text-xs uppercase">SUBMIT PROOF FOR ADMIN VERIFICATION →</button>
             </form>
@@ -890,11 +888,11 @@
             "proof verification center": ["ఆధార ధృవీకరణ కేంద్రం", "प्रमाण सत्यापन केंद्र"], "inspect repair proof submitted by staff before forwarding to student:": ["విద్యార్థికి పంపే ముందు సిబ్బంది సమర్పించిన మరమ్మత్తు ఆధారాన్ని పరిశీలించండి:", "छात्र को भेजने से पहले स्टाफ द्वारा जमा मरम्मत प्रमाण जांचें:"],
             "staff notes:": ["సిబ్బంది గమనికలు:", "स्टाफ नोट्स:"], "▶ view video proof": ["▶ వీడియో ఆధారాన్ని చూడండి", "▶ वीडियो प्रमाण देखें"],
             "approve resolution →": ["పరిష్కారాన్ని ఆమోదించండి →", "समाधान स्वीकृत करें →"], "reject & rework": ["తిరస్కరించి మళ్లీ పని చేయించండి", "अस्वीकार करें और दोबारा काम कराएं"],
-            "upload repair proof": ["మరమ్మత్తు ఆధారాన్ని అప్‌లోడ్ చేయండి", "मरम्मत प्रमाण अपलोड करें"], "attach before & after images + notes for complaint": ["ఫిర్యాదుకు ముందు/తర్వాత చిత్రాలు మరియు గమనికలు జోడించండి", "शिकायत के लिए पहले/बाद की तस्वीरें और नोट्स जोड़ें"],
-            "before repair image url": ["మరమ్మత్తుకు ముందు చిత్ర URL", "मरम्मत से पहले की तस्वीर का URL"], "after repair image url *": ["మరమ్మత్తు తర్వాత చిత్ర URL *", "मरम्मत के बाद की तस्वीर का URL *"],
-            "optional video proof url": ["ఐచ్ఛిక వీడియో ఆధార URL", "वैकल्पिक वीडियो प्रमाण URL"], "repair completion notes *": ["మరమ్మత్తు పూర్తి వివరాలు *", "मरम्मत पूर्ण होने के नोट्स *"],
-            "url or paste image link": ["URL లేదా చిత్ర లింక్ అతికించండి", "URL या तस्वीर का लिंक पेस्ट करें"], "youtube or video link (optional)": ["YouTube లేదా వీడియో లింక్ (ఐచ్ఛికం)", "YouTube या वीडियो लिंक (वैकल्पिक)"],
-            "describe what repair work was completed...": ["చేసిన మరమ్మత్తు పనిని వివరించండి...", "किए गए मरम्मत कार्य का विवरण दें..."], "submit proof for admin verification →": ["అడ్మిన్ ధృవీకరణకు ఆధారం పంపండి →", "एडमिन सत्यापन के लिए प्रमाण भेजें →"],
+            "upload repair proof": ["మరమ్మత్తు ఆధారాన్ని అప్‌లోడ్ చేయండి", "मरम्मत प्रमाण अपलोड करें"], "attach repair photo + optional notes for complaint": ["ఫిర్యాదుకు మరమ్మత్తు ఫోటో + ఐచ్ఛిక గమనికలు జోడించండి", "शिकायत के लिए मरम्मत की फोटो + वैकल्पिक नोट्स जोड़ें"],
+            "add photo": ["ఫోటో జోడించండి", "फोटो जोड़ें"], "description (optional)": ["వివరణ (ఐచ్ఛికం)", "विवरण (वैकल्पिक)"],
+            "describe the repair work completed... (optional)": ["పూర్తి చేసిన మరమ్మత్తు పనిని వివరించండి... (ఐచ్ఛికం)", "पूरे किए गए मरम्मत कार्य का वर्णन करें... (वैकल्पिक)"],
+            "please add a repair photo before submitting.": ["సమర్పించే ముందు మరమ్మత్తు ఫోటోను జోడించండి.", "जमा करने से पहले मरम्मत की फोटो जोड़ें।"],
+            "submit proof for admin verification →": ["అడ్మిన్ ధృవీకరణకు ఆధారం పంపండి →", "एडमिन सत्यापन के लिए प्रमाण भेजें →"],
             "no complaints match the selected filters.": ["ఎంచుకున్న ఫిల్టర్‌లకు సరిపోయే ఫిర్యాదులు లేవు.", "चुने गए फ़िल्टर से मेल खाने वाली शिकायतें नहीं हैं।"],
             "no active maintenance tasks assigned.": ["ప్రస్తుతం నిర్వహణ పనులు కేటాయించబడలేదు.", "अभी कोई सक्रिय रखरखाव कार्य नहीं सौंपा गया है।"],
             "status updated": ["స్థితి నవీకరించబడింది", "स्थिति अपडेट हुई"], "current status:": ["ప్రస్తుత స్థితి:", "वर्तमान स्थिति:"],
@@ -943,11 +941,10 @@
             "search id, student, desc...": ["ఐడి, విద్యార్థి లేదా వివరణ వెతకండి...", "आईडी, छात्र या विवरण खोजें..."], "inspect proof": ["ఆధారాన్ని పరిశీలించండి", "प्रमाण जांचें"],
             "staff operations console": ["సిబ్బంది కార్యకలాపాల కన్సోల్", "स्टाफ संचालन कंसोल"], "reopened by student": ["విద్యార్థి మళ్లీ తెరిచారు", "छात्र ने फिर से खोली"],
             "student": ["విద్యార్థి", "छात्र"], "• admin": ["• అడ్మిన్", "• एडमिन"], "• staff": ["• సిబ్బంది", "• स्टाफ"], "• end-to-end verification": ["• పూర్తి ధృవీకరణ", "• संपूर्ण सत्यापन"],
-            "department": ["విభాగం", "विभाग"], "priority": ["ప్రాధాన్యత", "प्राथमिकता"], "before repair image url": ["మరమ్మత్తుకు ముందు చిత్ర URL", "मरम्मत से पहले की तस्वीर का URL"],
-            "after repair image url": ["మరమ్మత్తు తర్వాత చిత్ర URL", "मरम्मत के बाद की तस्वीर का URL"], "optional video proof url": ["ఐచ్ఛిక వీడియో ఆధార URL", "वैकल्पिक वीडियो प्रमाण URL"],
-            "repair completion notes": ["మరమ్మత్తు పూర్తి వివరాలు", "मरम्मत पूर्ण होने के नोट्स"], "instructions for staff member...": ["సిబ్బందికి సూచనలు...", "स्टाफ के लिए निर्देश..."],
-            "youtube or video link (optional)": ["YouTube లేదా వీడియో లింక్ (ఐచ్ఛికం)", "YouTube या वीडियो लिंक (वैकल्पिक)"],
-            "url or paste image link": ["URL లేదా చిత్ర లింక్ అతికించండి", "URL या तस्वीर का लिंक पेस्ट करें"],
+            "department": ["విభాగం", "विभाग"], "priority": ["ప్రాధాన్యత", "प्राथमिकता"],
+            "add photo": ["ఫోటో జోడించండి", "फोटो जोड़ें"], "description (optional)": ["వివరణ (ఐచ్ఛికం)", "विवरण (वैकल्पिक)"],
+            "describe the repair work completed... (optional)": ["పూర్తి చేసిన మరమ్మత్తు పనిని వివరించండి... (ఐచ్ఛికం)", "पूरे किए गए मरम्मत कार्य का वर्णन करें... (वैकल्पिक)"],
+            "instructions for staff member...": ["సిబ్బందికి సూచనలు...", "स्टाफ के लिए निर्देश..."],
             "within 1 hour": ["1 గంటలోపు", "1 घंटे के भीतर"], "within 1.5 hours": ["1.5 గంటల్లోపు", "1.5 घंटे के भीतर"], "within 2 hours": ["2 గంటల్లోపు", "2 घंटे के भीतर"],
             "within 3 hours": ["3 గంటల్లోపు", "3 घंटे के भीतर"], "within 4 hours": ["4 గంటల్లోపు", "4 घंटे के भीतर"], "within 12 hours": ["12 గంటల్లోపు", "12 घंटे के भीतर"],
             "default staff": ["డిఫాల్ట్ సిబ్బంది", "डिफ़ॉल्ट स्टाफ"], "active": ["యాక్టివ్", "सक्रिय"],
@@ -1597,6 +1594,10 @@
         function openStaffUploadModal(id) {
             selectedComplaintForAction = complaintsList.find(c => c.id === id);
             if (!selectedComplaintForAction) return;
+            document.querySelector('#staff-upload-modal form').reset();
+            document.getElementById('staff-photo-preview').classList.add('hidden');
+            document.getElementById('staff-photo-preview').classList.remove('flex');
+            document.getElementById('staff-photo-error').classList.add('hidden');
             document.getElementById('staff-modal-cmp-id').innerText = `CMP${id}`;
             document.getElementById('staff-upload-modal').classList.remove('hidden');
         }
@@ -1605,15 +1606,59 @@
             document.getElementById('staff-upload-modal').classList.add('hidden');
         }
 
+        function previewStaffProofPhoto(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('staff-photo-preview');
+            const error = document.getElementById('staff-photo-error');
+            error.classList.add('hidden');
+            if (!file) {
+                preview.classList.add('hidden');
+                preview.classList.remove('flex');
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                event.target.value = '';
+                preview.classList.add('hidden');
+                preview.classList.remove('flex');
+                error.innerText = 'Please select an image file.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('staff-photo-preview-image').src = URL.createObjectURL(file);
+            document.getElementById('staff-photo-filename').innerText = file.name;
+            preview.classList.remove('hidden');
+            preview.classList.add('flex');
+        }
+
         async function submitStaffProof(event) {
             event.preventDefault();
             if (!selectedComplaintForAction) return;
 
+            const photoInput = document.getElementById('staff-repair-photo');
+            const photoError = document.getElementById('staff-photo-error');
+            const photo = photoInput.files[0];
+            if (!photo) {
+                photoError.innerText = 'Please add a repair photo before submitting.';
+                photoError.classList.remove('hidden');
+                return;
+            }
+
+            const afterImage = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Unable to read the selected photo. Please try again.'));
+                reader.readAsDataURL(photo);
+            }).catch(error => {
+                alert(error.message);
+                return null;
+            });
+            if (!afterImage) return;
+
             const payload = {
                 action: 'upload_proof',
-                beforeImage: document.getElementById('staff-before-img').value.trim() || selectedComplaintForAction.photoUrl || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80',
-                afterImage: document.getElementById('staff-after-img').value.trim() || 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?w=600&auto=format&fit=crop&q=80',
-                videoUrl: document.getElementById('staff-video-url').value.trim(),
+                beforeImage: selectedComplaintForAction.photoUrl || '',
+                afterImage,
                 notes: document.getElementById('staff-repair-notes').value.trim()
             };
 
