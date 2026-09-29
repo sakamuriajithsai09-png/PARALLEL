@@ -179,12 +179,13 @@
       "subissue": "Electrical Spark / Noise",
       "priority": "CRITICAL",
       "department": "Electrical",
-      "status": "Staff Assigned",
+      "status": "Staff Working",
       "staffId": "staff004",
       "staff": "Kiran Kumar",
       "createdAt": "2026-09-27T09:30:00.000Z",
       "aiSummary": "High-risk electrical spark hazard in library reading hall.",
-      "estimatedTime": "1.5 Hours"
+      "estimatedTime": "1.5 Hours",
+      "workStartedAt": "2026-09-29T05:05:05.788Z"
     },
     {
       "id": 1003,
