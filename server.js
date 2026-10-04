@@ -162,8 +162,43 @@ app.post("/api/auth/login", async (req, res) => {
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
   const normalizedId = String(identifier || "").trim().toLowerCase();
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(503).json({ error: "Authentication is not configured. Set the Supabase environment variables." });
+  if (role === 'admin') {
+    const adminAccounts = [
+      {
+        adminId: 'superadmin',
+        password: 'Admin@123',
+        name: 'Super Admin',
+        department: 'Administration'
+      }
+    ];
+
+    const db = readDB();
+
+    const accounts = [
+      ...(db.admins || []),
+      ...adminAccounts
+    ];
+
+    const account = accounts.find(candidate =>
+      String(candidate.adminId || '').trim().toLowerCase() ===
+        String(identifier || '').trim().toLowerCase()
+      &&
+      String(candidate.password || '').trim() ===
+        String(password || '').trim()
+    );
+
+    if (!account) {
+      return res.status(401).json({
+        error: 'Invalid Admin ID or Password.'
+      });
+    }
+
+    return res.json({
+      role: 'admin',
+      name: account.name,
+      identifier: account.adminId,
+      department: account.department
+    });
   }
   if (!["student", "admin", "staff"].includes(role) || !normalizedId || typeof password !== "string" || !password) {
     return res.status(400).json({ error: "Role, ID, and password are required." });

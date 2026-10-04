@@ -1192,6 +1192,65 @@
             message.innerText = '';
         }
 
+        const staffAccounts = [
+            {
+                staffId: 'staff001',
+                password: 'ravi123',
+                name: 'Ravi',
+                department: 'Maintenance',
+                work: 'General Campus Maintenance'
+            },
+            {
+                staffId: 'staff002',
+                password: 'priya123',
+                name: 'Priya',
+                department: 'Maintenance',
+                work: 'Hostel Maintenance'
+            },
+            {
+                staffId: 'staff003',
+                password: 'arjun123',
+                name: 'Arjun',
+                department: 'Electrical',
+                work: 'Electrical Repairs & Power Issues'
+            },
+            {
+                staffId: 'staff004',
+                password: 'kiran123',
+                name: 'Kiran',
+                department: 'Water Supply',
+                work: 'Water Supply, Leakage & Plumbing'
+            },
+            {
+                staffId: 'staff005',
+                password: 'anitha123',
+                name: 'Anitha',
+                department: 'Cleaning',
+                work: 'Campus Cleaning & Washroom Maintenance'
+            },
+            {
+                staffId: 'staff006',
+                password: 'suresh123',
+                name: 'Suresh',
+                department: 'Wi-Fi',
+                work: 'Internet, Wi-Fi & Network Issues'
+            },
+            {
+                staffId: 'staff007',
+                password: 'lakshmi123',
+                name: 'Lakshmi',
+                department: 'Mess Management',
+                work: 'Mess, Food & Canteen Issues'
+            },
+            {
+                staffId: 'staff008',
+                password: 'singh123',
+                name: 'Singh',
+                department: 'Security',
+                work: 'Campus Security & Safety Issues'
+            },
+        ];
+
         async function handleStudentSignup(event) {
             event.preventDefault();
 
@@ -1266,6 +1325,30 @@
             if (role === 'student') {
                 msgEl.classList.remove('border-brandAccent/30', 'bg-brandAccent/10', 'text-brandAccent');
                 msgEl.classList.add('border-red-400/30', 'bg-red-950/20', 'text-red-300');
+            }
+
+            if (role === 'staff') {
+                const matchedStaff = staffAccounts.find(account =>
+                    String(account.staffId).toLowerCase() === String(identifier).toLowerCase() &&
+                    String(account.password) === String(password)
+                );
+
+                if (matchedStaff) {
+                    currentUser = {
+                        role: 'staff',
+                        name: matchedStaff.name,
+                        identifier: matchedStaff.staffId,
+                        department: matchedStaff.department,
+                        accessToken: 'local-access-token',
+                        refreshToken: 'local-refresh-token',
+                        expiresIn: 3600,
+                        localMode: true
+                    };
+                    const key = 'parallelStaffSession';
+                    sessionStorage.setItem(key, JSON.stringify(currentUser));
+                    showPortalForRole(role);
+                    return;
+                }
             }
 
             try {
