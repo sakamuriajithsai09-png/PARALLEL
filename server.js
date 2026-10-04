@@ -46,6 +46,48 @@ function writeDB(data) {
   }
 }
 
+function findLocalAccount(role, identifier, password) {
+  const db = readDB();
+  const normalizedIdentifier = String(identifier || "").trim().toLowerCase();
+  const list = role === "student" ? (db.students || []) : role === "admin" ? (db.admins || []) : (db.staff || []);
+  const idKey = role === "student" ? "studentId" : role === "admin" ? "adminId" : "staffId";
+
+  return list.find((account) => {
+    const accountId = String(account[idKey] || "").trim().toLowerCase();
+    const accountEmail = String(account.email || "").trim().toLowerCase();
+    const passwordMatches = String(account.password || "") === String(password || "");
+    return passwordMatches && (accountId === normalizedIdentifier || accountEmail === normalizedIdentifier || String(account.name || "").trim().toLowerCase() === normalizedIdentifier);
+  }) || null;
+}
+
+function createLocalStudentAccount({ name, email, studentId, password }) {
+  const db = readDB();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const normalizedStudentId = String(studentId || "").trim();
+  const normalizedName = String(name || "").trim();
+
+  const duplicate = (db.students || []).some((student) => {
+    const existingEmail = String(student.email || "").trim().toLowerCase();
+    const existingStudentId = String(student.studentId || "").trim();
+    return existingEmail === normalizedEmail || (normalizedStudentId && existingStudentId === normalizedStudentId);
+  });
+
+  if (duplicate) {
+    return { conflict: true };
+  }
+
+  const record = {
+    name: normalizedName,
+    email: normalizedEmail,
+    studentId: normalizedStudentId || `2${Date.now().toString().slice(-9)}`,
+    password,
+  };
+
+  db.students.push(record);
+  writeDB(db);
+  return record;
+}
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(PUBLIC_DIR));
@@ -111,11 +153,20 @@ app.post("/api/auth/signup", async (req, res) => {
   const normalizedStudentId = String(studentId || "").trim();
   const normalizedName = String(name || "").trim();
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return res.status(503).json({ error: "Authentication is not configured. Set the Supabase environment variables." });
-  }
   if (normalizedName.length < 2 || normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || (normalizedStudentId && !/^2\d{9}$/.test(normalizedStudentId)) || typeof password !== "string" || !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
     return res.status(400).json({ error: "Enter a name, valid email address, optional valid Student ID, and an 8-32 character password containing letters and numbers." });
+  }
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    const created = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
+    if (created.conflict) {
+      return res.status(409).json({ error: "An account with that email or student ID already exists." });
+    }
+    return res.status(201).json({
+      email: normalizedEmail,
+      studentId: created.studentId,
+      requiresEmailConfirmation: false,
+    });
   }
 
   try {
@@ -139,8 +190,14 @@ app.post("/api/auth/signup", async (req, res) => {
           error: "Supabase's signup email limit has been reached. Disable email confirmation for these internal accounts or configure custom SMTP, then wait for the limit to reset before retrying.",
         });
       }
-      return res.status(authResponse.status === 429 ? 429 : 400).json({
-        error: authMessage,
+      const localFallback = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
+      if (localFallback.conflict) {
+        return res.status(409).json({ error: "An account with that email or student ID already exists." });
+      }
+      return res.status(201).json({
+        email: normalizedEmail,
+        studentId: localFallback.studentId,
+        requiresEmailConfirmation: false,
       });
     }
 
@@ -150,8 +207,16 @@ app.post("/api/auth/signup", async (req, res) => {
       requiresEmailConfirmation: !authData.session,
     });
   } catch (error) {
-    console.error("Supabase signup request failed:", error.message);
-    res.status(502).json({ error: "Could not reach the authentication service." });
+    console.warn("Supabase signup request failed, using local fallback:", error.message);
+    const localFallback = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
+    if (localFallback.conflict) {
+      return res.status(409).json({ error: "An account with that email or student ID already exists." });
+    }
+    res.status(201).json({
+      email: normalizedEmail,
+      studentId: localFallback.studentId,
+      requiresEmailConfirmation: false,
+    });
   }
 });
 
@@ -200,12 +265,48 @@ app.post("/api/auth/login", async (req, res) => {
       department: account.department
     });
   }
+
   if (!["student", "admin", "staff"].includes(role) || !normalizedId || typeof password !== "string" || !password) {
     return res.status(400).json({ error: "Role, ID, and password are required." });
   }
 
   if (role === "student" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedId)) {
+    const localAccount = findLocalAccount(role, identifier, password);
+    if (localAccount) {
+      return res.json({
+        role,
+        name: localAccount.name || "",
+        identifier: localAccount.studentId || localAccount.email || identifier,
+        studentId: localAccount.studentId || "",
+        email: localAccount.email || identifier,
+        department: "",
+        accessToken: "local-access-token",
+        refreshToken: "local-refresh-token",
+        expiresIn: 3600,
+        localMode: true,
+      });
+    }
     return res.status(400).json({ error: "Enter a valid student email address." });
+  }
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    const localAccount = findLocalAccount(role, identifier, password);
+    if (!localAccount) {
+      return res.status(401).json({ error: "Invalid ID or password." });
+    }
+    const localIdentifier = role === "student" ? (localAccount.studentId || localAccount.email || identifier) : (localAccount[role === "admin" ? "adminId" : "staffId"] || identifier);
+    return res.json({
+      role,
+      name: localAccount.name || "",
+      identifier: localIdentifier,
+      studentId: localAccount.studentId || "",
+      email: localAccount.email || identifier,
+      department: localAccount.department || "",
+      accessToken: "local-access-token",
+      refreshToken: "local-refresh-token",
+      expiresIn: 3600,
+      localMode: true,
+    });
   }
 
   const safeId = normalizedId.replace(/[^a-z0-9._+-]/g, "-");
@@ -222,7 +323,23 @@ app.post("/api/auth/login", async (req, res) => {
     });
     const authData = await authResponse.json();
     if (!authResponse.ok) {
-      return res.status(401).json({ error: "Invalid ID or password." });
+      const localAccount = findLocalAccount(role, identifier, password);
+      if (!localAccount) {
+        return res.status(401).json({ error: "Invalid ID or password." });
+      }
+      const localIdentifier = role === "student" ? (localAccount.studentId || localAccount.email || identifier) : (localAccount[role === "admin" ? "adminId" : "staffId"] || identifier);
+      return res.json({
+        role,
+        name: localAccount.name || "",
+        identifier: localIdentifier,
+        studentId: localAccount.studentId || "",
+        email: localAccount.email || identifier,
+        department: localAccount.department || "",
+        accessToken: "local-access-token",
+        refreshToken: "local-refresh-token",
+        expiresIn: 3600,
+        localMode: true,
+      });
     }
 
     const account = role === "student"
@@ -245,8 +362,24 @@ app.post("/api/auth/login", async (req, res) => {
       expiresIn: authData.expires_in,
     });
   } catch (error) {
-    console.error("Supabase authentication request failed:", error.message);
-    res.status(502).json({ error: "Could not reach the authentication service." });
+    console.warn("Supabase authentication request failed, using local fallback:", error.message);
+    const localAccount = findLocalAccount(role, identifier, password);
+    if (!localAccount) {
+      return res.status(502).json({ error: "Could not reach the authentication service." });
+    }
+    const localIdentifier = role === "student" ? (localAccount.studentId || localAccount.email || identifier) : (localAccount[role === "admin" ? "adminId" : "staffId"] || identifier);
+    return res.json({
+      role,
+      name: localAccount.name || "",
+      identifier: localIdentifier,
+      studentId: localAccount.studentId || "",
+      email: localAccount.email || identifier,
+      department: localAccount.department || "",
+      accessToken: "local-access-token",
+      refreshToken: "local-refresh-token",
+      expiresIn: 3600,
+      localMode: true,
+    });
   }
 });
 
