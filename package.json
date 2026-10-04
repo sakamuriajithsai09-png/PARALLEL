@@ -4,8 +4,9 @@
   "description": "PARALLEL — Smart Campus Complaint & Issue Management System",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "server": "node server.js"
+    "start": "node --env-file=.env server.js",
+    "server": "node --env-file=.env server.js",
+    "migrate:supabase-users": "node --env-file=.env scripts/migrate-supabase-users.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

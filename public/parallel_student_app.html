@@ -201,17 +201,69 @@
 
                     <form id="student-login-form" class="space-y-5" onsubmit="handleLogin(event, 'student')">
                         <div>
-                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Student ID</label>
-                            <input id="login-student-id" type="text" required placeholder="Enter Student ID (e.g. 2600040101)" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Email Address</label>
+                            <input id="login-student-email" type="email" required autocomplete="email" placeholder="Enter your email address" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
                         </div>
                         <div>
                             <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
-                            <input id="login-password" type="password" required placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                            <div class="relative">
+                                <input id="login-password" type="password" required placeholder="Enter Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                                <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-white" aria-label="Show password" title="Show password">
+                                    <span class="eye-icon">👁</span>
+                                </button>
+                            </div>
                         </div>
                         <div id="student-login-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-4 py-3 text-xs text-red-300"></div>
                         <button type="submit" class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950">
                             Student Login
                         </button>
+
+                        <button type="button" onclick="showStudentSignup()" class="w-full rounded-xl border border-brandAccent2/30 bg-brandAccent2/5 py-3 text-xs font-bold uppercase tracking-wider text-brandAccent2 hover:bg-brandAccent2/10">
+                            New Student? Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <div id="student-signup-card" class="login-card hidden rounded-3xl p-6 backdrop-blur-xl sm:p-8">
+                    <div class="mb-7 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-[.22em] text-brandAccent2">Student Registration</p>
+                            <h2 class="mt-2 text-2xl font-bold text-white">Create Student Account</h2>
+                        </div>
+                        <span class="rounded-xl border border-brandAccent2/30 bg-brandAccent2/10 px-3 py-1.5 text-xs font-bold text-brandAccent2">● Secure Signup</span>
+                    </div>
+
+                    <form id="student-signup-form" class="space-y-5" onsubmit="handleStudentSignup(event)">
+                        <div>
+                            <label for="signup-student-name" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Full Name</label>
+                            <input id="signup-student-name" type="text" required minlength="2" placeholder="Enter your full name" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                        </div>
+                        <div>
+                            <label for="signup-student-email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Email Address</label>
+                            <input id="signup-student-email" type="email" required autocomplete="email" maxlength="254" placeholder="Enter your email address" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                        </div>
+                        <div>
+                            <label for="signup-student-id" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Student ID (Optional)</label>
+                            <input id="signup-student-id" type="text" inputmode="numeric" pattern="2[0-9]{9}" maxlength="10" placeholder="Add your Student ID for complaint tracking" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                        </div>
+                        <div>
+                            <label for="signup-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
+                            <div class="relative">
+                                <input id="signup-password" type="password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,32}" maxlength="32" autocomplete="new-password" placeholder="Use 8-32 letters and numbers" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                                <button type="button" onclick="togglePasswordVisibility('signup-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-white" aria-label="Show password" title="Show password"><span class="eye-icon">👁</span></button>
+                            </div>
+                            <p class="mt-2 text-xs text-slate-500">8-32 characters, including at least one letter and one number.</p>
+                        </div>
+                        <div>
+                            <label for="signup-confirm-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Confirm Password</label>
+                            <div class="relative">
+                                <input id="signup-confirm-password" type="password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,32}" maxlength="32" autocomplete="new-password" placeholder="Confirm Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                                <button type="button" onclick="togglePasswordVisibility('signup-confirm-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-white" aria-label="Show password" title="Show password"><span class="eye-icon">👁</span></button>
+                            </div>
+                        </div>
+                        <div id="student-signup-message" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-4 py-3 text-xs text-red-300" role="alert"></div>
+                        <button type="submit" id="student-signup-btn" class="login-button flex w-full items-center justify-center rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider text-slate-950">Create Student Account</button>
+                        <button type="button" onclick="showStudentLogin()" class="w-full rounded-xl border border-white/10 py-3 text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:border-brandAccent/40">← Back to Student Login</button>
                     </form>
                 </div>
 
@@ -933,6 +985,10 @@
             "KLU Campus Care — Smart Campus Complaint & Operations System": ["KLU క్యాంపస్ కేర్ — స్మార్ట్ క్యాంపస్ ఫిర్యాదుల నిర్వహణ", "KLU कैंपस केयर — स्मार्ट कैंपस शिकायत प्रबंधन"],
         };
         Object.assign(APP_TRANSLATIONS, {
+            "email address": ["ఇమెయిల్ చిరునామా", "ईमेल पता"],
+            "enter your email address": ["మీ ఇమెయిల్ చిరునామా నమోదు చేయండి", "अपना ईमेल पता दर्ज करें"],
+            "student id (optional)": ["విద్యార్థి ఐడి (ఐచ్ఛికం)", "छात्र आईडी (वैकल्पिक)"],
+            "add your student id for complaint tracking": ["ఫిర్యాదుల ట్రాకింగ్ కోసం విద్యార్థి ఐడి జోడించండి", "शिकायत ट्रैकिंग के लिए छात्र आईडी जोड़ें"],
             "📝 description": ["📝 వివరణ", "📝 विवरण"], "smart campus guarantee:": ["స్మార్ట్ క్యాంపస్ హామీ:", "स्मार्ट कैंपस गारंटी:"],
             "student portal": ["విద్యార్థి పోర్టల్", "छात्र पोर्टल"], "admin portal": ["అడ్మిన్ పోర్టల్", "एडमिन पोर्टल"], "staff portal": ["సిబ్బంది పోర్టల్", "स्टाफ पोर्टल"],
             "admin command & operations center": ["అడ్మిన్ కమాండ్ మరియు కార్యకలాపాల కేంద్రం", "एडमिन कमांड और संचालन केंद्र"], "● real-time monitoring online": ["● తక్షణ పర్యవేక్షణ ఆన్‌లైన్‌లో ఉంది", "● रीयल-टाइम निगरानी चालू"],
@@ -1108,7 +1164,7 @@
             if (role === 'student') {
                 document.getElementById('student-portal').classList.remove('hidden');
                 document.getElementById('logged-in-student-name').innerText = currentUser.name || 'Student';
-                document.getElementById('logged-in-student-id').innerText = currentUser.identifier || '2600040101';
+                document.getElementById('logged-in-student-id').innerText = currentUser.studentId || currentUser.email || currentUser.identifier || 'Student';
             } else if (role === 'admin') {
                 document.getElementById('admin-portal').classList.remove('hidden');
                 document.getElementById('admin-name-display').innerText = currentUser.name || 'System Admin';
@@ -1120,16 +1176,97 @@
             renderAllViews();
         }
 
+        function showStudentSignup() {
+            document.getElementById('student-login-card').classList.add('hidden');
+            document.getElementById('student-signup-card').classList.remove('hidden');
+            const message = document.getElementById('student-signup-message');
+            message.classList.add('hidden');
+            message.innerText = '';
+        }
+
+        function showStudentLogin() {
+            document.getElementById('student-signup-card').classList.add('hidden');
+            document.getElementById('student-login-card').classList.remove('hidden');
+            const message = document.getElementById('student-login-message');
+            message.classList.add('hidden');
+            message.innerText = '';
+        }
+
+        async function handleStudentSignup(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('signup-student-name').value.trim();
+            const email = document.getElementById('signup-student-email').value.trim();
+            const studentId = document.getElementById('signup-student-id').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const message = document.getElementById('student-signup-message');
+            const button = document.getElementById('student-signup-btn');
+
+            message.classList.add('hidden');
+            message.innerText = '';
+
+            if (studentId && !/^2\d{9}$/.test(studentId)) {
+                message.innerText = 'Student ID must be exactly 10 digits and start with 2.';
+                message.classList.remove('hidden');
+                return;
+            }
+            if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
+                message.innerText = 'Password must be 8 to 32 letters and numbers, including at least one of each.';
+                message.classList.remove('hidden');
+                return;
+            }
+            if (password !== confirmPassword) {
+                message.innerText = 'Passwords do not match.';
+                message.classList.remove('hidden');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerText = 'CREATING ACCOUNT...';
+            try {
+                const res = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, studentId, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Unable to create student account.');
+
+                document.getElementById('login-student-email').value = data.email;
+                document.getElementById('login-password').value = '';
+                document.getElementById('student-signup-form').reset();
+                showStudentLogin();
+
+                const loginMessage = document.getElementById('student-login-message');
+                loginMessage.innerText = data.requiresEmailConfirmation
+                    ? 'Account created. Confirm your email address before logging in.'
+                    : 'Account created successfully. Please enter your password to login.';
+                loginMessage.classList.remove('hidden', 'border-red-400/30', 'bg-red-950/20', 'text-red-300');
+                loginMessage.classList.add('border-brandAccent/30', 'bg-brandAccent/10', 'text-brandAccent');
+            } catch (error) {
+                message.innerText = error.message;
+                message.classList.remove('hidden');
+            } finally {
+                button.disabled = false;
+                button.innerText = 'Create Student Account';
+            }
+        }
+
         async function handleLogin(event, role) {
             event.preventDefault();
-            const idInput = role === 'student' ? 'login-student-id' : role === 'admin' ? 'admin-id' : 'staff-id';
+            const idInput = role === 'student' ? 'login-student-email' : role === 'admin' ? 'admin-id' : 'staff-id';
             const passInput = role === 'student' ? 'login-password' : role === 'admin' ? 'admin-password' : 'staff-password';
             const msgId = role === 'student' ? 'student-login-message' : role === 'admin' ? 'admin-login-message' : 'staff-login-message';
 
             const identifier = document.getElementById(idInput).value.trim();
-            const password = document.getElementById(passInput).value.trim();
+            const password = document.getElementById(passInput).value;
             const msgEl = document.getElementById(msgId);
             msgEl.classList.add('hidden');
+            if (role === 'student') {
+                msgEl.classList.remove('border-brandAccent/30', 'bg-brandAccent/10', 'text-brandAccent');
+                msgEl.classList.add('border-red-400/30', 'bg-red-950/20', 'text-red-300');
+            }
 
             try {
                 const res = await fetch('/api/auth/login', {
@@ -1229,7 +1366,7 @@
             if (!currentUser) return alert('Please login first');
 
             const payload = {
-                studentId: currentUser.identifier || '2600040101',
+                studentId: currentUser.studentId || currentUser.identifier || currentUser.email,
                 name: currentUser.name || 'Abhiram R.',
                 location: document.getElementById('form-location').value,
                 category: document.getElementById('form-category').value,
@@ -1778,6 +1915,16 @@
                 case 'Reopened': return 'bg-red-500/20 text-red-400 border border-red-500/30';
                 default: return 'bg-slate-700 text-slate-300';
             }
+        }
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            button.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
         }
     </script>
 </body>

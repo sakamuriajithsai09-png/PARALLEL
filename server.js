@@ -50,6 +50,16 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(PUBLIC_DIR));
 
+app.get("/download/project-zip", (req, res) => {
+  const zipPath = path.join(PUBLIC_DIR, "parallel-project.zip");
+
+  if (!fs.existsSync(zipPath)) {
+    return res.status(404).send("Download file not found.");
+  }
+
+  res.download(zipPath, "parallel-project.zip");
+});
+
 // Helper: AI Classification Logic
 function generateAiInsight(category, location, description) {
   const text = (description || "").toLowerCase();
@@ -92,40 +102,117 @@ function generateAiInsight(category, location, description) {
   return { dept, priority, estTime, shortSummary };
 }
 
-// ROUTE: Auth Login
-app.post("/api/auth/login", (req, res) => {
-  const { role, identifier, password } = req.body || {};
-  const db = readDB();
-  const accounts = role === "student" ? db.students : role === "admin" ? db.admins : role === "staff" ? db.staff : [];
-  const normalizedId = String(identifier || "").trim().toLowerCase();
-  const rawPassword = String(password || "").trim();
+// ROUTE: Supabase Student Signup
+app.post("/api/auth/signup", async (req, res) => {
+  const { name, email, studentId, password } = req.body || {};
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  const normalizedStudentId = String(studentId || "").trim();
+  const normalizedName = String(name || "").trim();
 
-  const account = accounts.find((candidate) => {
-    const candidateId = role === "student"
-      ? String(candidate.studentId || "").trim().toLowerCase()
-      : role === "admin"
-        ? String(candidate.adminId || "").trim().toLowerCase()
-        : String(candidate.staffId || "").trim().toLowerCase();
-    const candidatePass = String(candidate.password || "").trim();
-    return candidateId === normalizedId && (candidatePass === rawPassword || candidatePass.toLowerCase() === rawPassword.toLowerCase());
-  });
-
-  if (!account) {
-    return res.status(401).json({
-      error: role === "student"
-        ? "Invalid Student ID or Password."
-        : role === "admin"
-          ? "Invalid Admin ID or Password."
-          : "Incorrect Staff ID or Password. Please use the demo credentials provided below."
-    });
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return res.status(503).json({ error: "Authentication is not configured. Set the Supabase environment variables." });
+  }
+  if (normalizedName.length < 2 || normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || (normalizedStudentId && !/^2\d{9}$/.test(normalizedStudentId)) || typeof password !== "string" || !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
+    return res.status(400).json({ error: "Enter a name, valid email address, optional valid Student ID, and an 8-32 character password containing letters and numbers." });
   }
 
-  res.json({
-    role,
-    name: account.name,
-    identifier: role === "student" ? account.studentId : role === "admin" ? account.adminId : account.staffId,
-    department: account.department || "",
-  });
+  try {
+    const authResponse = await fetch(`${supabaseUrl.replace(/\/$/, "")}/auth/v1/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: supabaseAnonKey,
+      },
+      body: JSON.stringify({
+        email: normalizedEmail,
+        password,
+        data: { role: "student", studentId: normalizedStudentId, name: normalizedName },
+      }),
+    });
+    const authData = await authResponse.json();
+    if (!authResponse.ok) {
+      const authMessage = authData.msg || authData.message || "Unable to create student account.";
+      if (/email rate limit exceeded/i.test(authMessage)) {
+        return res.status(429).json({
+          error: "Supabase's signup email limit has been reached. Disable email confirmation for these internal accounts or configure custom SMTP, then wait for the limit to reset before retrying.",
+        });
+      }
+      return res.status(authResponse.status === 429 ? 429 : 400).json({
+        error: authMessage,
+      });
+    }
+
+    res.status(201).json({
+      email: normalizedEmail,
+      studentId: normalizedStudentId,
+      requiresEmailConfirmation: !authData.session,
+    });
+  } catch (error) {
+    console.error("Supabase signup request failed:", error.message);
+    res.status(502).json({ error: "Could not reach the authentication service." });
+  }
+});
+
+// ROUTE: Supabase Auth Login
+app.post("/api/auth/login", async (req, res) => {
+  const { role, identifier, password } = req.body || {};
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  const normalizedId = String(identifier || "").trim().toLowerCase();
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return res.status(503).json({ error: "Authentication is not configured. Set the Supabase environment variables." });
+  }
+  if (!["student", "admin", "staff"].includes(role) || !normalizedId || typeof password !== "string" || !password) {
+    return res.status(400).json({ error: "Role, ID, and password are required." });
+  }
+
+  if (role === "student" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedId)) {
+    return res.status(400).json({ error: "Enter a valid student email address." });
+  }
+
+  const safeId = normalizedId.replace(/[^a-z0-9._+-]/g, "-");
+  const email = role === "student" ? normalizedId : `parallel-${role}-${safeId}@parallel-campus.org`;
+
+  try {
+    const authResponse = await fetch(`${supabaseUrl.replace(/\/$/, "")}/auth/v1/token?grant_type=password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: supabaseAnonKey,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    const authData = await authResponse.json();
+    if (!authResponse.ok) {
+      return res.status(401).json({ error: "Invalid ID or password." });
+    }
+
+    const account = role === "student"
+      ? { ...(authData.user?.app_metadata || {}), ...(authData.user?.user_metadata || {}) }
+      : authData.user?.app_metadata || {};
+    if (account.role !== role || (role !== "student" && String(account.identifier || "").toLowerCase() !== normalizedId)) {
+      return res.status(403).json({ error: "This account is not authorized for the selected portal." });
+    }
+
+    const studentId = role === "student" ? String(account.studentId || account.identifier || "") : "";
+    res.json({
+      role,
+      name: account.name || "",
+      identifier: role === "student" ? studentId || authData.user?.email : account.identifier,
+      studentId,
+      email: authData.user?.email || normalizedId,
+      department: account.department || "",
+      accessToken: authData.access_token,
+      refreshToken: authData.refresh_token,
+      expiresIn: authData.expires_in,
+    });
+  } catch (error) {
+    console.error("Supabase authentication request failed:", error.message);
+    res.status(502).json({ error: "Could not reach the authentication service." });
+  }
 });
 
 // ROUTE: Get Complaints (with optional filtering)
@@ -328,7 +415,9 @@ app.get("/api/staff", (req, res) => {
   const staffList = db.staff.map(s => {
     const activeTasks = db.complaints.filter(c => c.staffId === s.staffId && (c.status === "Staff Assigned" || c.status === "Staff Working")).length;
     return {
-      ...s,
+      staffId: s.staffId,
+      name: s.name,
+      department: s.department || "",
       activeTasks,
       workload: activeTasks === 0 ? "AVAILABLE" : activeTasks < 3 ? "MODERATE" : "BUSY"
     };
