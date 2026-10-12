@@ -1429,7 +1429,9 @@
                 showStudentLogin();
 
                 const loginMessage = document.getElementById('student-login-message');
-                loginMessage.innerText = data.requiresEmailConfirmation
+                loginMessage.innerText = data.localMode
+                    ? 'Account created in local mode only. It will not appear in Supabase Authentication or be available on other devices.'
+                    : data.requiresEmailConfirmation
                     ? 'Account created. Confirm your email address before logging in.'
                     : 'Account created successfully. Please enter your password to login.';
                 loginMessage.classList.remove('hidden', 'border-red-400/30', 'bg-red-950/20', 'text-red-300');

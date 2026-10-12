@@ -209,6 +209,12 @@ app.post("/api/auth/signup", async (req, res) => {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (process.env.NODE_ENV === "production" || process.env.VERCEL === "1") {
+      return res.status(503).json({
+        error: "Student signup is unavailable because Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in the deployment environment.",
+      });
+    }
+
     const created = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
     if (!created) {
       return res.status(409).json({ error: "An account with that email or student ID already exists." });
@@ -217,6 +223,7 @@ app.post("/api/auth/signup", async (req, res) => {
       email: normalizedEmail,
       studentId: created.studentId,
       requiresEmailConfirmation: false,
+      localMode: true,
     });
   }
 
@@ -241,34 +248,23 @@ app.post("/api/auth/signup", async (req, res) => {
           error: "Supabase's signup email limit has been reached. Disable email confirmation for these internal accounts or configure custom SMTP, then wait for the limit to reset before retrying.",
         });
       }
-      const localFallback = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
-      if (!localFallback) {
-        return res.status(409).json({ error: "An account with that email or student ID already exists." });
-      }
-      return res.status(201).json({
-        email: normalizedEmail,
-        studentId: localFallback.studentId,
-        requiresEmailConfirmation: false,
-      });
+      const status = authResponse.status >= 400 && authResponse.status < 500 ? authResponse.status : 502;
+      return res.status(status).json({ error: authMessage });
     }
 
-    const localAccount = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
+    if (!authData.user) {
+      console.error("Supabase signup succeeded without returning a user.");
+      return res.status(502).json({ error: "The authentication service did not confirm account creation. Please try again." });
+    }
+
     res.status(201).json({
       email: normalizedEmail,
-      studentId: localAccount?.studentId || resolvedStudentId || (authData.user?.user_metadata?.studentId || ""),
-      requiresEmailConfirmation: false,
+      studentId: resolvedStudentId || authData.user.user_metadata?.studentId || "",
+      requiresEmailConfirmation: !authData.session,
     });
   } catch (error) {
-    console.warn("Supabase signup request failed, using local fallback:", error.message);
-    const localFallback = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
-    if (!localFallback) {
-      return res.status(409).json({ error: "An account with that email or student ID already exists." });
-    }
-    res.status(201).json({
-      email: normalizedEmail,
-      studentId: localFallback.studentId,
-      requiresEmailConfirmation: false,
-    });
+    console.error("Supabase signup request failed:", error.message);
+    res.status(502).json({ error: "Could not reach the authentication service. No account was created; please try again." });
   }
 });
 

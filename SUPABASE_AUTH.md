@@ -4,7 +4,7 @@ The app keeps its Student ID, Admin ID, and Staff ID login fields. Each existing
 
 ## Configure
 
-1. Create a Supabase project and copy its project URL, anon key, and service role key. Students sign up and log in with a real email address. The app also persists signup credentials locally so students can log in without waiting for Supabase email confirmation. If signup emails hit the provider limit, wait for it to reset or configure custom SMTP.
+1. Create a Supabase project and copy its project URL, anon key, and service role key. Students sign up and log in with a real email address. If email confirmation is enabled, students must confirm their address before logging in. If signup emails hit the provider limit, wait for it to reset or configure custom SMTP.
 2. The local `.env` file contains `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Set `SUPABASE_SERVICE_ROLE_KEY` only for the one-time migration command; never expose it to the browser or add it to Vercel's runtime environment.
 3. Import the accounts from `db.json`:
 
@@ -23,11 +23,11 @@ The app keeps its Student ID, Admin ID, and Staff ID login fields. Each existing
    npm start
    ```
 
-   Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel project environment variables, then redeploy.
+   Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel project environment variables for every deployed environment, then redeploy. Production signup fails with a configuration error if either value is missing; failed Supabase requests are not saved as local-only accounts.
 5. Once the migration succeeds, remove the `password` properties from `db.json` and rotate any credentials that were previously used outside this demo.
 
 The importer marks imported accounts as confirmed. It updates legacy generated student identities to the real student email in place. It can be rerun after passwords are removed from `db.json` to update existing accounts; creating a new imported account still requires its password.
 
-Students create accounts and log in with their real email from the student portal. The optional Student ID is stored only as profile metadata for complaint tracking. Admin and staff continue to authenticate with their IDs and trusted app metadata set by the importer.
+Students create accounts and log in with their real email from the student portal. When Supabase is not configured during local development, signup uses the local `db.json` only; those accounts are not shared across devices and do not appear in Supabase Authentication. The optional Student ID is stored only as profile metadata for complaint tracking. Admin and staff continue to authenticate with their IDs and trusted app metadata set by the importer.
 
 This integration authenticates the login form. The app's complaint and staff API routes do not yet validate Supabase access tokens, so those routes are not protected by this login alone.
