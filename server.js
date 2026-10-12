@@ -204,8 +204,8 @@ app.post("/api/auth/signup", async (req, res) => {
   const resolvedStudentId = normalizedStudentId || getKluStudentId(normalizedEmail);
   const normalizedName = String(name || "").trim();
 
-  if (normalizedName.length < 2 || normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || (normalizedStudentId && !/^2\d{9}$/.test(normalizedStudentId)) || typeof password !== "string" || !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
-    return res.status(400).json({ error: "Enter a name, valid email address, optional valid Student ID, and an 8-32 character password containing letters and numbers." });
+  if (normalizedName.length < 2 || normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || (normalizedStudentId && !/^2\d{9}$/.test(normalizedStudentId)) || typeof password !== "string" || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s])\S{8,32}$/.test(password)) {
+    return res.status(400).json({ error: "Enter a name, valid email address, optional valid Student ID, and an 8-32 character password with uppercase, lowercase, a number, and a symbol (no spaces)." });
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {

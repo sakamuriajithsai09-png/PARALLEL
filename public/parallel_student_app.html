@@ -270,15 +270,15 @@
                         <div>
                             <label for="signup-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
                             <div class="relative">
-                                <input id="signup-password" type="password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,32}" maxlength="32" autocomplete="new-password" placeholder="Use 8-32 letters and numbers" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                                <input id="signup-password" type="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s])\S{8,32}" maxlength="32" autocomplete="new-password" placeholder="Use 8-32 characters with upper/lowercase, number, and symbol" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
                                 <button type="button" onclick="togglePasswordVisibility('signup-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-white" aria-label="Show password" title="Show password"><span class="eye-icon">👁</span></button>
                             </div>
-                            <p class="mt-2 text-xs text-slate-500">8-32 characters, including at least one letter and one number.</p>
+                            <p class="mt-2 text-xs text-slate-500">8-32 characters, including uppercase, lowercase, a number, and a symbol; no spaces.</p>
                         </div>
                         <div>
                             <label for="signup-confirm-password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Confirm Password</label>
                             <div class="relative">
-                                <input id="signup-confirm-password" type="password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{8,32}" maxlength="32" autocomplete="new-password" placeholder="Confirm Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                                <input id="signup-confirm-password" type="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9\s])\S{8,32}" maxlength="32" autocomplete="new-password" placeholder="Confirm Password" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
                                 <button type="button" onclick="togglePasswordVisibility('signup-confirm-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-white" aria-label="Show password" title="Show password"><span class="eye-icon">👁</span></button>
                             </div>
                         </div>
@@ -1401,8 +1401,8 @@
                 message.classList.remove('hidden');
                 return;
             }
-            if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
-                message.innerText = 'Password must be 8 to 32 letters and numbers, including at least one of each.';
+            if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s])\S{8,32}$/.test(password)) {
+                message.innerText = 'Password must be 8-32 characters with at least one uppercase letter, lowercase letter, number, and symbol; spaces are not allowed.';
                 message.classList.remove('hidden');
                 return;
             }
