@@ -400,14 +400,18 @@
                                     <label class="block text-xs font-bold text-slate-300 uppercase mb-2">📍 Location <span class="text-brandAccent">*</span></label>
                                     <select id="form-location" required class="w-full bg-brandBg border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:border-brandAccent outline-none">
                                         <option value="" disabled selected>Select Location...</option>
-                                        <option value="Boys Hostel Block A">Boys Hostel Block A</option>
-                                        <option value="Girls Hostel Block B">Girls Hostel Block B</option>
-                                        <option value="Hostel Mess 1">Hostel Mess 1</option>
-                                        <option value="Hostel Mess 2">Hostel Mess 2</option>
-                                        <option value="Main Academic Block">Main Academic Block</option>
-                                        <option value="Library & Resource Hub">Library & Resource Hub</option>
-                                        <option value="Main Campus Gate 2">Main Campus Gate 2</option>
-                                        <option value="Campus Bus / Transport">Campus Bus / Transport</option>
+                                        <option value="KPHG boys Hostel">KPHG boys Hostel</option>
+                                        <option value="Neelagiri PG Hostel">Neelagiri PG Hostel</option>
+                                        <option value="Himalaya Boys Hostel">Himalaya Boys Hostel</option>
+                                        <option value="Tulip Hostel">Tulip Hostel</option>
+                                        <option value="C Block">C Block</option>
+                                        <option value="R&D Block">R&D Block</option>
+                                        <option value="S Block">S Block</option>
+                                        <option value="F Block">F Block</option>
+                                        <option value="Fine Arts Block">Fine Arts Block</option>
+                                        <option value="Mechanical & Civil Block">Mechanical & Civil Block</option>
+                                        <option value="Library & Research Block">Library & Research Block</option>
+                                        <option value="Transportation">Transportation</option>
                                     </select>
                                 </div>
                                 <div>
@@ -436,7 +440,23 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-300 uppercase mb-2">📷 Photo Evidence (Optional)</label>
-                                <input id="form-photo" type="text" placeholder="Paste Photo Image URL (or upload simulation)" class="w-full bg-brandBg border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-600 outline-none" />
+                                <input id="form-photo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,image/avif" class="hidden" onchange="handleComplaintPhotoFile(this.files[0])" />
+                                <div id="form-photo-dropzone" tabindex="0" onpaste="handleComplaintPhotoPaste(event)" ondragover="event.preventDefault()" ondrop="handleComplaintPhotoDrop(event)" class="rounded-xl border border-dashed border-white/20 bg-brandBg p-4 outline-none focus:border-brandAccent">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-200">Paste or drop a photo here</p>
+                                            <p class="mt-1 text-xs text-slate-500">Focus this area and press Ctrl+V, or choose an image (max 5 MB).</p>
+                                        </div>
+                                        <button type="button" onclick="document.getElementById('form-photo-file').click()" class="rounded-lg border border-brandAccent/40 px-3 py-2 text-xs font-bold text-brandAccent hover:bg-brandAccent/10">Choose photo</button>
+                                    </div>
+                                    <div id="form-photo-preview-wrap" class="mt-3 hidden">
+                                        <div class="flex items-start gap-3">
+                                            <img id="form-photo-preview" alt="Complaint photo preview" class="max-h-40 max-w-full rounded-lg border border-white/10 object-contain" />
+                                            <button type="button" onclick="clearComplaintPhoto()" class="text-xs font-bold text-red-300 hover:text-red-200">Remove</button>
+                                        </div>
+                                    </div>
+                                    <p id="form-photo-status" class="mt-2 text-xs text-slate-400" role="status"></p>
+                                </div>
                             </div>
 
                             <button type="submit" id="submit-btn" class="w-full bg-brandAccent text-black font-extrabold text-base py-4 rounded-xl transition-all glow-accent">
@@ -952,6 +972,7 @@
         let complaintsLoadError = null;
         let analyticsRefreshPromise = null;
         let analyticsRangeDays = 30;
+        let complaintPhotoDataUrl = '';
         let staffList = [];
         let selectedComplaintForAction = null;
         let currentSelectedRating = 5;
@@ -976,16 +997,31 @@
             "report issues directly to administration. gemini ai automatically classifies, predicts priority, and routes your complaint.": ["సమస్యలను నేరుగా పరిపాలనకు నివేదించండి. Gemini AI ఫిర్యాదును వర్గీకరించి, ప్రాధాన్యతను అంచనా వేసి, సరైన విభాగానికి పంపుతుంది.", "समस्याएं सीधे प्रशासन को बताएं। Gemini AI शिकायत का वर्गीकरण, प्राथमिकता का अनुमान और सही विभाग को भेजने का काम करता है।"],
             "📍 location *": ["📍 స్థలం *", "📍 स्थान *"], "🏷️ category *": ["🏷️ వర్గం *", "🏷️ श्रेणी *"],
             "select location...": ["స్థలాన్ని ఎంచుకోండి...", "स्थान चुनें..."], "select category...": ["వర్గాన్ని ఎంచుకోండి...", "श्रेणी चुनें..."],
-            "boys hostel block a": ["బాయ్స్ హాస్టల్ బ్లాక్ A", "बॉयज़ हॉस्टल ब्लॉक A"], "girls hostel block b": ["గర్ల్స్ హాస్టల్ బ్లాక్ B", "गर्ल्स हॉस्टल ब्लॉक B"],
-            "hostel mess 1": ["హాస్టల్ మెస్ 1", "हॉस्टल मेस 1"], "hostel mess 2": ["హాస్టల్ మెస్ 2", "हॉस्टल मेस 2"],
-            "main academic block": ["ప్రధాన విద్యా భవనం", "मुख्य शैक्षणिक भवन"], "library & resource hub": ["గ్రంథాలయం మరియు వనరుల కేంద్రం", "पुस्तकालय और संसाधन केंद्र"],
-            "main campus gate 2": ["ప్రధాన క్యాంపస్ గేట్ 2", "मुख्य कैंपस गेट 2"], "campus bus / transport": ["క్యాంపస్ బస్సు / రవాణా", "कैंपस बस / परिवहन"],
+            "kphg boys hostel": ["KPHG బాలుర హాస్టల్", "KPHG बॉयज़ हॉस्टल"],
+            "neelagiri pg hostel": ["నీలగిరి PG హాస్టల్", "नीलगिरि PG हॉस्टल"],
+            "himalaya boys hostel": ["హిమాలయ బాలుర హాస్టల్", "हिमालय बॉयज़ हॉस्टल"],
+            "tulip hostel": ["ట్యూలిప్ హాస్టల్", "ट्यूलिप हॉस्टल"],
+            "c block": ["C బ్లాక్", "C ब्लॉक"],
+            "r&d block": ["R&D బ్లాక్", "R&D ब्लॉक"],
+            "s block": ["S బ్లాక్", "S ब्लॉक"],
+            "f block": ["F బ్లాక్", "F ब्लॉक"],
+            "fine arts block": ["ఫైన్ ఆర్ట్స్ బ్లాక్", "फाइन आर्ट्स ब्लॉक"],
+            "mechanical & civil block": ["మెకానికల్ మరియు సివిల్ బ్లాక్", "मैकेनिकल और सिविल ब्लॉक"],
+            "library & research block": ["గ్రంథాలయం మరియు పరిశోధనా బ్లాక్", "पुस्तकालय और अनुसंधान ब्लॉक"],
+            "transportation": ["రవాణా", "परिवहन"],
             "hostel maintenance": ["హాస్టల్ నిర్వహణ", "हॉस्टल रखरखाव"], "mess management": ["మెస్ నిర్వహణ", "मेस प्रबंधन"],
             "electrical": ["విద్యుత్", "इलेक्ट्रिकल"], "wi-fi": ["వై-ఫై", "वाई-फ़ाई"], "water supply": ["నీటి సరఫరా", "जल आपूर्ति"],
             "transport": ["రవాణా", "परिवहन"], "cleaning": ["శుభ్రత", "सफाई"], "security": ["భద్రత", "सुरक्षा"],
             "📝 description *": ["📝 వివరణ *", "📝 विवरण *"], "describe the problem in detail...": ["సమస్యను వివరంగా తెలియజేయండి...", "समस्या का विस्तार से वर्णन करें..."],
             "📷 photo evidence (optional)": ["📷 ఫోటో ఆధారం (ఐచ్ఛికం)", "📷 फोटो प्रमाण (वैकल्पिक)"],
-            "paste photo image url (or upload simulation)": ["ఫోటో URLను అతికించండి", "फोटो URL पेस्ट करें"],
+            "paste or drop a photo here": ["ఫోటోను ఇక్కడ అతికించండి లేదా డ్రాప్ చేయండి", "यहाँ फोटो पेस्ट करें या ड्रॉप करें"],
+            "focus this area and press ctrl+v, or choose an image (max 5 mb).": ["ఈ ప్రాంతాన్ని ఫోకస్ చేసి Ctrl+V నొక్కండి లేదా ఫోటోను ఎంచుకోండి (గరిష్ఠం 5 MB).", "इस क्षेत्र पर फ़ोकस करके Ctrl+V दबाएँ या फ़ोटो चुनें (अधिकतम 5 MB)।"],
+            "choose photo": ["ఫోటోను ఎంచుకోండి", "फ़ोटो चुनें"],
+            "remove": ["తొలగించు", "हटाएँ"],
+            "photo added.": ["ఫోటో జోడించబడింది.", "फ़ोटो जोड़ दी गई।"],
+            "choose an image file.": ["చిత్ర ఫైల్‌ను ఎంచుకోండి.", "इमेज फ़ाइल चुनें।"],
+            "image is too large. choose a photo under 5 mb.": ["చిత్రం చాలా పెద్దది. 5 MB కంటే తక్కువ ఫోటోను ఎంచుకోండి.", "इमेज बहुत बड़ी है। 5 MB से कम की फ़ोटो चुनें।"],
+            "could not read this image. please choose another one.": ["ఈ చిత్రాన్ని చదవలేకపోయాం. దయచేసి మరొకదాన్ని ఎంచుకోండి.", "यह इमेज पढ़ी नहीं जा सकी। कृपया दूसरी चुनें।"],
             "submit complaint to admin →": ["ఫిర్యాదును అడ్మిన్‌కు పంపండి →", "शिकायत एडमिन को भेजें →"],
             "ai routing & saving ticket...": ["AI ద్వారా పంపుతోంది మరియు భద్రపరుస్తోంది...", "AI रूटिंग और टिकट सेव हो रहा है..."],
             "🤖": ["🤖", "🤖"], "gemini ai auto-detector": ["GEMINI AI ఆటో డిటెక్టర్", "GEMINI AI ऑटो डिटेक्टर"],
@@ -1955,6 +1991,63 @@
             triggerAiClassification(cat, textarea.value);
         }
 
+        const MAX_COMPLAINT_PHOTO_BYTES = 5 * 1024 * 1024;
+        const COMPLAINT_PHOTO_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/bmp', 'image/avif']);
+
+        function setComplaintPhotoStatus(message, tone = 'text-slate-400') {
+            const status = document.getElementById('form-photo-status');
+            status.textContent = getAppTranslation(message);
+            status.className = `mt-2 text-xs ${tone}`;
+        }
+
+        function handleComplaintPhotoPaste(event) {
+            const items = Array.from(event.clipboardData?.items || []);
+            const image = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+            if (!image) return;
+            event.preventDefault();
+            handleComplaintPhotoFile(image.getAsFile());
+        }
+
+        function handleComplaintPhotoDrop(event) {
+            event.preventDefault();
+            const image = Array.from(event.dataTransfer?.files || []).find(file => file.type.startsWith('image/'));
+            if (image) handleComplaintPhotoFile(image);
+        }
+
+        function handleComplaintPhotoFile(file) {
+            if (!file) return;
+            if (!COMPLAINT_PHOTO_TYPES.has(file.type)) {
+                setComplaintPhotoStatus('Choose an image file.', 'text-red-300');
+                return;
+            }
+            if (file.size > MAX_COMPLAINT_PHOTO_BYTES) {
+                setComplaintPhotoStatus('Image is too large. Choose a photo under 5 MB.', 'text-red-300');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (typeof reader.result !== 'string') {
+                    setComplaintPhotoStatus('Could not read this image. Please choose another one.', 'text-red-300');
+                    return;
+                }
+                complaintPhotoDataUrl = reader.result;
+                document.getElementById('form-photo-preview').src = reader.result;
+                document.getElementById('form-photo-preview-wrap').classList.remove('hidden');
+                setComplaintPhotoStatus('Photo added.', 'text-brandAccent');
+            };
+            reader.onerror = () => setComplaintPhotoStatus('Could not read this image. Please choose another one.', 'text-red-300');
+            reader.readAsDataURL(file);
+        }
+
+        function clearComplaintPhoto() {
+            complaintPhotoDataUrl = '';
+            document.getElementById('form-photo-file').value = '';
+            document.getElementById('form-photo-preview').removeAttribute('src');
+            document.getElementById('form-photo-preview-wrap').classList.add('hidden');
+            setComplaintPhotoStatus('');
+        }
+
         function triggerAiClassification(category, desc) {
             const text = (desc || '').toLowerCase();
             let dept = category || 'Hostel Maintenance';
@@ -1985,7 +2078,7 @@
                 location: document.getElementById('form-location').value,
                 category: document.getElementById('form-category').value,
                 description: document.getElementById('form-description').value,
-                photoUrl: document.getElementById('form-photo').value.trim()
+                photoUrl: complaintPhotoDataUrl
             };
 
             const submitBtn = document.getElementById('submit-btn');
@@ -2001,6 +2094,7 @@
                 if (!res.ok) throw new Error('Failed to submit complaint');
                 
                 document.getElementById('complaintForm').reset();
+                clearComplaintPhoto();
                 alert('Complaint Submitted Successfully! Status: Pending Admin Verification');
                 await loadComplaints();
                 switchTab('my-complaints');
