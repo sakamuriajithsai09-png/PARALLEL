@@ -56,36 +56,79 @@ function findLocalAccount(role, identifier, password) {
     const accountId = String(account[idKey] || "").trim().toLowerCase();
     const accountEmail = String(account.email || "").trim().toLowerCase();
     const passwordMatches = String(account.password || "") === String(password || "");
-    return passwordMatches && (accountId === normalizedIdentifier || accountEmail === normalizedIdentifier || String(account.name || "").trim().toLowerCase() === normalizedIdentifier);
+    const nameMatches = String(account.name || "").trim().toLowerCase() === normalizedIdentifier;
+    return passwordMatches && (accountId === normalizedIdentifier || accountEmail === normalizedIdentifier || nameMatches);
   }) || null;
+}
+
+function getKluStudentId(email) {
+  const match = String(email || "").trim().match(/^(2\d{9})@kluniversity\.in$/i);
+  return match ? match[1] : "";
 }
 
 function createLocalStudentAccount({ name, email, studentId, password }) {
   const db = readDB();
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const normalizedStudentId = String(studentId || "").trim();
+  const emailStudentId = getKluStudentId(normalizedEmail);
   const normalizedName = String(name || "").trim();
 
-  const duplicate = (db.students || []).some((student) => {
+  const duplicateByEmail = (db.students || []).find((student) => {
     const existingEmail = String(student.email || "").trim().toLowerCase();
-    const existingStudentId = String(student.studentId || "").trim();
-    return existingEmail === normalizedEmail || (normalizedStudentId && existingStudentId === normalizedStudentId);
+    return existingEmail === normalizedEmail;
   });
+  const duplicateByStudentId = normalizedStudentId
+    ? (db.students || []).find((student) => String(student.studentId || "").trim() === normalizedStudentId)
+    : null;
+  if (duplicateByEmail && duplicateByStudentId && duplicateByEmail !== duplicateByStudentId) {
+    return { conflict: true };
+  }
+  if (duplicateByEmail && normalizedStudentId && !duplicateByStudentId) {
+    const currentStudentId = String(duplicateByEmail.studentId || "").trim();
+    if (currentStudentId && currentStudentId !== normalizedStudentId) {
+      const occupiedId = (db.students || []).some((student) =>
+        student !== duplicateByEmail && String(student.studentId || "").trim() === normalizedStudentId
+      );
+      if (occupiedId) return { conflict: true };
+    }
+  }
+  if (duplicateByStudentId && !duplicateByEmail) {
+    const existingEmail = String(duplicateByStudentId.email || "").trim().toLowerCase();
+    if (existingEmail && normalizedEmail && existingEmail !== normalizedEmail) {
+      return { conflict: true };
+    }
+  }
+  const duplicate = duplicateByEmail || duplicateByStudentId;
 
   if (duplicate) {
-    return { conflict: true };
+    if (duplicateByStudentId && !duplicateByEmail && normalizedEmail) duplicate.email = normalizedEmail;
+    if (duplicateByEmail && (normalizedStudentId || emailStudentId)) duplicate.studentId = normalizedStudentId || emailStudentId;
+    else if (normalizedStudentId && !duplicate.studentId) duplicate.studentId = normalizedStudentId;
+    if (normalizedName && !duplicate.name) duplicate.name = normalizedName;
+    if (password && duplicate.password !== String(password)) duplicate.password = password;
+    writeDB(db);
+    return duplicate;
   }
 
   const record = {
     name: normalizedName,
     email: normalizedEmail,
-    studentId: normalizedStudentId || `2${Date.now().toString().slice(-9)}`,
+    studentId: normalizedStudentId || emailStudentId || `2${Date.now().toString().slice(-9)}`,
     password,
   };
 
   db.students.push(record);
   writeDB(db);
   return record;
+}
+
+function ensureLocalStudentAccount({ name, email, studentId, password }) {
+  if (!email && !studentId) {
+    return null;
+  }
+
+  const localStudent = createLocalStudentAccount({ name, email, studentId, password });
+  return localStudent && !localStudent.conflict ? localStudent : null;
 }
 
 app.use(cors());
@@ -144,6 +187,13 @@ function generateAiInsight(category, location, description) {
   return { dept, priority, estTime, shortSummary };
 }
 
+function recordComplaintActivity(complaint, event, status, at = new Date().toISOString()) {
+  complaint.statusUpdatedAt = at;
+  complaint.activity = Array.isArray(complaint.activity) ? complaint.activity : [];
+  complaint.activity.push({ event, status, at });
+  if (complaint.activity.length > 50) complaint.activity.shift();
+}
+
 // ROUTE: Supabase Student Signup
 app.post("/api/auth/signup", async (req, res) => {
   const { name, email, studentId, password } = req.body || {};
@@ -151,6 +201,7 @@ app.post("/api/auth/signup", async (req, res) => {
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const normalizedStudentId = String(studentId || "").trim();
+  const resolvedStudentId = normalizedStudentId || getKluStudentId(normalizedEmail);
   const normalizedName = String(name || "").trim();
 
   if (normalizedName.length < 2 || normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || (normalizedStudentId && !/^2\d{9}$/.test(normalizedStudentId)) || typeof password !== "string" || !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$/.test(password)) {
@@ -158,8 +209,8 @@ app.post("/api/auth/signup", async (req, res) => {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    const created = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
-    if (created.conflict) {
+    const created = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
+    if (!created) {
       return res.status(409).json({ error: "An account with that email or student ID already exists." });
     }
     return res.status(201).json({
@@ -179,7 +230,7 @@ app.post("/api/auth/signup", async (req, res) => {
       body: JSON.stringify({
         email: normalizedEmail,
         password,
-        data: { role: "student", studentId: normalizedStudentId, name: normalizedName },
+        data: { role: "student", studentId: resolvedStudentId, name: normalizedName },
       }),
     });
     const authData = await authResponse.json();
@@ -190,8 +241,8 @@ app.post("/api/auth/signup", async (req, res) => {
           error: "Supabase's signup email limit has been reached. Disable email confirmation for these internal accounts or configure custom SMTP, then wait for the limit to reset before retrying.",
         });
       }
-      const localFallback = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
-      if (localFallback.conflict) {
+      const localFallback = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
+      if (!localFallback) {
         return res.status(409).json({ error: "An account with that email or student ID already exists." });
       }
       return res.status(201).json({
@@ -201,15 +252,16 @@ app.post("/api/auth/signup", async (req, res) => {
       });
     }
 
+    const localAccount = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
     res.status(201).json({
       email: normalizedEmail,
-      studentId: normalizedStudentId,
-      requiresEmailConfirmation: !authData.session,
+      studentId: localAccount?.studentId || resolvedStudentId || (authData.user?.user_metadata?.studentId || ""),
+      requiresEmailConfirmation: false,
     });
   } catch (error) {
     console.warn("Supabase signup request failed, using local fallback:", error.message);
-    const localFallback = createLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: normalizedStudentId, password });
-    if (localFallback.conflict) {
+    const localFallback = ensureLocalStudentAccount({ name: normalizedName, email: normalizedEmail, studentId: resolvedStudentId, password });
+    if (!localFallback) {
       return res.status(409).json({ error: "An account with that email or student ID already exists." });
     }
     res.status(201).json({
@@ -286,7 +338,25 @@ app.post("/api/auth/login", async (req, res) => {
         localMode: true,
       });
     }
-    return res.status(400).json({ error: "Enter a valid student email address." });
+    return res.status(400).json({ error: "Enter a valid student ID or email address." });
+  }
+
+  if (role === "student") {
+    const localAccount = findLocalAccount(role, identifier, password);
+    if (localAccount) {
+      return res.json({
+        role,
+        name: localAccount.name || "",
+        identifier: localAccount.studentId || localAccount.email || identifier,
+        studentId: localAccount.studentId || "",
+        email: localAccount.email || identifier,
+        department: "",
+        accessToken: "local-access-token",
+        refreshToken: "local-refresh-token",
+        expiresIn: 3600,
+        localMode: true,
+      });
+    }
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -432,6 +502,7 @@ app.post("/api/complaints", (req, res) => {
 
   const ai = generateAiInsight(category, location, description);
 
+  const createdAt = new Date().toISOString();
   const newComplaint = {
     id: db.nextId || 1000,
     studentId: String(studentId).trim(),
@@ -446,7 +517,9 @@ app.post("/api/complaints", (req, res) => {
     estimatedTime: ai.estTime,
     status: "Pending Admin Verification",
     photoUrl: photoUrl || "",
-    createdAt: new Date().toISOString()
+    createdAt,
+    statusUpdatedAt: createdAt,
+    activity: [{ event: "submitted", status: "Pending Admin Verification", at: createdAt }]
   };
 
   db.nextId = newComplaint.id + 1;
@@ -473,6 +546,7 @@ app.put("/api/complaints/:id/verify", (req, res) => {
     if (notes) complaint.adminNotes = notes;
     complaint.verifiedAt = new Date().toISOString();
   }
+  recordComplaintActivity(complaint, action === "reject" ? "rejected" : "verified", complaint.status);
 
   writeDB(db);
   res.json(complaint);
@@ -495,6 +569,7 @@ app.put("/api/complaints/:id/assign", (req, res) => {
   if (adminNotes) complaint.adminNotes = adminNotes;
   complaint.status = "Staff Assigned";
   complaint.assignedAt = new Date().toISOString();
+  recordComplaintActivity(complaint, "assigned", complaint.status, complaint.assignedAt);
 
   writeDB(db);
   res.json(complaint);
@@ -524,6 +599,8 @@ app.put("/api/complaints/:id/staff-action", (req, res) => {
   } else {
     return res.status(400).json({ error: "Invalid staff action" });
   }
+  recordComplaintActivity(complaint, action === "upload_proof" ? "proof_submitted" : "work_started",
+    complaint.status, action === "upload_proof" ? complaint.proofAt : complaint.workStartedAt);
 
   writeDB(db);
   res.json(complaint);
@@ -546,6 +623,8 @@ app.put("/api/complaints/:id/admin-proof-verify", (req, res) => {
   } else {
     return res.status(400).json({ error: "Invalid admin proof verification action" });
   }
+  recordComplaintActivity(complaint, action === "approve" ? "proof_approved" : "rework_requested", complaint.status,
+    action === "approve" ? complaint.approvedByAdminAt : new Date().toISOString());
 
   writeDB(db);
   res.json(complaint);
@@ -572,6 +651,8 @@ app.put("/api/complaints/:id/satisfaction", (req, res) => {
     complaint.reopenReason = feedback || "Resolution did not meet student satisfaction.";
     complaint.adminAlert = "URGENT: Reopened by student. High priority rework required!";
   }
+  recordComplaintActivity(complaint, complaint.status === "Closed" ? "resolved" : "reopened", complaint.status,
+    complaint.closedAt || complaint.reopenedAt);
 
   writeDB(db);
   res.json(complaint);

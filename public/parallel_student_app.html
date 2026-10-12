@@ -148,6 +148,27 @@
             transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
         }
         .login-button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 12px 30px rgba(0, 230, 118, 0.2); }
+        .analytics-chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+        .analytics-chart-svg text { font-family: 'Inter', system-ui, sans-serif; }
+        .analytics-chart-svg .chart-mark { transition: opacity .18s ease, filter .18s ease; }
+        .analytics-chart-svg .chart-mark:hover { opacity: .82; filter: brightness(1.2); }
+        .analytics-table th, .analytics-table td { padding: .8rem .75rem; text-align: left; }
+        .analytics-table th { color: #94a3b8; font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+        .analytics-table td { border-top: 1px solid rgba(255,255,255,.06); color: #cbd5e1; font-size: .75rem; }
+        .analytics-feed-item + .analytics-feed-item { border-top: 1px solid rgba(255,255,255,.06); }
+        @media (max-width: 420px) {
+            #logged-in-student-name { display: none; }
+            #student-portal header > div { gap: .5rem; }
+            #student-portal header > div > div:first-child { gap: .5rem; }
+            #student-portal header > div > div:last-child { gap: .375rem; }
+            #student-portal header .display-font { font-size: 1.125rem; }
+            #student-portal header #app-language-student { width: 2.5rem; }
+            #student-portal header #logged-in-student-id { padding-left: .5rem; }
+            #student-portal header > div > div:last-child > button:last-child { padding-left: .5rem; padding-right: .5rem; }
+        }
+        @media (max-width: 360px) {
+            #student-portal header > div > div:last-child > button:first-of-type { display: none; }
+        }
         .dashboard-glass { background: rgba(12, 18, 30, .72); border: 1px solid rgba(255,255,255,.08); box-shadow: 0 18px 50px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.03); backdrop-filter: blur(18px); }
         .staff-dashboard { background: radial-gradient(circle at 82% 12%, rgba(124,58,237,.14), transparent 28%), radial-gradient(circle at 10% 70%, rgba(0,230,118,.1), transparent 30%), #050816; }
         .staff-card { background: linear-gradient(135deg, rgba(17,24,39,.76), rgba(8,16,30,.78)); border: 1px solid rgba(255,255,255,.09); box-shadow: 0 20px 60px rgba(0,0,0,.22); backdrop-filter: blur(20px); transition: transform .25s ease, border-color .25s ease; }
@@ -201,8 +222,8 @@
 
                     <form id="student-login-form" class="space-y-5" onsubmit="handleLogin(event, 'student')">
                         <div>
-                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Email Address</label>
-                            <input id="login-student-email" type="email" required autocomplete="email" placeholder="Enter your email address" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
+                            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Student ID / Email</label>
+                            <input id="login-student-email" type="text" required autocomplete="username" placeholder="Enter your student ID or email" class="login-input w-full rounded-xl py-3.5 px-4 text-sm text-white placeholder-slate-600" />
                         </div>
                         <div>
                             <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-300">Password</label>
@@ -502,11 +523,81 @@
 
             <!-- VIEW 3: ANALYTICS -->
             <section id="view-analytics" class="tab-view hidden space-y-6">
-                <div class="card-glass p-6">
-                    <h1 class="display-font text-3xl text-white uppercase">Campus Resolution Insights</h1>
-                    <p class="text-slate-400 text-sm">Real-time complaint workflow metrics across all 8 departments.</p>
+                <div class="card-glass flex flex-wrap items-end justify-between gap-4 p-5 sm:p-6">
+                    <div>
+                        <span class="text-xs font-bold tracking-widest text-brandAccent uppercase">Live campus data</span>
+                        <h1 class="display-font text-3xl text-white uppercase">Campus Resolution Insights</h1>
+                        <p class="mt-1 text-sm text-slate-400">Real-time complaint workflow metrics across all 8 departments.</p>
+                        <p class="mt-1 text-[10px] text-slate-500">Built-in responsive SVG charts · hover or tap chart marks for details · refreshes when Analytics opens or on demand.</p>
+                    </div>
+                    <button type="button" onclick="refreshAnalytics()" class="rounded-xl border border-brandAccent/30 bg-brandAccent/5 px-4 py-2.5 text-xs font-bold text-brandAccent hover:bg-brandAccent/10">
+                        ↻ Refresh data
+                    </button>
                 </div>
-                <div id="analytics-cards" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                <div id="analytics-error" class="hidden rounded-xl border border-red-400/30 bg-red-950/20 px-4 py-3 text-sm text-red-300" role="alert"></div>
+                <div id="analytics-kpis" class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6 sm:gap-4"></div>
+                <div class="grid gap-6 xl:grid-cols-2">
+                    <section class="card-glass min-w-0 p-5 sm:p-6">
+                        <div class="mb-5">
+                            <h2 class="display-font text-xl text-white uppercase">Complaint Status</h2>
+                            <p class="text-xs text-slate-400">Current distribution across all complaints</p>
+                        </div>
+                        <div id="analytics-status-chart"></div>
+                    </section>
+                    <section class="card-glass min-w-0 p-5 sm:p-6">
+                        <div class="mb-5">
+                            <h2 class="display-font text-xl text-white uppercase">Department Workload</h2>
+                            <p class="text-xs text-slate-400">Complaints grouped by assigned department</p>
+                        </div>
+                        <div id="analytics-department-chart"></div>
+                    </section>
+                </div>
+                <div class="grid gap-6 xl:grid-cols-3">
+                    <section class="card-glass min-w-0 p-5 xl:col-span-2 sm:p-6">
+                        <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <h2 class="display-font text-xl text-white uppercase">Complaint Trends</h2>
+                                <p class="text-xs text-slate-400">Complaints submitted versus resolved by date</p>
+                            </div>
+                            <div class="flex gap-1 rounded-xl border border-white/10 bg-brandBg p-1" role="group" aria-label="Trend date range">
+                                <button type="button" data-analytics-range="7" onclick="setAnalyticsRange(7)" class="analytics-range-btn rounded-lg px-3 py-1.5 text-xs font-bold">7D</button>
+                                <button type="button" data-analytics-range="30" onclick="setAnalyticsRange(30)" class="analytics-range-btn rounded-lg px-3 py-1.5 text-xs font-bold">30D</button>
+                                <button type="button" data-analytics-range="90" onclick="setAnalyticsRange(90)" class="analytics-range-btn rounded-lg px-3 py-1.5 text-xs font-bold">90D</button>
+                            </div>
+                        </div>
+                        <div id="analytics-trend-chart"></div>
+                    </section>
+                    <section class="card-glass min-w-0 p-5 sm:p-6">
+                        <div class="mb-5">
+                            <h2 class="display-font text-xl text-white uppercase">Priority Breakdown</h2>
+                            <p class="text-xs text-slate-400">High, medium, low and critical issues</p>
+                        </div>
+                        <div id="analytics-priority-chart"></div>
+                    </section>
+                </div>
+                <div class="grid gap-6 xl:grid-cols-2">
+                    <section class="card-glass min-w-0 p-5 sm:p-6">
+                        <div class="mb-4">
+                            <h2 class="display-font text-xl text-white uppercase">Department Performance</h2>
+                            <p class="text-xs text-slate-400">Total complaints, resolved cases and resolution rate</p>
+                        </div>
+                        <div id="analytics-department-table" class="overflow-x-auto"></div>
+                    </section>
+                    <section class="card-glass min-w-0 p-5 sm:p-6">
+                        <div class="mb-4">
+                            <h2 class="display-font text-xl text-white uppercase">Recent Activity</h2>
+                            <p class="text-xs text-slate-400">Latest updates from the complaint lifecycle</p>
+                        </div>
+                        <div id="analytics-activity" class="max-h-80 overflow-y-auto"></div>
+                    </section>
+                </div>
+                <section class="card-glass p-5 sm:p-6">
+                    <div class="mb-4">
+                        <h2 class="display-font text-xl text-white uppercase">Resolution Insights</h2>
+                        <p class="text-xs text-slate-400">Highlights calculated from the current complaint records</p>
+                    </div>
+                    <div id="analytics-insights" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"></div>
+                </section>
             </section>
         </main>
     </div>
@@ -857,6 +948,10 @@
         // State
         let currentUser = null;
         let complaintsList = [];
+        let complaintsLoadStatus = 'loading';
+        let complaintsLoadError = null;
+        let analyticsRefreshPromise = null;
+        let analyticsRangeDays = 30;
         let staffList = [];
         let selectedComplaintForAction = null;
         let currentSelectedRating = 5;
@@ -1378,14 +1473,23 @@
         }
 
         async function loadComplaints() {
+            complaintsLoadStatus = 'loading';
+            complaintsLoadError = null;
+            renderAnalytics();
             try {
                 const res = await fetch('/api/complaints');
-                if (res.ok) {
-                    complaintsList = await res.json();
-                    renderAllViews();
-                }
+                if (!res.ok) throw new Error(`Complaint data request failed (${res.status}).`);
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('The complaint service returned an invalid response.');
+                complaintsList = data;
+                complaintsLoadError = null;
+                complaintsLoadStatus = data.length ? 'ready' : 'empty';
+                renderAllViews();
             } catch (err) {
+                complaintsLoadError = err.message || 'Unable to load complaint data.';
+                complaintsLoadStatus = 'error';
                 console.error('Error fetching complaints:', err);
+                renderAllViews();
             }
         }
 
@@ -1405,12 +1509,439 @@
             renderStudentView();
             renderAdminDashboard();
             renderStaffConsole();
+            renderAnalytics();
         }
 
         // --- STUDENT PORTAL LOGIC ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            if (tabId === 'analytics') {
+                renderAnalytics();
+                refreshAnalytics();
+            }
+        }
+
+        function escapeAnalyticsText(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[character]);
+        }
+
+        function analyticsDate(value) {
+            if (!value) return null;
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function analyticsDurationDays(complaint) {
+            const createdAt = analyticsDate(complaint.createdAt);
+            const closedAt = analyticsDate(complaint.closedAt || complaint.resolvedAt);
+            if (!createdAt || !closedAt || closedAt < createdAt) return null;
+            return (closedAt - createdAt) / 86400000;
+        }
+
+        function analyticsAverage(values) {
+            return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+        }
+
+        function analyticsFormatDuration(days) {
+            if (days === null || !Number.isFinite(days)) return '—';
+            if (days < 1) return `${Math.max(1, Math.round(days * 24))} hr`;
+            return `${days < 10 ? days.toFixed(1) : Math.round(days)} days`;
+        }
+
+        function analyticsStatusGroup(status) {
+            const normalized = String(status || '').toLowerCase();
+            if (normalized === 'closed' || normalized === 'resolved') return 'Resolved';
+            if (normalized === 'pending admin verification' || normalized === 'submitted' || normalized === 'pending' || normalized === 'rejected') return 'Pending';
+            return 'In Progress';
+        }
+
+        function analyticsEmpty(message) {
+            return `<div class="py-8 text-center text-sm text-slate-500">${escapeAnalyticsText(message)}</div>`;
+        }
+
+        const ANALYTICS_DEPARTMENTS = [
+            'Hostel Maintenance', 'Mess Management', 'Electrical', 'Wi-Fi',
+            'Water Supply', 'Transport', 'Cleaning', 'Security'
+        ];
+
+        function analyticsDepartment(complaint) {
+            const name = String(complaint.department || complaint.category || 'Unassigned').trim() || 'Unassigned';
+            const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return ANALYTICS_DEPARTMENTS.find(department =>
+                department.toLowerCase().replace(/[^a-z0-9]/g, '') === key
+            ) || name;
+        }
+
+        function analyticsDepartmentGroups(complaints) {
+            const groups = new Map(ANALYTICS_DEPARTMENTS.map(department => [department, []]));
+            complaints.forEach(complaint => {
+                const department = analyticsDepartment(complaint);
+                if (!groups.has(department)) groups.set(department, []);
+                groups.get(department).push(complaint);
+            });
+            return groups;
+        }
+
+        function analyticsRenderKpis(complaints) {
+            const total = complaints.length;
+            const resolved = complaints.filter(c => analyticsStatusGroup(c.status) === 'Resolved').length;
+            const pending = complaints.filter(c => analyticsStatusGroup(c.status) === 'Pending').length;
+            const inProgress = total - resolved - pending;
+            const durations = complaints.filter(c => analyticsStatusGroup(c.status) === 'Resolved')
+                .map(analyticsDurationDays).filter(value => value !== null);
+            const average = analyticsAverage(durations);
+            const resolutionRate = total ? Math.round((resolved / total) * 100) : 0;
+            const cards = [
+                { label: 'Total Complaints', value: total, icon: '📋', tone: 'text-white', note: 'All recorded issues' },
+                { label: 'Pending', value: pending, icon: '⏳', tone: 'text-amber-300', note: 'Not yet resolved' },
+                { label: 'In Progress', value: inProgress, icon: '⚙️', tone: 'text-cyan-300', note: 'Active workflow' },
+                { label: 'Resolved', value: resolved, icon: '✓', tone: 'text-brandAccent', note: 'Closed successfully' },
+                { label: 'Resolution Rate', value: `${resolutionRate}%`, icon: '↗', tone: 'text-brandAccent2', note: 'Resolved / total' },
+                { label: 'Avg. Resolution', value: analyticsFormatDuration(average), icon: '◷', tone: 'text-purple-300', note: `${durations.length} closed with dates` }
+            ];
+            document.getElementById('analytics-kpis').innerHTML = cards.map(card => `
+                <article class="card-glass min-w-0 border border-white/5 p-4 sm:p-5">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 sm:text-xs">${card.label}</span>
+                        <span class="${card.tone} text-lg" aria-hidden="true">${card.icon}</span>
+                    </div>
+                    <div class="mt-3 display-font text-2xl ${card.tone} sm:text-3xl">${card.value}</div>
+                    <p class="mt-1 text-[10px] text-slate-500 sm:text-xs">${card.note}</p>
+                </article>
+            `).join('');
+        }
+
+        function analyticsRenderStatusChart(complaints) {
+            const container = document.getElementById('analytics-status-chart');
+            const items = [
+                { label: 'Pending', count: complaints.filter(c => analyticsStatusGroup(c.status) === 'Pending').length, color: '#ffc400' },
+                { label: 'In Progress', count: complaints.filter(c => analyticsStatusGroup(c.status) === 'In Progress').length, color: '#00b0ff' },
+                { label: 'Resolved', count: complaints.filter(c => analyticsStatusGroup(c.status) === 'Resolved').length, color: '#00e676' }
+            ];
+            const total = complaints.length;
+            if (!total) {
+                container.innerHTML = analyticsEmpty('No complaint records to chart yet.');
+                return;
+            }
+
+            let startAngle = -Math.PI / 2;
+            const radius = 72;
+            const center = 100;
+            const paths = items.filter(item => item.count > 0).map(item => {
+                if (item.count === total) {
+                    return `<circle class="chart-mark" cx="${center}" cy="${center}" r="${radius}" fill="${item.color}"><title>${item.label}: ${item.count} (100%)</title></circle>`;
+                }
+                const sweep = item.count / total * Math.PI * 2;
+                const endAngle = startAngle + sweep;
+                const x1 = center + radius * Math.cos(startAngle);
+                const y1 = center + radius * Math.sin(startAngle);
+                const x2 = center + radius * Math.cos(endAngle);
+                const y2 = center + radius * Math.sin(endAngle);
+                const largeArc = sweep > Math.PI ? 1 : 0;
+                const path = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                startAngle = endAngle;
+                return `<path class="chart-mark" d="${path}" fill="${item.color}" stroke="#11161f" stroke-width="2"><title>${item.label}: ${item.count} (${Math.round(item.count / total * 100)}%)</title></path>`;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="flex flex-col items-center gap-5 sm:flex-row sm:justify-center">
+                    <svg class="analytics-chart-svg max-w-[230px]" viewBox="0 0 200 200" role="img" aria-label="Complaint status distribution">
+                        ${paths}
+                        <circle cx="100" cy="100" r="43" fill="#11161f"></circle>
+                        <text x="100" y="96" text-anchor="middle" fill="#94a3b8" font-size="10">TOTAL</text>
+                        <text x="100" y="119" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="800">${total}</text>
+                    </svg>
+                    <div class="grid w-full grid-cols-1 gap-3 sm:max-w-[190px]">
+                        ${items.map(item => `<div class="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-brandBg/60 px-3 py-2.5"><span class="flex items-center gap-2 text-xs text-slate-300"><i class="h-2.5 w-2.5 rounded-full" style="background:${item.color}"></i>${item.label}</span><strong class="text-right text-sm text-white">${Math.round(item.count / total * 100)}% <span class="text-[10px] font-normal text-slate-500">(${item.count})</span></strong></div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        function analyticsRenderDepartmentChart(complaints) {
+            const container = document.getElementById('analytics-department-chart');
+            if (!complaints.length) {
+                container.innerHTML = analyticsEmpty('No department data to chart yet.');
+                return;
+            }
+            const items = [...analyticsDepartmentGroups(complaints).entries()];
+            const width = 560;
+            const rowHeight = 34;
+            const labelWidth = 126;
+            const chartWidth = width - labelWidth - 46;
+            const height = items.length * rowHeight + 14;
+            const max = Math.max(1, ...items.map(([, entries]) => entries.length));
+            const bars = items.map(([department, count], index) => {
+                const y = index * rowHeight + 7;
+                const complaintCount = count.length;
+                const barWidth = complaintCount / max * chartWidth;
+                return `<g class="chart-mark"><text x="${labelWidth - 10}" y="${y + 15}" text-anchor="end" fill="#cbd5e1" font-size="10">${escapeAnalyticsText(department.length > 18 ? `${department.slice(0, 17)}…` : department)}</text><rect x="${labelWidth}" y="${y}" width="${chartWidth}" height="19" rx="7" fill="#1e293b"></rect><rect x="${labelWidth}" y="${y}" width="${barWidth}" height="19" rx="7" fill="${complaintCount ? 'url(#deptBarGradient)' : '#334155'}"><title>${escapeAnalyticsText(department)}: ${complaintCount} complaints</title></rect><text x="${labelWidth + barWidth + 8}" y="${y + 14}" fill="#f8fafc" font-size="10" font-weight="700">${complaintCount}</text></g>`;
+            }).join('');
+            container.innerHTML = `<svg class="analytics-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Complaints by department across eight departments"><defs><linearGradient id="deptBarGradient" x1="0" x2="1"><stop offset="0%" stop-color="#00e676"></stop><stop offset="100%" stop-color="#00b0ff"></stop></linearGradient></defs>${bars}</svg><p class="mt-2 text-[10px] text-slate-500">All eight campus departments · hover or tap a bar for its exact count.</p>`;
+        }
+
+        function setAnalyticsRange(days) {
+            analyticsRangeDays = [7, 30, 90].includes(Number(days)) ? Number(days) : 30;
+            document.querySelectorAll('.analytics-range-btn').forEach(button => {
+                const active = Number(button.dataset.analyticsRange) === analyticsRangeDays;
+                button.classList.toggle('bg-brandAccent', active);
+                button.classList.toggle('text-black', active);
+                button.classList.toggle('text-slate-400', !active);
+            });
+            if (complaintsLoadStatus === 'ready' || complaintsLoadStatus === 'empty') {
+                analyticsRenderTrendChart(complaintsList);
+            }
+        }
+
+        function analyticsRenderTrendChart(complaints) {
+            const container = document.getElementById('analytics-trend-chart');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const firstDay = new Date(today);
+            firstDay.setDate(today.getDate() - analyticsRangeDays + 1);
+            const buckets = Array.from({ length: analyticsRangeDays }, (_, index) => {
+                const date = new Date(firstDay);
+                date.setDate(firstDay.getDate() + index);
+                return { date, submitted: 0, resolved: 0 };
+            });
+            complaints.forEach(complaint => {
+                const created = analyticsDate(complaint.createdAt);
+                if (created) {
+                    created.setHours(0, 0, 0, 0);
+                    const submittedOffset = Math.round((created - firstDay) / 86400000);
+                    if (submittedOffset >= 0 && submittedOffset < buckets.length) buckets[submittedOffset].submitted++;
+                }
+                const resolved = analyticsDate(complaint.closedAt || complaint.resolvedAt);
+                if (resolved) {
+                    resolved.setHours(0, 0, 0, 0);
+                    const resolvedOffset = Math.round((resolved - firstDay) / 86400000);
+                    if (resolvedOffset >= 0 && resolvedOffset < buckets.length) buckets[resolvedOffset].resolved++;
+                }
+            });
+            if (!complaints.length) {
+                container.innerHTML = analyticsEmpty('No complaint records to show for this trend yet.');
+                return;
+            }
+            const width = 760;
+            const height = 250;
+            const left = 38;
+            const right = 14;
+            const top = 18;
+            const bottom = 34;
+            const graphWidth = width - left - right;
+            const graphHeight = height - top - bottom;
+            const max = Math.max(1, ...buckets.flatMap(bucket => [bucket.submitted, bucket.resolved]));
+            const points = buckets.map((bucket, index) => ({
+                ...bucket,
+                x: left + (buckets.length === 1 ? graphWidth / 2 : index / (buckets.length - 1) * graphWidth),
+                submittedY: top + graphHeight - bucket.submitted / max * graphHeight,
+                resolvedY: top + graphHeight - bucket.resolved / max * graphHeight
+            }));
+            const submittedPath = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.submittedY}`).join(' ');
+            const resolvedPath = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.resolvedY}`).join(' ');
+            const grid = Array.from({ length: 4 }, (_, index) => {
+                const y = top + index * graphHeight / 3;
+                const value = Math.round(max * (1 - index / 3));
+                return `<line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" stroke="rgba(148,163,184,.14)" stroke-dasharray="4 5"></line><text x="${left - 9}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="9">${value}</text>`;
+            }).join('');
+            const tickStep = Math.max(1, Math.ceil(buckets.length / 6));
+            const labels = points.filter((_, index) => index % tickStep === 0 || index === points.length - 1)
+                .map(point => `<text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#64748b" font-size="9">${point.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</text>`).join('');
+            const markers = points.filter((_, index) => index % tickStep === 0 || index === points.length - 1 || points[index].submitted > 0 || points[index].resolved > 0)
+                .map(point => `<g><circle class="chart-mark" cx="${point.x}" cy="${point.submittedY}" r="4" fill="#00e676" stroke="#0a0e14" stroke-width="2"><title>${point.date.toLocaleDateString()}: ${point.submitted} submitted</title></circle><circle class="chart-mark" cx="${point.x}" cy="${point.resolvedY}" r="4" fill="#a78bfa" stroke="#0a0e14" stroke-width="2"><title>${point.date.toLocaleDateString()}: ${point.resolved} resolved</title></circle></g>`).join('');
+            const legend = `<div class="mb-2 flex flex-wrap gap-4 text-[10px] font-semibold text-slate-400"><span class="flex items-center gap-2"><i class="h-2 w-5 rounded bg-brandAccent"></i>Submitted</span><span class="flex items-center gap-2"><i class="h-2 w-5 rounded bg-purple-400"></i>Resolved</span></div>`;
+            container.innerHTML = `${legend}<svg class="analytics-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Complaints submitted and resolved over the last ${analyticsRangeDays} days">${grid}<path d="${submittedPath}" fill="none" stroke="#00e676" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path><path d="${resolvedPath}" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>${markers}${labels}</svg>`;
+        }
+
+        function analyticsRenderPriorityChart(complaints) {
+            const container = document.getElementById('analytics-priority-chart');
+            if (!complaints.length) {
+                container.innerHTML = analyticsEmpty('No complaint records to show yet.');
+                return;
+            }
+            const priorities = [
+                { label: 'Critical', key: 'CRITICAL', color: '#f87171' },
+                { label: 'High', key: 'HIGH', color: '#fb923c' },
+                { label: 'Medium', key: 'MEDIUM', color: '#fbbf24' },
+                { label: 'Low', key: 'LOW', color: '#00e676' }
+            ];
+            const counts = priorities.map(item => ({
+                ...item,
+                count: complaints.filter(c => String(c.priority || 'MEDIUM').toUpperCase() === item.key).length
+            }));
+            const max = Math.max(1, ...counts.map(item => item.count));
+            const width = 420;
+            const labelWidth = 68;
+            const barWidth = 278;
+            const rowHeight = 44;
+            const bars = counts.map((item, index) => {
+                const y = index * rowHeight + 8;
+                const filled = item.count / max * barWidth;
+                return `<g class="chart-mark"><text x="${labelWidth - 10}" y="${y + 16}" text-anchor="end" fill="#cbd5e1" font-size="11">${item.label}</text><rect x="${labelWidth}" y="${y}" width="${barWidth}" height="20" rx="7" fill="#1e293b"></rect><rect x="${labelWidth}" y="${y}" width="${filled}" height="20" rx="7" fill="${item.color}"><title>${item.label} priority: ${item.count} complaints</title></rect><text x="${labelWidth + barWidth + 10}" y="${y + 15}" fill="#f8fafc" font-size="11" font-weight="700">${item.count}</text></g>`;
+            }).join('');
+            container.innerHTML = `<svg class="analytics-chart-svg" viewBox="0 0 ${width} ${counts.length * rowHeight + 10}" role="img" aria-label="Complaint priority breakdown">${bars}</svg>`;
+        }
+
+        function analyticsRenderDepartmentTable(complaints) {
+            const container = document.getElementById('analytics-department-table');
+            const rows = [...analyticsDepartmentGroups(complaints).entries()].map(([name, items]) => {
+                const resolved = items.filter(c => analyticsStatusGroup(c.status) === 'Resolved').length;
+                const rate = items.length ? `${Math.round(resolved / items.length * 100)}%` : '—';
+                return `<tr><td class="font-semibold text-white">${escapeAnalyticsText(name)}</td><td>${items.length}</td><td class="text-brandAccent">${resolved}</td><td>${rate}</td></tr>`;
+            }).join('');
+            const empty = complaints.length ? '' : '<p class="mb-2 text-xs text-slate-500">No complaints recorded yet; all departments currently have zero.</p>';
+            container.innerHTML = `${empty}<table class="analytics-table w-full min-w-[420px]"><thead><tr><th>Department</th><th>Total</th><th>Resolved</th><th>Resolution Rate</th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function analyticsRenderActivity(complaints) {
+            const container = document.getElementById('analytics-activity');
+            const events = [];
+            const labels = {
+                submitted: ['Complaint submitted', 'text-brandAccent2'],
+                assigned: ['Assigned to staff', 'text-cyan-300'],
+                work_started: ['Work started', 'text-amber-300'],
+                proof_submitted: ['Repair proof submitted', 'text-purple-300'],
+                proof_approved: ['Proof approved', 'text-brandAccent'],
+                rework_requested: ['Rework requested', 'text-orange-300'],
+                verified: ['Complaint verified', 'text-blue-300'],
+                rejected: ['Complaint rejected', 'text-red-300'],
+                resolved: ['Complaint resolved', 'text-brandAccent'],
+                reopened: ['Complaint reopened', 'text-red-300']
+            };
+            const milestones = [
+                ['createdAt', 'Complaint submitted', 'text-brandAccent2'],
+                ['verifiedAt', 'Complaint verified', 'text-blue-300'],
+                ['assignedAt', 'Assigned to staff', 'text-cyan-300'],
+                ['workStartedAt', 'Work started', 'text-amber-300'],
+                ['proofAt', 'Repair proof submitted', 'text-purple-300'],
+                ['approvedByAdminAt', 'Proof approved', 'text-brandAccent'],
+                ['closedAt', 'Complaint resolved', 'text-brandAccent'],
+                ['reopenedAt', 'Complaint reopened', 'text-red-300']
+            ];
+            complaints.forEach(complaint => {
+                if (Array.isArray(complaint.activity) && complaint.activity.length) {
+                    complaint.activity.forEach(entry => {
+                        const date = analyticsDate(entry.at);
+                        const [label, tone] = labels[entry.event] || [entry.status || 'Status updated', 'text-brandAccent2'];
+                        if (date) events.push({ complaint, date, label, tone, status: entry.status });
+                    });
+                    return;
+                }
+                milestones.forEach(([field, label, tone]) => {
+                    const date = analyticsDate(complaint[field]);
+                    if (date) events.push({ complaint, date, label, tone });
+                });
+            });
+            events.sort((a, b) => b.date - a.date);
+            if (!events.length) {
+                container.innerHTML = analyticsEmpty('No dated activity is available yet.');
+                return;
+            }
+            container.innerHTML = events.slice(0, 10).map(event => `
+                <article class="analytics-feed-item flex gap-3 py-3">
+                    <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brandAccent"></span>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                            <span class="text-xs font-bold ${event.tone}">CMP${escapeAnalyticsText(event.complaint.id)} · ${event.label}</span>
+                            <time class="text-[10px] text-slate-500">${event.date.toLocaleString()}</time>
+                        </div>
+                        <p class="mt-1 truncate text-xs text-slate-400">${escapeAnalyticsText(event.complaint.description || 'Campus complaint')} · ${escapeAnalyticsText(analyticsDepartment(event.complaint))}${event.status ? ` · ${escapeAnalyticsText(event.status)}` : ''}${event.complaint.staff && event.label === 'Assigned to staff' ? ` · ${escapeAnalyticsText(event.complaint.staff)}` : ''}</p>
+                    </div>
+                </article>`).join('');
+        }
+
+        function analyticsRenderInsights(complaints) {
+            const container = document.getElementById('analytics-insights');
+            const countsByDepartment = [...analyticsDepartmentGroups(complaints).entries()]
+                .map(([name, items]) => [name, items.length]).sort((a, b) => b[1] - a[1]);
+            const busiest = countsByDepartment[0];
+            const reopened = complaints.filter(c => String(c.status || '').toLowerCase() === 'reopened').length;
+            const urgent = complaints.filter(c => ['HIGH', 'CRITICAL'].includes(String(c.priority || '').toUpperCase())).length;
+            const closed = complaints.filter(c => analyticsStatusGroup(c.status) === 'Resolved');
+            const average = analyticsAverage(closed.map(analyticsDurationDays).filter(value => value !== null));
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const currentStart = new Date(now);
+            currentStart.setDate(currentStart.getDate() - 29);
+            const previousStart = new Date(currentStart);
+            previousStart.setDate(previousStart.getDate() - 30);
+            const rateForWindow = (start, end) => {
+                const periodComplaints = complaints.filter(complaint => {
+                    const created = analyticsDate(complaint.createdAt);
+                    return created && created >= start && created < end;
+                });
+                if (!periodComplaints.length) return null;
+                const resolvedCount = periodComplaints.filter(c => analyticsStatusGroup(c.status) === 'Resolved').length;
+                return resolvedCount / periodComplaints.length * 100;
+            };
+            const currentRate = rateForWindow(currentStart, new Date(now.getTime() + 86400000));
+            const previousRate = rateForWindow(previousStart, currentStart);
+            const rateChange = currentRate !== null && previousRate !== null ? currentRate - previousRate : null;
+            const insights = complaints.length ? [
+                { label: 'Resolution-rate change', value: rateChange === null ? '—' : `${rateChange > 0 ? '+' : ''}${Math.round(rateChange)} pp`, detail: 'Last 30 days vs previous 30 days' },
+                { label: 'Average resolution time', value: analyticsFormatDuration(average), detail: `${closed.length} resolved · based on recorded dates` },
+                { label: 'Most complaints', value: busiest && busiest[1] ? `${busiest[0]} · ${busiest[1]}` : 'No complaints yet', detail: 'Busiest department by total volume' },
+                { label: 'High-priority issues', value: `${urgent} (${Math.round(urgent / complaints.length * 100)}%)`, detail: 'High and critical complaints' }
+            ] : [];
+            container.innerHTML = insights.length ? insights.map(item => `<article class="rounded-xl border border-white/5 bg-brandBg/60 p-4"><p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">${escapeAnalyticsText(item.label)}</p><p class="mt-2 text-sm font-bold text-white">${escapeAnalyticsText(item.value)}</p><p class="mt-1 text-[10px] text-slate-500">${escapeAnalyticsText(item.detail)}</p></article>`).join('') : analyticsEmpty('Insights will appear once complaint records are available.');
+        }
+
+        function renderAnalytics() {
+            const error = document.getElementById('analytics-error');
+            if (!error) return;
+            error.classList.toggle('hidden', complaintsLoadStatus !== 'error');
+            error.innerText = complaintsLoadStatus === 'error'
+                ? `Analytics could not load live complaint data: ${complaintsLoadError || 'Unknown error.'} Use Refresh data to retry.`
+                : '';
+            if (complaintsLoadStatus === 'loading') {
+                const loading = `<div class="animate-pulse py-8 text-center text-sm text-slate-400" role="status">Loading live campus complaint data…</div>`;
+                document.getElementById('analytics-kpis').innerHTML = `<div class="card-glass col-span-full p-4">${loading}</div>`;
+                ['analytics-status-chart', 'analytics-department-chart', 'analytics-trend-chart',
+                    'analytics-priority-chart', 'analytics-department-table', 'analytics-activity',
+                    'analytics-insights'].forEach(id => {
+                    document.getElementById(id).innerHTML = loading;
+                });
+                return;
+            }
+            if (complaintsLoadStatus === 'error') {
+                document.getElementById('analytics-kpis').innerHTML = analyticsEmpty('Live data unavailable.');
+                ['analytics-status-chart', 'analytics-department-chart', 'analytics-trend-chart',
+                    'analytics-priority-chart', 'analytics-department-table', 'analytics-activity',
+                    'analytics-insights'].forEach(id => {
+                    document.getElementById(id).innerHTML = analyticsEmpty('Retry after the complaint service is available.');
+                });
+                return;
+            }
+            analyticsRenderKpis(complaintsList);
+            analyticsRenderStatusChart(complaintsList);
+            analyticsRenderDepartmentChart(complaintsList);
+            analyticsRenderTrendChart(complaintsList);
+            analyticsRenderPriorityChart(complaintsList);
+            analyticsRenderDepartmentTable(complaintsList);
+            analyticsRenderActivity(complaintsList);
+            analyticsRenderInsights(complaintsList);
+            setAnalyticsRange(analyticsRangeDays);
+        }
+
+        async function refreshAnalytics() {
+            if (analyticsRefreshPromise) return analyticsRefreshPromise;
+            const button = document.querySelector('#view-analytics button[onclick="refreshAnalytics()"]');
+            if (button) {
+                button.disabled = true;
+                button.innerText = '↻ Refreshing...';
+            }
+            analyticsRefreshPromise = loadComplaints();
+            try {
+                await analyticsRefreshPromise;
+            } finally {
+                analyticsRefreshPromise = null;
+                if (button) {
+                    button.disabled = false;
+                    button.innerText = '↻ Refresh data';
+                }
+            }
         }
 
         function handleCategoryChange() {

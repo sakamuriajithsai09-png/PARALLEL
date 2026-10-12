@@ -4,7 +4,7 @@ The app keeps its Student ID, Admin ID, and Staff ID login fields. Each existing
 
 ## Configure
 
-1. Create a Supabase project and copy its project URL, anon key, and service role key. Students sign up and log in with a real email address; disable email confirmation for immediate login, or leave it enabled and have students confirm their email. If signup emails hit the provider limit, wait for it to reset or configure custom SMTP.
+1. Create a Supabase project and copy its project URL, anon key, and service role key. Students sign up and log in with a real email address. The app also persists signup credentials locally so students can log in without waiting for Supabase email confirmation. If signup emails hit the provider limit, wait for it to reset or configure custom SMTP.
 2. The local `.env` file contains `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Set `SUPABASE_SERVICE_ROLE_KEY` only for the one-time migration command; never expose it to the browser or add it to Vercel's runtime environment.
 3. Import the accounts from `db.json`:
 
